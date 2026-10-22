@@ -28,7 +28,18 @@
     ctx.strokeStyle=col.muted; ctx.lineWidth=1.5;
     ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(w,oy);ctx.moveTo(ox,0);ctx.lineTo(ox,h);ctx.stroke();
   }
-  function txt(ctx,s,x,y,col,size=13,align="left"){ ctx.fillStyle=col; ctx.font=`${size}px system-ui,sans-serif`; ctx.textAlign=align; ctx.fillText(s,x,y); }
+  // 캔버스 텍스트: a^{2}, x_{1}, 2^x, log_a 마크업을 위·아래 첨자로 그린다
+  function txt(ctx,s,x,y,col,size=13,align="left"){ s=String(s); ctx.fillStyle=col; ctx.textAlign="left"; const F=sz=>`${sz}px system-ui,sans-serif`;
+    if(!/[\^_]/.test(s)){ ctx.font=F(size); ctx.textAlign=align; ctx.fillText(s,x,y); return; }
+    const parts=[]; let last=0; const re=/(\^|_)(\{[^}]*\}|[^\s{}^_])/g; let m; while((m=re.exec(s))){ if(m.index>last) parts.push({t:s.slice(last,m.index),k:0}); parts.push({t:m[2].replace(/^\{|\}$/g,""),k:m[1]==="^"?1:-1}); last=re.lastIndex; } if(last<s.length) parts.push({t:s.slice(last),k:0});
+    const small=Math.round(size*0.72); let w=0; parts.forEach(p=>{ ctx.font=F(p.k?small:size); w+=ctx.measureText(p.t).width; });
+    let cx=align==="center"?x-w/2:align==="right"||align==="end"?x-w:x;
+    parts.forEach(p=>{ ctx.font=F(p.k?small:size); ctx.fillText(p.t,cx,y+(p.k===1?-size*0.4:p.k===-1?size*0.25:0)); cx+=ctx.measureText(p.t).width; }); }
+  // 계수 표기: 1x → x, −1x → −x, 0.5x 그대로
+  const cf=(a,v="x")=>a===1?v:a===-1?"−"+v:a===0?"0":`${a}${v}`;
+  // HTML 쪽(설명·판독값): 같은 마크업을 <sup>/<sub> 로
+  const fmt = t=>String(t).replace(/(\^|_)(\{[^}]*\}|[^\s{}^_<&])/g,(m,k,v)=>{ v=v.replace(/^\{|\}$/g,""); return k==="^"?`<sup>${v}</sup>`:`<sub>${v}</sub>`; });
+  window.MF = fmt;
 
   // ---------- 1. 이차함수 ----------
   W.quadratic = { title:"이차함수 y = ax²+bx+c 밀어 보기", grade:"g31", node:"quadratic-func",
@@ -362,7 +373,7 @@
       function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const ox=w/2,oy=h/2,s=32; board(ctx,w,h,ox,oy,s,col);
         curve(ctx,w,ox,oy,s,x=>a*x,col.acc); curve(ctx,w,ox,oy,s,x=>a/x,col.acc2,3,null,[-20,-0.05]); curve(ctx,w,ox,oy,s,x=>a/x,col.acc2,3,null,[0.05,20]);
         dot(ctx,ox+x0*s,oy-a*x0*s,col.acc); dot(ctx,ox+x0*s,oy-(a/x0)*s,col.acc2);
-        txt(ctx,`y = ${a}x`,12,22,col.acc,15); txt(ctx,`y = ${a}/x`,12,44,col.acc2,15);
+        txt(ctx,`y = ${cf(a)}`,12,22,col.acc,15); txt(ctx,`y = ${a}/x`,12,44,col.acc2,15);
         out.innerHTML=`x = <b>${x0}</b> 일 때 정비례 y = ${a}·${x0} = <b>${+(a*x0).toFixed(2)}</b>, 반비례 y = ${a}/${x0} = <b>${+(a/x0).toFixed(2)}</b><br>정비례: x 가 2배면 y 도 2배 · 반비례: x 가 2배면 y 는 절반 (xy = ${a} 로 일정)`; }
       slider(ctl,"a",-4,4,0.5,a,v=>{a=v===0?0.5:v;draw();}); slider(ctl,"x 의 값",0.5,5,0.5,x0,v=>{x0=v;draw();}); draw(); }};
 
@@ -377,7 +388,7 @@
         txt(ctx,"1",ox+1.5*s,oy-(a+b)*s+(a>=0?14:-6),col.acc2,11,"center"); txt(ctx,String(+a.toFixed(2)),ox+2*s+6,oy-(1.5*a+b)*s+4,col.acc2,11);
         dot(ctx,ox,oy-b*s,col.ok); txt(ctx,`(0, ${b})`,ox+8,oy-b*s-8,col.ok,11); if(a!==0){ dot(ctx,ox-b/a*s,oy,col.ok); txt(ctx,`(${+(-b/a).toFixed(2)}, 0)`,ox-b/a*s+8,oy+18,col.ok,11); }
         let cross="평행 — 만나지 않음 (연립방정식 해 없음)"; if(a!==a2){ const x=(b2-b)/(a-a2), y=a*x+b; dot(ctx,ox+x*s,oy-y*s,col.bad,7); cross=`교점 (<b>${+x.toFixed(2)}</b>, <b>${+y.toFixed(2)}</b>) = 연립방정식의 해`; } else if(b===b2) cross="일치 — 해가 무수히 많음";
-        txt(ctx,`y = ${a}x ${b>=0?"+":"−"} ${Math.abs(b)}`,12,22,col.acc,15); txt(ctx,`y = ${a2}x ${b2>=0?"+":"−"} ${Math.abs(b2)} (비교용)`,12,44,col.muted,13);
+        txt(ctx,`y = ${cf(a)} ${b>=0?"+":"−"} ${Math.abs(b)}`,12,22,col.acc,15); txt(ctx,`y = ${cf(a2)} ${b2>=0?"+":"−"} ${Math.abs(b2)} (비교용)`,12,44,col.muted,13);
         out.innerHTML=`기울기 a = <b>${a}</b> (${a>0?"증가":a<0?"감소":"상수"}) · y절편 <b>${b}</b> · x절편 <b>${a?+(-b/a).toFixed(2):"없음"}</b><br>${cross}`; }
       slider(ctl,"a (기울기)",-3,3,0.25,a,v=>{a=v;draw();}); slider(ctl,"b (y절편)",-5,5,0.5,b,v=>{b=v;draw();}); slider(ctl,"비교 직선의 기울기",-3,3,0.25,a2,v=>{a2=v;draw();}); draw(); }};
 
@@ -392,19 +403,19 @@
         ctx.strokeStyle=col.ok; ctx.lineWidth=2; ctx.setLineDash([5,4]); ctx.beginPath(); ctx.moveTo(ox+cx*s,oy-cy*s); ctx.lineTo(ox+hx*s,oy-hy*s); ctx.stroke(); ctx.setLineDash([]);
         const A=1+m*m, B=2*(m*(k-cy)-cx), Cc=cx*cx+(k-cy)*(k-cy)-r*r, D=B*B-4*A*Cc; let rel;
         if(D>1e-9){ const x1=(-B-Math.sqrt(D))/(2*A), x2=(-B+Math.sqrt(D))/(2*A); [x1,x2].forEach(x=>dot(ctx,ox+x*s,oy-(m*x+k)*s,col.bad)); rel="두 점에서 만남 (d < r)"; } else if(Math.abs(D)<=1e-9||Math.abs(d-r)<0.02){ dot(ctx,ox+hx*s,oy-hy*s,col.bad); rel="접함 (d = r)"; } else rel="만나지 않음 (d > r)";
-        txt(ctx,`(x−${cx})² + y² = ${r}²`,12,22,col.acc,14); txt(ctx,`y = ${m}x ${k>=0?"+":"−"} ${Math.abs(k)}`,12,44,col.acc2,14);
+        txt(ctx,`(x−${cx})² + y² = ${r}²`,12,22,col.acc,14); txt(ctx,`y = ${cf(m)} ${k>=0?"+":"−"} ${Math.abs(k)}`,12,44,col.acc2,14);
         out.innerHTML=`중심 (${cx}, ${cy}) 에서 직선까지 거리 d = |${m}·${cx} − 0 + ${k}| / √(${m}²+1) = <b>${d.toFixed(2)}</b>, r = <b>${r}</b> → <b>${rel}</b><br>판별식으로 풀면 D = ${D.toFixed(2)} (부호가 같은 판정)`; }
       slider(ctl,"직선의 기울기 m",-3,3,0.25,m,v=>{m=v;draw();}); slider(ctl,"직선의 y절편 k",-6,6,0.25,k,v=>{k=v;draw();}); slider(ctl,"반지름 r",1,5,0.5,r,v=>{r=v;draw();}); draw(); }};
 
   // ---------- 19. 지수함수·로그함수 (고2) ----------
-  W.explog = { title:"y = aˣ 와 y = logₐx: 밑 a 를 밀면 둘이 함께 뒤집힌다", grade:"h2a", node:"h-explog",
+  W.explog = { title:"y = a^x 와 y = log_a x: 밑 a 를 밀면 둘이 함께 뒤집힌다", grade:"h2a", node:"h-explog",
     desc:"밑 a 가 1 보다 클 때와 작을 때 증가·감소가 바뀌고, 두 그래프는 항상 y = x 에 대칭입니다. (0,1) 과 (1,0) 은 a 와 상관없이 지납니다.",
     render(root){ const {ctx,w,h}=makeCanvas(root); const ctl=el("div",{class:"ctrl"}); const out=el("div",{class:"readout"}); root.append(ctl,out); let a=2, x0=3;
       function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const ox=w/2,oy=h/2,s=34; board(ctx,w,h,ox,oy,s,col);
         curve(ctx,w,ox,oy,s,x=>x,col.line,1.5,[4,4]); curve(ctx,w,ox,oy,s,x=>Math.pow(a,x),col.acc); curve(ctx,w,ox,oy,s,x=>Math.log(x)/Math.log(a),col.acc2,3,null,[0.001,30]);
         dot(ctx,ox,oy-s,col.acc); dot(ctx,ox+s,oy,col.acc2); const y0=Math.pow(a,x0); if(Math.abs(y0)<30){ dot(ctx,ox+x0*s,oy-y0*s,col.ok); dot(ctx,ox+y0*s,oy-x0*s,col.ok); }
-        txt(ctx,`y = ${a}ˣ`,12,22,col.acc,15); txt(ctx,`y = log_${a} x`,12,44,col.acc2,15);
-        out.innerHTML=`a = <b>${a}</b>: ${a>1?"둘 다 증가":"둘 다 감소"} · 점근선: 지수함수 y=0, 로그함수 x=0<br>${a}^${x0} = <b>${+y0.toFixed(3)}</b> ⇔ log_${a}(${+y0.toFixed(3)}) = <b>${x0}</b> — 같은 사실을 x, y 만 바꿔 읽은 것`; }
+        txt(ctx,`y = ${a}^{x}`,12,22,col.acc,15); txt(ctx,`y = log_{${a}} x`,12,44,col.acc2,15);
+        out.innerHTML=`a = <b>${a}</b>: ${a>1?"둘 다 증가":"둘 다 감소"} · 점근선: 지수함수 y=0, 로그함수 x=0<br>${a}<sup>${x0}</sup> = <b>${+y0.toFixed(3)}</b> ⇔ log<sub>${a}</sub>(${+y0.toFixed(3)}) = <b>${x0}</b> — 같은 사실을 x, y 만 바꿔 읽은 것`; }
       slider(ctl,"밑 a (1 제외)",0.25,4,0.25,a,v=>{a=v===1?1.25:v;draw();}); slider(ctl,"x 의 값",-3,3,0.5,x0,v=>{x0=v;draw();}); draw(); }};
 
   // ---------- 20. 할선 → 접선 (고2 미분) ----------

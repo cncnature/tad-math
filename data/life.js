@@ -117,7 +117,7 @@ window.DATA.life = [
  { cat:"스포츠·놀이", node:"quadratic-func", title:"농구공의 궤적은 포물선", fig:"parabola", figp:{label:"y = −x² + 4x",vertex:"최고점 (2, 4)"},
    body:"던진 공은 이차함수를 그립니다. 꼭짓점이 최고 높이, x 절편이 착지점.",
    calc:["y = −x² + 4x = −(x−2)² + 4 → 최고 높이 4 m (x = 2 m 지점)","y = 0 → x = 0, 4 → 4 m 앞에 떨어짐","림 높이 3.05 m 를 지나는 x: −x²+4x = 3.05 → x ≈ 1.03, 2.97 — 내려올 때(2.97 m) 들어가야 함"], tag:"농구" },
- { cat:"스포츠·놀이", node:"trig", title:"미끄럼틀 각도와 길이", fig:"rightTri", figp:{a:"수평 4 m",b:"높이 3 m",c:"미끄럼틀 5 m",ang:"θ",angLabel:"37°"},
+ { cat:"스포츠·놀이", node:"trig", title:"미끄럼틀 각도와 길이", fig:"rightTri", figp:{a:"수평 4 m",b:"높이 3 m",w:360,c:"미끄럼틀 5 m",ang:"θ",angLabel:"37°"},
    body:"높이 3 m, 수평 거리 4 m 미끄럼틀의 길이와 기울기. 3·4·5 삼각형이 놀이터에 있습니다.",
    calc:["길이 = √(3² + 4²) = 5 m","tanθ = 3/4 = 0.75 → θ ≈ 36.9°","안전 기준 30~40° 안. sinθ = 3/5 = 0.6 는 '길이 1 m 당 0.6 m 내려감'"], tag:"놀이터" },
  { cat:"스포츠·놀이", node:"pythagoras", title:"야구 다이아몬드의 대각선", fig:null,

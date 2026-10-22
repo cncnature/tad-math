@@ -27,6 +27,7 @@
 
   // ---------- 유틸 ----------
   const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const MF = t=>(window.MF||(x=>x))(esc(t));
   const md = s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
   // 긴 공식(세미콜론·쉼표로 나열된 식)은 줄을 나눠 표시 — 좁은 화면 대비
   const texCard = t=>{ t=String(t); let parts=null;
@@ -161,7 +162,7 @@
     ${l.story?`<h2 id="story">📖 공식이 태어나는 이야기</h2><p class="muted">외우기 전에 읽는 서너 문단. 어디서 왔고 왜 그 모양인지 알면 공식은 저절로 나옵니다.</p><div class="story">${l.story.map((st,i)=>`<div class="st"><div class="st-n">${i+1}</div><div><h4>${md(st.h)}</h4><p>${md(st.t)}</p></div></div>`).join("")}</div>`:""}
     ${l.pitfalls?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${l.points?`<h2 id="pt">🎯 출제 포인트</h2><ul class="pt">${l.points.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
-    ${widgets.length?`<h2>만져 보기</h2>${widgets.map(([k,w])=>`<div class="widget" id="w-${k}"><b>${w.title}</b><p class="muted">${w.desc}</p></div>`).join("")}`:""}
+    ${widgets.length?`<h2>만져 보기</h2>${widgets.map(([k,w])=>`<div class="widget" id="w-${k}"><b>${MF(w.title)}</b><p class="muted">${MF(w.desc)}</p></div>`).join("")}`:""}
     ${l.formulas.length?`<h2 id="f">이 단원의 공식</h2><div class="grid">${l.formulas.map(f=>byFormula(f)).filter(Boolean).map(f=>`<a class="card link" href="#/formulas/${f.id}"><h3>${f.title} ${f.core?'<span class="tag">외울 것</span>':'<span class="tag">되살릴 것</span>'}</h3><div class="formula">$${texCard(f.tex)}$</div></a>`).join("")}</div>`:""}
     <h2 id="ex">예제</h2><div class="card"><p><b>문제.</b> ${md(l.example.q)}</p><details class="sol"><summary>풀이 보기</summary><ol class="steps">${l.example.sol.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(l.example.ans)}</p></details></div>
     <h2 id="quiz">확인 퀴즈</h2>${quizHtml(l.quiz,"lesson:"+l.id)}
@@ -280,8 +281,8 @@
   // ---------- 매스랩 ----------
   function lab(id){
     const Wd=window.WIDGETS;
-    if(id&&Wd[id]){ const w=Wd[id]; render(`<div class="crumb"><a href="#/">홈</a> › <a href="#/lab">매스랩</a></div>${tag(w.grade)}<h1>${w.title}</h1><p class="lead">${w.desc}</p><div class="widget" id="lab-w"></div><div class="row">${lessonsOfNode(w.node).map(l=>`<a class="btn sm ghost" href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`).join("")}<a class="btn sm ghost" href="#/roadmap/${w.node}">🗺 지도</a></div>`); w.render($("#lab-w")); return; }
-    render(`<div class="crumb"><a href="#/">홈</a> › 매스랩</div><h1>🔬 매스랩</h1><p class="lead">설명을 읽기 전에 먼저 밀어 보세요. 슬라이더 하나가 공식 한 줄을 설명합니다.</p>${GORDER.filter(g=>Object.values(Wd).some(w=>w.grade===g)).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${Object.entries(Wd).filter(([k,w])=>w.grade===g).map(([k,w])=>`<a class="card link ${GCOL(g)}" href="#/lab/${k}">${tag(w.grade)}<h3>${w.title}</h3><p class="muted">${w.desc}</p></a>`).join("")}</div>`).join("")}
+    if(id&&Wd[id]){ const w=Wd[id]; render(`<div class="crumb"><a href="#/">홈</a> › <a href="#/lab">매스랩</a></div>${tag(w.grade)}<h1>${MF(w.title)}</h1><p class="lead">${MF(w.desc)}</p><div class="widget" id="lab-w"></div><div class="row">${lessonsOfNode(w.node).map(l=>`<a class="btn sm ghost" href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`).join("")}<a class="btn sm ghost" href="#/roadmap/${w.node}">🗺 지도</a></div>`); w.render($("#lab-w")); return; }
+    render(`<div class="crumb"><a href="#/">홈</a> › 매스랩</div><h1>🔬 매스랩</h1><p class="lead">설명을 읽기 전에 먼저 밀어 보세요. 슬라이더 하나가 공식 한 줄을 설명합니다.</p>${GORDER.filter(g=>Object.values(Wd).some(w=>w.grade===g)).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${Object.entries(Wd).filter(([k,w])=>w.grade===g).map(([k,w])=>`<a class="card link ${GCOL(g)}" href="#/lab/${k}">${tag(w.grade)}<h3>${MF(w.title)}</h3><p class="muted">${MF(w.desc)}</p></a>`).join("")}</div>`).join("")}
     <div class="box"><b>위젯 추가하기</b> — <code>js/widgets.js</code> 에 <code>WIDGETS.id = {title, desc, node, grade, render(container)}</code> 하나를 더하면 목록·소단원·생태계에 자동으로 연결됩니다.</div>`);
   }
 
