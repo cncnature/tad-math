@@ -253,3 +253,43 @@ table select{padding:4px 6px;border:1px solid var(--line);border-radius:8px;back
 .formula .katex-display{margin:0;overflow-x:auto;overflow-y:hidden;padding:2px 0}
 .card.link{overflow:hidden}
 @media(max-width:480px){.formula{font-size:1.05rem;padding:8px 10px}}
+
+/* ===== 개념 지도 (학년 × 영역 격자) ===== */
+.map.rm{overflow:auto;max-height:78vh;background:var(--card);border:1px solid var(--line);border-radius:var(--r);position:relative;cursor:grab;touch-action:pan-x pan-y}
+.map.rm.grab{cursor:grabbing}
+.rm-inner{transform-origin:0 0}
+.rm-svg{display:block;font-family:inherit}
+.rm-svg .band{pointer-events:none}
+.rm-svg .strand-h{font-size:12px;font-weight:800;letter-spacing:.02em}
+.rm-svg .col-line{stroke:var(--line);stroke-width:1;stroke-dasharray:2 4}
+.rm-svg .col-h{fill:var(--muted);font-size:12.5px;font-weight:700}
+.rm-svg .edge{fill:none;stroke:var(--ink);stroke-opacity:.12;stroke-width:1.4;stroke-linecap:round;transition:stroke-opacity .18s,stroke-width .18s}
+.rm-svg .edge.dim{stroke-opacity:.05}
+.rm-svg.hover .edge:not(.on):not(.next){stroke-opacity:.05}
+.rm-svg .edge.on{stroke:var(--acc2);stroke-opacity:.95;stroke-width:2.6}
+.rm-svg .edge.next{stroke:var(--acc);stroke-opacity:.95;stroke-width:2.6}
+.rm-svg .node{cursor:pointer;outline:none;transition:opacity .18s}
+.rm-svg .node rect:first-child{fill:var(--card);stroke:var(--line);stroke-width:1.2;filter:drop-shadow(0 1px 1.5px rgba(20,30,60,.08))}
+.rm-svg .node text{fill:var(--ink);font-size:12.5px;font-weight:650}
+.rm-svg .node .star{fill:#f5b301;font-size:11px;font-weight:400}
+.rm-svg .node:hover rect:first-child,.rm-svg .node:focus-visible rect:first-child{stroke:var(--ink);stroke-width:1.6}
+.rm-svg .node.dim{opacity:.28}
+.rm-svg .node.up rect:first-child{fill:#fff4e5;stroke:var(--acc2);stroke-width:1.8}
+.rm-svg .node.down rect:first-child{fill:#eaf1ff;stroke:var(--acc);stroke-width:1.8}
+.rm-svg .node.on rect:first-child{fill:var(--ink);stroke:var(--ink);stroke-width:2}
+.rm-svg .node.on text{fill:#fff}.rm-svg .node.on .star{fill:#ffd866}
+:root[data-theme="dark"] .rm-svg .node.up rect:first-child{fill:#4a3a1a}
+:root[data-theme="dark"] .rm-svg .node.down rect:first-child{fill:#1d2d4f}
+:root[data-theme="dark"] .rm-svg .node.on rect:first-child{fill:#f3f4f6;stroke:#f3f4f6}
+:root[data-theme="dark"] .rm-svg .node.on text{fill:#111827}
+.rm-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 8px}
+.rm-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.rm-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.rm-zoom{display:flex;gap:6px}
+.rm-panel{border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:14px 16px;margin:12px 0}
+.rm-panel.hint{background:var(--bg);color:var(--muted)}
+.rm-panel-h{display:flex;align-items:center;gap:10px;font-size:1.05rem}
+.rm-panel-h b{font-size:1.15rem}.rm-panel-h #rm-close{margin-left:auto}
+.rm-stats{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem;margin:8px 0}
+.rm-panel .o{color:var(--acc2)}.rm-panel .b{color:var(--acc)}
+.rm-panel p{margin:6px 0}

@@ -177,19 +177,46 @@
 
   // ---------- 개념 지도 ----------
   function roadmap(sel){
-    const cols=D.roadmap.columns; const colX={}; cols.forEach((c,i)=>colX[c.id]=110+i*170);
-    const pos={}; cols.forEach(c=>{ const ns=D.roadmap.nodes.filter(n=>n.col===c.id); ns.forEach((n,i)=>pos[n.id]=[colX[c.id],70+i*52]); });
-    const H=70+52*Math.max(...cols.map(c=>D.roadmap.nodes.filter(n=>n.col===c.id).length))+20;
+    if(sel&&!nodeOf(sel)) sel=null;
+    const cols=D.roadmap.columns; const STR=[["num","수와 연산","#2f6fed"],["alg","변화와 관계","#7c3aed"],["geo","도형과 측정","#1f9d55"],["stat","자료와 가능성","#ff8a3d"]];
+    const NW=140, NH=44, CW=166, GAP=10, LX=104, TOP=56;
+    const wrap=t=>{ if(t.length<=9) return [t]; const seps=[...t.matchAll(/[·,]/g)].map(m=>m.index); let cut=-1; if(seps.length){ cut=seps.reduce((b,i)=>Math.abs(i-t.length/2)<Math.abs(b-t.length/2)?i:b,seps[0]); return [t.slice(0,cut+1).replace(/[·,]$/,"·"),t.slice(cut+1)]; } const m=t.match(/^(.+?[과와의] )(.+)$/); if(m) return [m[1].trim(),m[2]]; return [t.slice(0,Math.ceil(t.length/2)),t.slice(Math.ceil(t.length/2))]; };
+    // 각 (열, 영역) 칸에 들어갈 노드 → 영역별 행 높이 = 가장 많이 쌓인 칸 기준
+    const cell={}; D.roadmap.nodes.forEach(n=>{ const k=n.col+"|"+n.strand; (cell[k]=cell[k]||[]).push(n); });
+    const rowH={}, rowY={}; let y=TOP; STR.forEach(([sid])=>{ const mx=Math.max(1,...cols.map(c=>(cell[c.id+"|"+sid]||[]).length)); rowH[sid]=mx*(NH+GAP)+26; rowY[sid]=y; y+=rowH[sid]; });
+    const H=y+16, W=LX+cols.length*CW+24;
+    const pos={}; D.roadmap.nodes.forEach(n=>{ const ci=cols.findIndex(c=>c.id===n.col); const list=cell[n.col+"|"+n.strand]; const k=list.indexOf(n); const stackH=list.length*(NH+GAP)-GAP; const y0=rowY[n.strand]+(rowH[n.strand]-stackH)/2; pos[n.id]=[LX+ci*CW+(CW-NW)/2, y0+k*(NH+GAP)]; });
     const up=sel?ancestors(sel):new Set(), down=sel?descendants(sel):new Set();
-    const edges=D.roadmap.edges.map(([a,b])=>{ const [x1,y1]=pos[a],[x2,y2]=pos[b]; const cls=sel&&((up.has(a)||a===sel)&&(up.has(b)||b===sel))?"on":sel&&((down.has(b)||b===sel)&&(down.has(a)||a===sel))?"next":""; return `<path class="edge ${cls}" d="M${x1+70},${y1} C${x1+110},${y1} ${x2-110},${y2} ${x2-70},${y2}"/>`; }).join("");
-    const nodes=D.roadmap.nodes.map(n=>{ const [x,y]=pos[n.id]; const nf=D.formulas.filter(f=>f.node===n.id).length; const cls=`node ${n.col} ${n.id===sel?"on":""}`; return `<g class="${cls}" data-id="${n.id}" transform="translate(${x-70},${y-18})"><rect width="140" height="36"/><text x="70" y="23" text-anchor="middle">${n.label}</text>${nf?`<text x="134" y="12" text-anchor="end" style="font-size:9px;fill:var(--acc)">📐${nf}</text>`:""}</g>`; }).join("");
-    const heads=cols.map(c=>`<text class="col-h" x="${colX[c.id]}" y="30" text-anchor="middle">${c.label}</text>`).join("");
+    const edgeCls=(a,b)=>{ if(!sel) return ""; if((up.has(a)||a===sel)&&(up.has(b)||b===sel)) return "on"; if((down.has(b)||b===sel)&&(down.has(a)||a===sel)) return "next"; return "dim"; };
+    const path=(a,b)=>{ const [x1,y1]=pos[a],[x2,y2]=pos[b]; const sx=x1+NW, sy=y1+NH/2, ex=x2, ey=y2+NH/2; if(x2>x1){ const dx=Math.max(40,(ex-sx)/2); return `M${sx},${sy} C${sx+dx},${sy} ${ex-dx},${ey} ${ex},${ey}`; } // 같은 열: 옆으로 돌아 아래로
+      const mx=x1+NW+18; return `M${sx},${sy} C${mx},${sy} ${mx},${ey} ${ex+NW},${ey}`; };
+    const edges=D.roadmap.edges.map(([a,b])=>`<path class="edge ${edgeCls(a,b)}" data-a="${a}" data-b="${b}" d="${path(a,b)}"${edgeCls(a,b)==="on"||edgeCls(a,b)==="next"?' marker-end="url(#arr-'+edgeCls(a,b)+')"':""}/>`).join("");
+    const bands=STR.map(([sid,name,c])=>`<rect class="band" x="0" y="${rowY[sid]}" width="${W}" height="${rowH[sid]}" fill="${c}" opacity="${STR.indexOf(STR.find(x=>x[0]===sid))%2?0.045:0.02}"/><text class="strand-h" x="14" y="${rowY[sid]+rowH[sid]/2+5}" fill="${c}">${name}</text>`).join("");
+    const colLines=cols.map((c,i)=>`<line class="col-line" x1="${LX+i*CW}" y1="${TOP-8}" x2="${LX+i*CW}" y2="${H-10}"/>`).join("")+`<line class="col-line" x1="${LX+cols.length*CW}" y1="${TOP-8}" x2="${LX+cols.length*CW}" y2="${H-10}"/>`;
+    const heads=cols.map((c,i)=>`<text class="col-h" x="${LX+i*CW+CW/2}" y="${TOP-22}" text-anchor="middle">${c.label}</text>`).join("");
+    const nodes=D.roadmap.nodes.map(n=>{ const [x,yy]=pos[n.id]; const st=STR.find(s=>s[0]===n.strand); const state=sel?(n.id===sel?"on":up.has(n.id)?"up":down.has(n.id)?"down":"dim"):""; const nf=D.formulas.filter(f=>f.node===n.id).length; return `<g class="node ${state}" data-id="${n.id}" transform="translate(${x},${yy})" tabindex="0" role="button" aria-label="${n.label}"><rect width="${NW}" height="${NH}" rx="10"/><rect class="bar" x="0" y="6" width="4" height="${NH-12}" rx="2" fill="${st[2]}"/>${(()=>{const L=wrap(n.label); return L.length===1?`<text x="${NW/2+2}" y="${NH/2+4.5}" text-anchor="middle">${L[0]}</text>`:`<text x="${NW/2+2}" y="${NH/2-3}" text-anchor="middle">${L[0]}</text><text x="${NW/2+2}" y="${NH/2+11}" text-anchor="middle">${L[1]}</text>`;})()}${n.unit?`<text class="star" x="${NW-10}" y="${NH/2+4}" text-anchor="middle">★</text>`:""}</g>`; }).join("");
     const n=sel&&nodeOf(sel);
-    render(`<div class="crumb"><a href="#/">홈</a> › 개념 지도</div><h1>🗺 개념 지도</h1><p class="lead">별 하나를 누르면 그 개념까지 오는 길(주황)과 거기서 열리는 길(파랑)에 불이 켜집니다. 개념 ${D.roadmap.nodes.length}개 · 이어진 길 ${D.roadmap.edges.length}개.</p>
-    ${n?`<div class="box"><b>${n.label}</b> — 앞에 깔린 개념 <b>${up.size}</b>개, 여기서 열리는 개념 <b>${down.size}</b>개. ${n.unit?`<a href="#/study/${n.unit}">📘 ${byUnit(n.unit).title} 단원으로 →</a>`:"(단원 준비 중)"} ${D.formulas.filter(f=>f.node===sel).length?` · <a href="#/formulas?node=${sel}">📐 공식 ${D.formulas.filter(f=>f.node===sel).length}편</a>`:""}${lessonsOfNode(sel).length?` · 소단원: ${lessonsOfNode(sel).map(l=>`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`).join(", ")}`:""}</div>`:`<div class="box warn">별을 하나 골라 보세요. 예: <a href="#/roadmap/quadratic-eq">이차방정식</a></div>`}
-    <div class="map"><svg viewBox="0 0 ${110+170*cols.length} ${H}" width="${110+170*cols.length}" height="${H}">${heads}${edges}${nodes}</svg></div>
-    <p class="muted">화면이 좁으면 지도를 좌우로 밀어 보세요. 중1 ~ 고3 전 구간 · 색은 학년대.</p>`);
-    main.querySelectorAll(".node").forEach(g=>g.addEventListener("click",()=>location.hash="#/roadmap/"+g.dataset.id));
+    const panel=n?`<div class="rm-panel"><div class="rm-panel-h">${tag(n.col==="m1"?"m11":n.col==="h2"?"h2a":n.col==="h3"?"h3c":n.col==="h1"?"h11":n.col)} <b>${n.label}</b> <button class="btn sm ghost" id="rm-close" aria-label="닫기">✕</button></div>
+      <div class="rm-stats"><span><b class="o">●</b> 앞에 깔린 개념 ${up.size}</span><span><b class="b">●</b> 여기서 열리는 개념 ${down.size}</span>${D.formulas.filter(f=>f.node===sel).length?`<span>📐 공식 ${D.formulas.filter(f=>f.node===sel).length}</span>`:""}</div>
+      ${preds(sel).length?`<p class="muted">← 바로 앞: ${preds(sel).map(p=>`<a href="#/roadmap/${p}">${nodeOf(p).label}</a>`).join(" · ")}</p>`:""}${succs(sel).length?`<p class="muted">→ 바로 다음: ${succs(sel).map(p=>`<a href="#/roadmap/${p}">${nodeOf(p).label}</a>`).join(" · ")}</p>`:""}
+      <div class="row">${lessonsOfNode(sel).map(l=>`<a class="btn sm" href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`).join("")}${n.unit?`<a class="btn sm ghost" href="#/study/${n.unit}">단원으로</a>`:""}${D.formulas.filter(f=>f.node===sel).length?`<a class="btn sm ghost" href="#/formulas?node=${sel}">📐 공식</a>`:""}</div></div>`:
+      `<div class="rm-panel hint"><b>별 하나를 눌러 보세요.</b> 그 개념까지 오는 길(<b class="o">주황</b>)과 거기서 열리는 길(<b class="b">파랑</b>)만 남고 나머지는 흐려집니다. 예: <a href="#/roadmap/quadratic-eq">이차방정식</a> · <a href="#/roadmap/h-calc">극한·미분·적분</a> · <a href="#/roadmap/pythagoras">피타고라스</a></div>`;
+    render(`<div class="crumb"><a href="#/">홈</a> › 개념 지도</div><h1>🗺 개념 지도</h1><p class="lead">가로는 학년, 세로는 네 영역. 개념 ${D.roadmap.nodes.length}개가 ${D.roadmap.edges.length}개의 길로 이어져 있습니다. ★ 는 바로 학습할 수 있는 개념.</p>
+    ${panel}
+    <div class="rm-tools"><div class="rm-legend">${STR.map(([sid,name,c])=>`<span><i style="background:${c}"></i>${name}</span>`).join("")}</div><div class="rm-zoom"><button class="btn sm ghost" data-z="-" aria-label="축소">−</button><button class="btn sm ghost" data-z="+" aria-label="확대">+</button><button class="btn sm ghost" data-z="fit">⤢ 전체 보기</button></div></div>
+    <div class="map rm" id="rm"><div class="rm-inner" id="rm-inner"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" class="rm-svg"><defs><marker id="arr-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="var(--acc2)"/></marker><marker id="arr-next" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="var(--acc)"/></marker></defs>${bands}${colLines}${heads}<g class="edges">${edges}</g><g class="nodes">${nodes}</g></svg></div></div>
+    <p class="muted" style="font-size:.85rem">드래그로 이동, +/− 로 확대·축소. 휴대폰은 가로로 돌리면 두 배쯤 커집니다.</p>`);
+    // 상호작용: 클릭 → 선택, 호버 → 미리 강조
+    const svg=main.querySelector(".rm-svg");
+    main.querySelectorAll(".node").forEach(g=>{ g.addEventListener("click",()=>location.hash="#/roadmap/"+g.dataset.id); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); location.hash="#/roadmap/"+g.dataset.id; } });
+      g.addEventListener("mouseenter",()=>{ if(sel) return; const id=g.dataset.id; const u=ancestors(id), d=descendants(id); svg.classList.add("hover"); svg.querySelectorAll(".edge").forEach(e=>{ const a=e.dataset.a,b=e.dataset.b; e.classList.toggle("on",(u.has(a)||a===id)&&(u.has(b)||b===id)); e.classList.toggle("next",(d.has(b)||b===id)&&(d.has(a)||a===id)); }); svg.querySelectorAll(".node").forEach(x=>{ const k=x.dataset.id; x.classList.toggle("up",u.has(k)); x.classList.toggle("down",d.has(k)); x.classList.toggle("on",k===id); }); });
+      g.addEventListener("mouseleave",()=>{ if(sel) return; svg.classList.remove("hover"); svg.querySelectorAll(".edge.on,.edge.next").forEach(e=>e.classList.remove("on","next")); svg.querySelectorAll(".node.up,.node.down,.node.on").forEach(x=>x.classList.remove("up","down","on")); }); });
+    const close=$("#rm-close"); if(close) close.onclick=()=>location.hash="#/roadmap";
+    // 확대·축소·이동
+    const box=$("#rm"), inner=$("#rm-inner"); let z=1; const fit=()=>{ z=Math.max(0.55,Math.min(1,(box.clientWidth-16)/W)); apply(); }; const apply=()=>{ inner.style.transform=`scale(${z})`; inner.style.width=(W*z)+"px"; inner.style.height=(H*z)+"px"; };
+    main.querySelectorAll("[data-z]").forEach(b=>b.onclick=()=>{ if(b.dataset.z==="fit") return fit(); z=Math.max(0.35,Math.min(2.2,z*(b.dataset.z==="+"?1.25:0.8))); apply(); });
+    fit(); if(sel&&pos[sel]){ const [x,yy]=pos[sel]; if(z<0.75){ z=0.9; apply(); } box.scrollTo({left:Math.max(0,x*z-box.clientWidth/2+NW/2*z),top:Math.max(0,yy*z-box.clientHeight/2),behavior:"smooth"}); }
+    let drag=null; box.addEventListener("pointerdown",e=>{ if(e.target.closest(".node")) return; drag={x:e.clientX,y:e.clientY,l:box.scrollLeft,t:box.scrollTop}; box.classList.add("grab"); }); window.addEventListener("pointermove",e=>{ if(!drag) return; box.scrollLeft=drag.l-(e.clientX-drag.x); box.scrollTop=drag.t-(e.clientY-drag.y); }); window.addEventListener("pointerup",()=>{ drag=null; box.classList.remove("grab"); });
   }
 
   // ---------- 공식 사전 ----------
