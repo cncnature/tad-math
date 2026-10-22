@@ -351,3 +351,10 @@ table select{padding:4px 6px;border:1px solid var(--line);border-radius:8px;back
 .oly-hints .hint.open .hint-t{color:var(--ink)}
 .oly-fb{margin:6px 0}
 [hidden]{display:none!important}
+/* 대학별 수리논술 */
+.card.ns.done{border-color:var(--ok)}
+.ns-q .ns-text p{font-size:1.08rem;margin:.35em 0;white-space:normal}
+.ns-write{margin-top:12px;padding:12px;border:1px dashed var(--line);border-radius:10px}
+table.rubric td:nth-child(2),table.rubric td:nth-child(3),table.rubric th:nth-child(2),table.rubric th:nth-child(3){text-align:center;width:72px}
+table.rubric input{width:18px;height:18px}
+ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px solid var(--line)}ul.check input{margin-right:8px}
