@@ -1,4 +1,4 @@
-/* 중등수학 만지기 — 단일 페이지 앱 (해시 라우터). 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. */
+/* TAD 수학 만지기 — 단일 페이지 앱 (해시 라우터). 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. */
 (function(){
   const D = window.DATA, $ = s=>document.querySelector(s), main = $("#main");
   // 학년 체계 (2022 개정): 중1 ~ 고3. 순서가 곧 학습 순서.
@@ -537,7 +537,7 @@
     render(`<div class="crumb noprint"><a href="#/">홈</a> › <a href="#/schooltest?g=${grade}&t=${term}">학교 시험 필수 문제</a> › 시험지</div>
     <div class="row noprint" style="margin-bottom:10px"><button class="btn" id="print">🖨 인쇄 / PDF 저장</button><button class="btn ghost" id="toggle-ans">정답·풀이 숨기기</button><a class="btn ghost" href="#/schooltest?g=${grade}&t=${term}">← 문제 풀기 화면</a></div>
     <div class="paper" id="paper">
-      <div class="paper-head"><div class="paper-top"><span>수학 만지기</span><span>${G[grade]} · ${TN[set.term]}</span></div><h1>${set.title} 대비 필수 문제</h1><div class="paper-sub">[ 수 학 ] · 시험 범위: ${set.range}</div><div class="paper-info"><span>학년 &nbsp; 반 &nbsp; 번호</span><span>이름:</span><span>점수: &nbsp; / ${total}</span></div><ul class="paper-notes"><li>각 문항의 배점은 문제 끝에 표시되어 있습니다.</li><li>선택형은 ①~⑤ 중 하나를 고르고, 서술형은 풀이 과정을 씁니다.</li></ul></div>
+      <div class="paper-head"><div class="paper-top"><span>TAD 수학 만지기</span><span>${G[grade]} · ${TN[set.term]}</span></div><h1>${set.title} 대비 필수 문제</h1><div class="paper-sub">[ 수 학 ] · 시험 범위: ${set.range}</div><div class="paper-info"><span>학년 &nbsp; 반 &nbsp; 번호</span><span>이름:</span><span>점수: &nbsp; / ${total}</span></div><ul class="paper-notes"><li>각 문항의 배점은 문제 끝에 표시되어 있습니다.</li><li>선택형은 ①~⑤ 중 하나를 고르고, 서술형은 풀이 과정을 씁니다.</li></ul></div>
       <div class="paper-body">${set.items.map((it,i)=>`<div class="pq"><div class="pq-q"><b>${i+1}.</b> ${it.kind?`<b>[${it.kind}]</b> `:""}${md(it.q)} <b>[${it.pts}점]</b></div>${figAny(it,"pfig")}${it.opts?`<div class="pq-opts">${it.opts.map((o,j)=>`<span>${["①","②","③","④","⑤"][j]} ${md(o)}</span>`).join("")}</div>`:'<div class="pq-blank"></div>'}</div>`).join("")}</div>
       <div class="paper-ans" id="ans"><h2>정답 및 풀이</h2><ol>${set.items.map(it=>`<li>${it.opts?`<b>${["①","②","③","④","⑤"][it.a]}</b> — `:""}${it.steps.map(s=>md(s)).join(" ")} <b>답: ${md(it.ans)}</b></li>`).join("")}</ol></div>
     </div>`);
@@ -561,7 +561,7 @@
     render(`<h1>🔍 "${esc(q)}" 검색 결과</h1>${L.length?`<h2>소단원</h2><ul>${L.map(l=>`<li><a href="#/study/${l.unit}/${l.id}">${l.title}</a> <span class="muted">${l.unitTitle}</span></li>`).join("")}</ul>`:""}${F.length?`<h2>공식</h2><ul>${F.map(f=>`<li><a href="#/formulas/${f.id}">${f.title}</a></li>`).join("")}</ul>`:""}${Cc.length?`<h2>개념</h2><ul>${Cc.map(c=>`<li><b>${c.term}</b> — ${md(c.def)}</li>`).join("")}</ul>`:""}${Lf.length?`<h2>생활 속 수학</h2><ul>${Lf.map(x=>`<li><a href="#/life">${x.title}</a></li>`).join("")}</ul>`:""}${P.length?`<h2>인물</h2><ul>${P.map(p=>`<li><a href="#/people">${p.name}</a></li>`).join("")}</ul>`:""}${!(L.length+F.length+Cc.length+Lf.length+P.length)?`<p class="muted">결과가 없습니다.</p>`:""}`); }
   $("#q").addEventListener("keydown",e=>{ if(e.key==="Enter"){ location.hash="#/search?q="+encodeURIComponent(e.target.value); } });
 
-  function about(){ render(`<h1>사이트 소개</h1><div class="card"><p><b>수학 만지기</b>는 중1부터 고3까지의 수학(중2-2~중3-2 를 가장 깊게)을 "외우기 전에 먼저 만져 보는" 방식으로 익히는 무료·오픈소스 학습 사이트입니다. 로그인·결제가 없고, 학습 기록은 사용자의 브라우저(localStorage)에만 저장됩니다.</p>
+  function about(){ render(`<h1>사이트 소개</h1><div class="card"><p><b>TAD 수학 만지기</b>는 중1부터 고3까지의 수학(중2-2~중3-2 를 가장 깊게)을 "외우기 전에 먼저 만져 보는" 방식으로 익히는 무료·오픈소스 학습 사이트입니다. 로그인·결제가 없고, 학습 기록은 사용자의 브라우저(localStorage)에만 저장됩니다.</p>
     <h3>단원 체계의 근거</h3><p>교육부 고시 2022 개정 수학과 교육과정(중학교 2·3학년 영역: 수와 연산, 변화와 관계, 도형과 측정, 자료와 가능성)의 성취기준을 따르며, 2015 개정 교육과정과 공통인 범위(이등변삼각형·사각형·닮음·피타고라스·확률 / 제곱근·인수분해·이차방정식·이차함수 / 삼각비·원·통계)를 다룹니다. 상자그림은 2022 개정에서 중3 통계에 추가된 내용입니다. 학교별 진도·범위는 교과서 차례로 확인하세요.</p>
     <h3>기술</h3><p>정적 HTML/CSS/JS, 수식 렌더링은 KaTeX(MIT), 위젯은 순수 Canvas 2D. 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. 콘텐츠는 <code>data/*.js</code> 파일을 고치면 바로 반영됩니다.</p>
     <h3>저작권</h3><p>본문·문항·위젯 코드는 이 저장소의 저작자가 작성했으며 MIT 라이선스로 공개합니다. 사이트 구조(개념 지도·공식 되살리기·끊긴 고리 진단 등)는 공개된 수학 학습 사이트들의 접근 방식을 참고하되 텍스트·코드·이미지를 복제하지 않았습니다. 인물 정보는 일반적으로 알려진 수학사 사실에 근거합니다.</p>
