@@ -148,11 +148,13 @@
   function unit(id){
     const u=byUnit(id); if(!u) return notFound();
     render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › ${G[u.grade]}</div><div class="row">${ico(UNIT_ICON[u.id]||"1F4D8","ico hero")}<div>${tag(u.grade)}<h1>${u.title}</h1><p class="lead">${u.desc}</p></div></div></div>
-    <div class="grid wide">${u.lessons.map((l,i)=>`<a class="card link" href="#/study/${u.id}/${l.id}"><div class="eyebrow">소단원 ${i+1}</div><h3>${l.title}</h3><p class="muted">${l.concept[0].replace(/\*\*/g,"").slice(0,70)}…</p><div>${l.formulas.map(f=>byFormula(f)?`<span class="tag">📐 ${byFormula(f).title}</span>`:"").join("")}</div></a>`).join("")}</div>
+    <div class="grid wide">${u.lessons.map((l,i)=>`<a class="card link" href="#/study/${u.id}/${l.id}"><div class="eyebrow">소단원 ${i+1}</div><h3>${l.title}</h3><p class="muted">${teaser(l.concept[0],70)}</p><div>${l.formulas.map(f=>byFormula(f)?`<span class="tag">📐 ${byFormula(f).title}</span>`:"").join("")}</div></a>`).join("")}</div>
     <h2>이 단원과 이어진 것</h2><div class="row">${[...new Set(u.lessons.map(l=>l.node))].map(n=>`<a class="btn ghost sm" href="#/roadmap/${n}">🗺 ${nodeOf(n).label} 의 자리</a>`).join("")}${Object.values(window.WIDGETS).some(w=>u.lessons.some(l=>l.node===w.node))?`<a class="btn ghost sm" href="#/lab">🔬 관련 위젯</a>`:""}<a class="btn ghost sm" href="#/exam">📝 시험 전 훑기</a></div>`);
   }
   // 도해: 소단원/공식에 붙는 그림 (data/lesson-figs.js + js/figures.js)
   function figOf(id){ const m=(D.lessonFigs||{})[id]; if(!m||!window.FIG||!window.FIG[m.fig]) return ""; try{ return `<figure class="lfig"><div class="figwrap">${window.FIG[m.fig](m.p||{})}</div>${m.cap?`<figcaption>${md(m.cap)}</figcaption>`:""}</figure>`; }catch(e){ console.warn("fig",id,e); return ""; } }
+  // 수식($…$)을 중간에서 자르지 않는 요약문
+  function teaser(t,n){ t=String(t).replace(/\*\*/g,""); if(t.length<=n) return md(t); let cut=n; const before=t.slice(0,cut); const dollars=(before.match(/\$/g)||[]).length; if(dollars%2===1) cut=before.lastIndexOf("$"); const sp=t.lastIndexOf(" ",cut); if(sp>n*0.6) cut=sp; return md(t.slice(0,cut).trim())+"…"; }
   function figAny(x,cls="lfig"){ if(!x||!x.fig||!window.FIG||!window.FIG[x.fig]) return ""; try{ return `<figure class="${cls}"><div class="figwrap">${window.FIG[x.fig](x.figp||{})}</div></figure>`; }catch(e){ console.warn("fig",x.fig,e); return ""; } }
   function figOfFormula(f){ if(f.fig&&window.FIG&&window.FIG[f.fig]){ try{ return `<figure class="lfig"><div class="figwrap">${window.FIG[f.fig](f.figp||{})}</div>${f.figcap?`<figcaption>${md(f.figcap)}</figcaption>`:""}</figure>`; }catch(e){} } const l=lessonsAll.find(l=>l.formulas.includes(f.id)&&(D.lessonFigs||{})[l.id]); return l?figOf(l.id):""; }
   function lesson(uid,lid){
@@ -161,7 +163,7 @@
     const node=nodeOf(l.node); const pre=preds(l.node).map(nodeOf), post=succs(l.node).map(nodeOf);
     const widgets=Object.entries(window.WIDGETS).filter(([k,w])=>w.node===l.node);
     const lifeItems=D.life.filter(x=>x.node===l.node).slice(0,3); const ppl=D.people.filter(p=>p.link===l.id||p.node===l.node).slice(0,2);
-    render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span><h1>${l.title}</h1><p class="lead">${md(l.concept[0]).replace(/<[^>]+>/g,"").slice(0,90)}…</p></div>
+    render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span><h1>${l.title}</h1><p class="lead">${teaser(l.concept[0],90)}</p></div>
     <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["story","이야기"],["pit","오개념"],["pt","출제 포인트"],["f","공식"],["ex","예제"],["quiz","퀴즈"],["bridge","개념 연결"],["place","개념의 자리"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
     <h2 id="c">핵심 개념</h2><div class="concept-row"><ul>${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>${figOf(l.id)}</div>
     <h2 id="why">왜 그런지</h2><div class="box">${md(l.why)}</div>
@@ -380,7 +382,7 @@
   function essay(id){
     const st=store.get("essay",{});
     if(!id) return render(`<div class="crumb"><a href="#/">홈</a> › 서술형·증명</div><h1>✍️ 서술형 · 증명 · 자기설명</h1><p class="lead">모범 답안을 보기 전에 <b>자기 말로 먼저 씁니다</b>. 그다음 채점 기준(10점)으로 스스로 점수를 매깁니다. '왜 이 줄이 나오는지'를 말로 설명하는 자기설명은 이해를 가장 깊게 남기는 학습법 중 하나입니다.</p>
-      ${GORDER.filter(g=>D.essay.some(e=>e.grade===g)).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.essay.filter(e=>e.grade===g).map(e=>{const r=st[e.id]; return `<a class="card link ${GCOL(g)}" href="#/essay/${e.id}">${tag(g)}${r?`<span class="tag">자기채점 ${r.score}/${e.pts}</span>`:""}<h3>${e.title}</h3><p class="muted">${md(e.q).slice(0,80)}…</p></a>`;}).join("")}</div>`).join("")}`);
+      ${GORDER.filter(g=>D.essay.some(e=>e.grade===g)).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.essay.filter(e=>e.grade===g).map(e=>{const r=st[e.id]; return `<a class="card link ${GCOL(g)}" href="#/essay/${e.id}">${tag(g)}${r?`<span class="tag">자기채점 ${r.score}/${e.pts}</span>`:""}<h3>${e.title}</h3><p class="muted">${teaser(e.q,80)}</p></a>`;}).join("")}</div>`).join("")}`);
     const e=D.essay.find(x=>x.id===id); if(!e) return notFound(); const r=st[id]||{text:"",score:null,checks:[]}; const l=byLesson(e.lesson);
     render(`<div class="lhead ${GCOL(e.grade)}"><div class="crumb"><a href="#/essay">서술형·증명</a> › ${e.title}</div>${tag(e.grade)}<h1>${e.title}</h1></div>
     <div class="card"><p style="font-size:1.08rem"><b>문제.</b> ${md(e.q)}</p><div class="box warn"><b>생각 열기:</b> ${md(e.prompt)}</div>
