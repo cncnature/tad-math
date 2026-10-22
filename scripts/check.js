@@ -1,7 +1,7 @@
 // node scripts/check.js — 데이터 파일 간 id 참조 무결성 검사
 const vm=require("vm"),fs=require("fs"),path=require("path"); let D0;const root=path.join(__dirname,"..");
 const w={DATA:{},WIDGETS:{}};const ctx=vm.createContext({window:w,document:{createElement:()=>({}),documentElement:{}},getComputedStyle:()=>({getPropertyValue:()=>""})});
-for(const f of ["curriculum","curriculum-m1","curriculum-m21","curriculum-h1","curriculum-h23","formulas","formulas-extra","concepts","roadmap","diagnostic","recall","exam","life","people","slides","play","bridge","essay","lesson-figs","content-extra","content-extra2","deepen-m","deepen-h1","deepen-h23"]) vm.runInContext(fs.readFileSync(path.join(root,"data",f+".js"),"utf8"),ctx);
+for(const f of ["curriculum","curriculum-m1","curriculum-m21","curriculum-h1","curriculum-h23","formulas","formulas-extra","concepts","roadmap","diagnostic","recall","exam","life","people","slides","play","bridge","essay","lesson-figs","content-extra","content-extra2","deepen-m","deepen-h1","deepen-h23","deepen-core"]) vm.runInContext(fs.readFileSync(path.join(root,"data",f+".js"),"utf8"),ctx);
 D0=w.DATA; D0.curriculum.units=[...D0.curriculum.units,...(D0.curriculumExtra||[]).flatMap(x=>x.units||x)];
 D0.curriculum.units.forEach(u=>u.lessons.forEach(l=>{const d=(D0.deepen||{})[l.id];if(!d)return;l.pitfalls=[...(l.pitfalls||[]),...(d.pitfalls||[])];l.points=[...(l.points||[]),...(d.points||[])];l.quiz=[...l.quiz,...(d.quiz||[])];}));
 Object.keys(D0.deepen||{}).forEach(k=>{});
