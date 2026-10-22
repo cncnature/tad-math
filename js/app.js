@@ -117,7 +117,7 @@
     <h2>더 둘러보기</h2>
     <div class="grid">
       <a class="card link" href="#/patterns">${ico("1F9ED")}<h3>수능 패턴 도감</h3><p class="muted">10년간 해마다 나온 ${D.suneung.patterns.length}가지 구조 — 신호·첫 수·동형 문제 3단계 풀이, 패턴 알아맞히기.</p></a>
-      <a class="card link" href="#/nonsul">${ico("1F393")}<h3>대학별 수리논술</h3><p class="muted">연세·고려·성균관·한양·중앙 등 ${D.nonsul.univs.length}개 대학(군)의 10년 출제 경향 + 동형 서술형 문제 · 모범 답안 · 채점 루브릭 · 답안 쓰기 트레이너.</p></a>
+      <a class="card link" href="#/nonsul">${ico("1F393")}<h3>대학별 수리논술 · 의약학 논술</h3><p class="muted">연세·고려·성균관·한양·중앙 등 ${nonsulData().univs.length}개 대학(군)의 10년 출제 경향 + 연도별 주제 순환 동형 문제 ${nonsulData().univs.reduce((a,u)=>a+u.problems.length,0)}개 · 모범 답안 · 채점 루브릭 · 의·약학(과학·의학논술) 탭.</p></a>
       <a class="card link" href="#/olympiad">${ico("1F3C5")}<h3>올림피아드 퀴즈</h3><p class="muted">KMO·KJMO·AMC 에서 되풀이되는 '생각의 기술' ${D.olympiad.items.length}문제 — 비둘기집·홀짝·색칠·보조선. 힌트 3단계, 메달 수집.</p></a>
       <a class="card link" href="#/schooltest">${ico("1F3EB")}<h3>학교 시험 필수 문제</h3><p class="muted">학년·학기별 중간·기말·학력평가에서 꼭 나오는 ${D.schoolExams.reduce((a,e)=>a+e.items.length,0)}문항과 서술형 풀이.</p></a>
       <a class="card link" href="#/daily">${ico("1F3C6")}<h3>하루 10분 코스</h3><p class="muted">암기 3장 → 섞어 풀기 6문제 → 이야기 1편. 연속 일수 도장.</p></a>
@@ -520,38 +520,49 @@
 
 
   // ---------- 올림피아드 퀴즈 ----------
+  function nonsulData(){
+    const N=D.nonsul; if(N._ready) return N;
+    if(!N.types.find(t=>t.id==="med")) N.types.push({id:"med",name:"의·약학 계열",desc:(D.nonsulMed&&D.nonsulMed.note)||"의·치·한·약학 논술 — 수리 + 과학(물리·화학·생명) + 의학논술.",color:"h3"});
+    N.univs.forEach(u=>{ if(u.problems) return; const base={subj:"수리",yr:"대표 유형",theme:u.topics[0],lesson:u.lesson,node:u.node,q:u.q,model:u.model,rubric:u.rubric,pitfalls:u.pitfalls}; u.problems=[base].concat((D.nonsulExtra||{})[u.id]||[]); });
+    if(D.nonsulMed) D.nonsulMed.univs.forEach(m=>{ if(!N.univs.find(u=>u.id===m.id)) N.univs.push(m); });
+    N._ready=true; return N;
+  }
   function nonsul(id,qs){
-    const N=D.nonsul; const pr=new URLSearchParams(qs||""); const ty=pr.get("t")||""; const rec=store.get("ns",{});
-    const typeOf=t=>N.types.find(x=>x.id===t); const cls={think:"h2a",text:"h2b",deep:"h1a",basic:"g32"};
+    const N=nonsulData(); const pr=new URLSearchParams(qs||""); const ty=pr.get("t")||""; const rec=store.get("ns",{});
+    const typeOf=t=>N.types.find(x=>x.id===t); const cls={think:"h2a",text:"h2b",deep:"h1a",basic:"g32",med:"h2a"};
+    const solved=u=>u.problems.filter((_,i)=>rec[u.id+":"+i]).length;
     if(id==="guide"){ return render(`<div class="crumb"><a href="#/">홈</a> › <a href="#/nonsul">대학별 수리논술</a> › 답안 쓰기 트레이너</div><h1>✍️ 논술 답안 쓰기 트레이너</h1>
       <p class="lead">수리논술은 <b>답이 아니라 논리</b>를 채점합니다. 같은 답이라도 "왜" 가 빠지면 반점. 아래 5줄 구조를 몸에 붙이면 어느 대학 문항에도 통합니다.</p>
       <h2>답안의 5줄 구조</h2><ol class="steps">${N.trainer.structure.map(([h,t])=>`<li><b>${h}</b> — ${md(t)}</li>`).join("")}</ol>
       <h2>제출 전 체크리스트</h2><ul class="check">${N.trainer.checklist.map((c,i)=>`<li><label><input type="checkbox" data-c="${i}"> ${md(c)}</label></li>`).join("")}</ul>
       <h2>채점자가 가장 많이 깎는 6가지</h2><div class="grid">${N.trainer.penalties.map(([a,b])=>`<div class="card"><h3>⚠️ ${md(a)}</h3><p>${md(b)}</p></div>`).join("")}</div>
-      <div class="row" style="margin-top:14px"><a class="btn" href="#/nonsul">🎓 대학별 문제로</a><a class="btn ghost" href="#/essay">📝 서술형 연습</a></div>`); }
-    if(!id){ const list=N.univs.filter(u=>!ty||u.type===ty);
+      <h2>의·약학 논술(의학논술) 답안 구조</h2><ol class="steps"><li><b>문제 재정의</b> — 제시문의 갈등을 '무엇과 무엇의 충돌' 인지 한 문장으로.</li><li><b>원칙 제시</b> — 자율성·선행·무해·정의 중 어느 원칙이 적용되는지 명시.</li><li><b>입장 + 근거 2개</b> — 추상적 선의가 아니라 구체적 행동(설명·확인·조정)으로.</li><li><b>예상 반론과 재반론</b> — 반론을 가장 강한 형태로 쓰고 답한다.</li><li><b>결론</b> — 첫 문장의 질문에 같은 말로 답한다.</li></ol>
+      <div class="row" style="margin-top:14px"><a class="btn" href="#/nonsul">🎓 대학별 문제로</a><a class="btn ghost" href="#/nonsul?t=med">🩺 의·약학 계열</a><a class="btn ghost" href="#/essay">📝 서술형 연습</a></div>`); }
+    if(!id){ const list=N.univs.filter(u=>!ty||u.type===ty); const total=N.univs.reduce((a,u)=>a+u.problems.length,0);
       return render(`<div class="crumb"><a href="#/">홈</a> › 대학별 수리논술</div><h1>🎓 대학별 수리논술</h1>
-      <p class="lead">수리논술을 치르는 주요 대학의 <b>최근 10년 출제 경향</b>을 유형·범위·시간별로 정리하고, 대학마다 가장 자주 나온 주제의 <b>동형 서술형 문제</b>와 모범 답안, 채점 기준(루브릭), 감점 포인트를 붙였습니다. 문제는 기출 원문이 아니라 같은 구조의 새 문제이며, 전형 정보는 2025~2026학년도 기준이므로 <b>지원 연도의 모집요강을 반드시 확인</b>하세요.</p>
-      <div class="grid"><a class="card link" href="#/nonsul/guide">${ico("270D")}<h3>✍️ 답안 쓰기 트레이너</h3><p class="muted">5줄 구조 · 제출 전 체크리스트 · 채점자가 가장 많이 깎는 6가지</p></a></div>
-      <div class="pill-row"><a class="pill ${!ty?"on":""}" href="#/nonsul">전체 ${N.univs.length}</a>${N.types.map(t=>`<a class="pill ${ty===t.id?"on":""}" href="#/nonsul?t=${t.id}">${t.name} ${N.univs.filter(u=>u.type===t.id).length}</a>`).join("")}</div>
-      ${ty?`<p class="muted">${typeOf(ty).desc}</p>`:""}
-      <div class="grid wide">${list.map(u=>{ const t=typeOf(u.type); const r=rec[u.id]; return `<a class="card link ns ${r?"done":""}" href="#/nonsul/${u.id}"><div class="row" style="justify-content:space-between"><span class="tag">${t.name}</span><span class="tag">난이도 ${u.level}</span></div><h3>${u.name}</h3><p class="muted">${u.time} · ${u.items}<br>${u.range}</p>${r?`<div class="eyebrow" style="color:var(--ok)">✓ 자기채점 ${r.score}/${r.max}</div>`:""}</a>`; }).join("")}</div>
-      <p class="muted" style="margin-top:18px">출처: 지역내일 「2025학년도 대학별 수리논술 분석」, 베리타스알파 모의논술 일정, 각 대학 입학처 선행학습영향평가 보고서(2016~2025). 유형 분류는 자료마다 다를 수 있습니다.</p>`); }
-    const u=N.univs.find(o=>o.id===id); if(!u) return notFound(); const t=typeOf(u.type); const ls=byLesson(u.lesson); const max=u.rubric.reduce((a,b)=>a+b[1],0);
-    let stage=store.get("ns",{})[id]?2:0;
-    function draw(){ const cur=store.get("ns",{})[id]; render(`<div class="lhead ${cls[u.type]}"><div class="crumb"><a href="#/">홈</a> › <a href="#/nonsul?t=${u.type}">대학별 수리논술</a> › ${t.name}</div><span class="tag">${t.name}</span> <span class="tag">${u.time}</span> <span class="tag">${u.items}</span> <span class="tag">난이도 ${u.level}</span><h1>${u.name}</h1><p class="lead muted">출제 범위: ${u.range}</p></div>
+      <p class="lead">수리논술을 치르는 주요 대학의 <b>최근 10년 출제 경향</b>을 유형·범위·시간별로 정리하고, 대학마다 자주 나온 주제를 <b>연도별로 순환</b>시킨 동형 서술형 문제 ${total}개(대학별 3~6개)와 모범 답안, 채점 기준(루브릭), 감점 포인트를 붙였습니다. 의·약학 계열은 과학논술·의학논술까지 별도 탭. 문제는 기출 원문이 아니라 같은 구조의 새 문제이며, 전형 정보는 2025~2026학년도 기준이므로 <b>지원 연도의 모집요강을 반드시 확인</b>하세요.</p>
+      <div class="grid"><a class="card link" href="#/nonsul/guide">${ico("270D")}<h3>✍️ 답안 쓰기 트레이너</h3><p class="muted">5줄 구조 · 제출 전 체크리스트 · 채점자가 가장 많이 깎는 6가지 · 의학논술 구조</p></a></div>
+      <div class="pill-row"><a class="pill ${!ty?"on":""}" href="#/nonsul">전체 ${N.univs.length}</a>${N.types.map(t=>`<a class="pill ${ty===t.id?"on":""}" href="#/nonsul?t=${t.id}">${t.id==="med"?"🩺 ":""}${t.name} ${N.univs.filter(u=>u.type===t.id).length}</a>`).join("")}</div>
+      ${ty?`<p class="muted">${md(typeOf(ty).desc)}</p>`:""}
+      <div class="grid wide">${list.map(u=>{ const t=typeOf(u.type); const n=solved(u); return `<a class="card link ns ${n===u.problems.length?"done":""}" href="#/nonsul/${u.id}"><div class="row" style="justify-content:space-between"><span class="tag">${t.name}</span><span class="tag">난이도 ${u.level}</span></div><h3>${u.name}</h3><p class="muted">${u.time} · ${u.items}<br>${u.range}</p><div class="eyebrow ${n?"":"muted"}" ${n?'style="color:var(--ok)"':""}>문제 ${u.problems.length}개${n?` · 자기채점 ${n}/${u.problems.length}`:""}</div></a>`; }).join("")}</div>
+      <p class="muted" style="margin-top:18px">출처: 지역내일 「2025학년도 대학별 수리논술 분석」·「2026학년도 의대 입학전형」, 베리타스알파 모의논술 일정, 각 대학 입학처 선행학습영향평가 보고서(2016~2025). 유형 분류는 자료마다 다를 수 있습니다.</p>`); }
+    const u=N.univs.find(o=>o.id===id); if(!u) return notFound(); const t=typeOf(u.type);
+    let pi=Math.min(Math.max(+(pr.get("p")||0),0),u.problems.length-1); let stage=0;
+    function draw(){ const P=u.problems[pi]; const key=id+":"+pi; const cur=store.get("ns",{})[key]; const max=P.rubric.reduce((a,b)=>a+b[1],0); const ls=P.lesson?byLesson(P.lesson):null; if(cur&&stage===0) stage=1;
+      render(`<div class="lhead ${cls[u.type]}"><div class="crumb"><a href="#/">홈</a> › <a href="#/nonsul?t=${u.type}">${u.type==="med"?"의·약학 논술":"대학별 수리논술"}</a> › ${t.name}</div><span class="tag">${t.name}</span> <span class="tag">${u.time}</span> <span class="tag">${u.items}</span> <span class="tag">난이도 ${u.level}</span><h1>${u.name}</h1><p class="lead muted">출제 범위: ${u.range}</p></div>
       <div class="card"><h3>🔍 10년 출제 경향</h3><p>${md(u.note)}</p><ul class="bul">${u.topics.map(x=>`<li>${md(x)}</li>`).join("")}</ul></div>
-      <h2>동형 서술형 문제</h2>
-      <div class="card ns-q"><div class="qrow"><div class="ns-text">${u.q.split("\n").map(l=>`<p>${md(l)}</p>`).join("")}</div>${figAny(u,"qfig")}</div>
-        <div class="ns-write" ${stage>0?"hidden":""}><p class="muted">먼저 종이에 답안을 완성하세요 (권장 ${Math.round(parseInt(u.time)/ (parseInt(u.items)||3))}분). 다 쓴 뒤 모범 답안을 열어 루브릭으로 자기채점합니다.</p><button class="btn" id="ns-open">모범 답안 · 채점 기준 열기</button></div>
-        <div id="ns-sol" ${stage>0?"":"hidden"}><h3>모범 답안</h3><ol class="steps">${u.model.map(x=>`<li>${md(x)}</li>`).join("")}</ol>
-          <h3>채점 기준 (루브릭) — 내 답안에 있으면 체크</h3><table class="fig-table rubric"><thead><tr><th>채점 요소</th><th>배점</th><th>내 답안</th></tr></thead><tbody>${u.rubric.map(([c,p],i)=>`<tr><td>${md(c)}</td><td>${p}</td><td><input type="checkbox" data-p="${p}" ${cur&&cur.got&&cur.got[i]?"checked":""}></td></tr>`).join("")}</tbody></table>
+      <h2>동형 서술형 문제 <span class="muted" style="font-weight:400;font-size:.9rem">— 자주 나온 주제를 연도별로 순환</span></h2>
+      <div class="pill-row">${u.problems.map((p,i)=>{ const r=store.get("ns",{})[id+":"+i]; return `<a class="pill ${i===pi?"on":""}" href="#/nonsul/${id}?p=${i}">${r?"✓ ":""}${i+1}. ${p.subj!=="수리"?p.subj+" · ":""}${p.theme}</a>`; }).join("")}</div>
+      <div class="card ns-q"><div class="row" style="justify-content:space-between"><span class="tag">${P.subj}</span><span class="tag">${P.yr}</span></div><div class="qrow"><div class="ns-text">${P.q.split("\n").map(l=>`<p>${md(l)}</p>`).join("")}</div>${figAny(P,"qfig")}</div>
+        <div class="ns-write" ${stage>0?"hidden":""}><p class="muted">먼저 종이에 답안을 완성하세요 (권장 ${Math.max(15,Math.round(parseInt(u.time)/(parseInt(u.items)||3))||25)}분). 다 쓴 뒤 모범 답안을 열어 루브릭으로 자기채점합니다.</p><button class="btn" id="ns-open">모범 답안 · 채점 기준 열기</button></div>
+        <div id="ns-sol" ${stage>0?"":"hidden"}><h3>모범 답안</h3><ol class="steps">${P.model.map(x=>`<li>${md(x)}</li>`).join("")}</ol>
+          <h3>채점 기준 (루브릭) — 내 답안에 있으면 체크</h3><table class="fig-table rubric"><thead><tr><th>채점 요소</th><th>배점</th><th>내 답안</th></tr></thead><tbody>${P.rubric.map(([c,p],i)=>`<tr><td>${md(c)}</td><td>${p}</td><td><input type="checkbox" data-p="${p}" ${cur&&cur.got&&cur.got[i]?"checked":""}></td></tr>`).join("")}</tbody></table>
           <div class="row"><button class="btn" id="ns-score">자기채점 저장</button><span id="ns-res" class="muted">${cur?`저장됨 ${cur.score}/${max}`:""}</span></div>
-          <h3>감점 포인트</h3><div class="grid">${u.pitfalls.map(x=>`<div class="box warn">⚠️ ${md(x)}</div>`).join("")}</div></div>
+          <h3>감점 포인트</h3><div class="grid">${P.pitfalls.map(x=>`<div class="box warn">⚠️ ${md(x)}</div>`).join("")}</div></div>
       </div>
-      <div class="row" style="margin-top:14px"><a class="btn" href="#/nonsul/guide">✍️ 답안 쓰기 트레이너</a>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a>`:""}<a class="btn ghost" href="#/roadmap/${u.node}">🗺 개념의 자리</a><a class="btn ghost" href="#/nonsul">목록</a></div>`);
+      <div class="row" style="margin-top:14px">${pi<u.problems.length-1?`<a class="btn" href="#/nonsul/${id}?p=${pi+1}">다음 문제 →</a>`:`<a class="btn" href="#/nonsul?t=${u.type}">목록</a>`}<a class="btn ghost" href="#/nonsul/guide">✍️ 답안 쓰기 트레이너</a>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a>`:""}${P.node?`<a class="btn ghost" href="#/roadmap/${P.node}">🗺 개념의 자리</a>`:""}</div>`);
       const ob=$("#ns-open"); if(ob) ob.onclick=()=>{ stage=1; draw(); };
-      const sb=$("#ns-score"); if(sb) sb.onclick=()=>{ const boxes=[...main.querySelectorAll(".rubric input")]; const got=boxes.map(b=>b.checked); const score=boxes.reduce((a,b)=>a+(b.checked?+b.dataset.p:0),0); const rr=store.get("ns",{}); rr[id]={score,max,got,when:Date.now()}; store.set("ns",rr); $("#ns-res").textContent=`저장됨 ${score}/${max}`+(score===max?" 🎉 만점!":score>=max*0.7?" 👍 합격권":" — 감점 포인트를 다시 읽어 보세요"); };
+      const sb=$("#ns-score"); if(sb) sb.onclick=()=>{ const boxes=[...main.querySelectorAll(".rubric input")]; const got=boxes.map(b=>b.checked); const score=boxes.reduce((a,b)=>a+(b.checked?+b.dataset.p:0),0); const rr=store.get("ns",{}); rr[key]={score,max,got,when:Date.now()}; store.set("ns",rr); $("#ns-res").textContent=`저장됨 ${score}/${max}`+(score===max?" 🎉 만점!":score>=max*0.7?" 👍 합격권":" — 감점 포인트를 다시 읽어 보세요"); };
       typeset(); }
     draw();
   }
