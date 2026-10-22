@@ -7,6 +7,8 @@
   const BAND = { m11:"중학교", m12:"중학교", m21:"중학교", g22:"중학교", g31:"중학교", g32:"중학교", h11:"고등학교", h12:"고등학교", h2a:"고등학교", h2c:"고등학교", h2p:"고등학교", h3c:"고등학교", h3g:"고등학교" };
   D.curriculum.grades = G;
   D.curriculum.units = [...D.curriculum.units, ...(D.curriculumExtra||[])].sort((a,b)=>gradeRank(a.grade)-gradeRank(b.grade));
+  // 공식이 태어나는 이야기(data/stories-*.js): 아직 없는 소단원에 붙임
+  D.curriculum.units.forEach(u=>u.lessons.forEach(l=>{ if(!l.story&&(D.stories||{})[l.id]) l.story=D.stories[l.id]; }));
   // 2차 심화(data/deepen-*.js): 오개념·출제 포인트·심화 퀴즈를 기존 항목 뒤에 이어 붙임
   D.curriculum.units.forEach(u=>u.lessons.forEach(l=>{ const d=(D.deepen||{})[l.id]; if(!d) return; if(d.pitfalls) l.pitfalls=[...(l.pitfalls||[]),...d.pitfalls]; if(d.points) l.points=[...(l.points||[]),...d.points]; if(d.quiz) l.quiz=[...l.quiz,...d.quiz]; if(d.concept) l.concept=[...l.concept,...d.concept]; }));
   const GCOL = g=>({m11:"m1",m12:"m1",m21:"m21",g22:"g22",g31:"g31",g32:"g32",h11:"h1",h12:"h1",h2a:"h2",h2c:"h2",h2p:"h2",h3c:"h3",h3g:"h3"})[g]||g; // 색상용 열 id
