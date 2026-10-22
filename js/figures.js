@@ -104,6 +104,7 @@
   const T=(x,y,t,o={})=>`<text x="${x}" y="${y}" font-size="${o.s||12}" fill="${o.c||INK}" text-anchor="${o.a||"start"}" font-weight="${o.w||500}" ${o.i?'font-style="italic"':''}>${window.MT(t)}</text>`;
   const L=(x1,y1,x2,y2,o={})=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${o.c||INK}" stroke-width="${o.w||2}" ${o.d?`stroke-dasharray="${o.d}"`:""} stroke-linecap="round"/>`;
   const C=(x,y,r,o={})=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${o.f||"none"}" stroke="${o.c||INK}" stroke-width="${o.w||2}" ${o.d?`stroke-dasharray="${o.d}"`:""}/>`;
+  const RA=(x,y,ux,uy,vx,vy,k=12)=>`<path d="M${x+ux*k},${y+uy*k} L${x+(ux+vx)*k},${y+(uy+vy)*k} L${x+vx*k},${y+vy*k}" fill="none" stroke="${BAD}" stroke-width="1.5"/>`;
   const P=(pts,o={})=>`<polygon points="${pts}" fill="${o.f||"rgba(47,111,237,.12)"}" stroke="${o.c||INK}" stroke-width="${o.w||2}" stroke-linejoin="round"/>`;
   const R=(x,y,w,h,o={})=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${o.r||0}" fill="${o.f||"rgba(47,111,237,.12)"}" stroke="${o.c||INK}" stroke-width="${o.w||2}"/>`;
   const ARR=(x1,y1,x2,y2,o={})=>{ const a=Math.atan2(y2-y1,x2-x1),k=9; return L(x1,y1,x2,y2,o)+`<path d="M${x2},${y2} L${x2-k*Math.cos(a-.4)},${y2-k*Math.sin(a-.4)} L${x2-k*Math.cos(a+.4)},${y2-k*Math.sin(a+.4)} Z" fill="${o.c||INK}"/>`; };
@@ -203,4 +204,54 @@
     let s=`<path d="M${A} L${P1} A${l},${l} 0 ${ang>180?1:0} 1 ${P2} Z" fill="rgba(47,111,237,.15)" stroke="${INK}" stroke-width="2"/>`+`<ellipse cx="${A[0]}" cy="${A[1]+l+r*0.35+14}" rx="${r}" ry="${r*0.35}" fill="rgba(255,138,61,.3)" stroke="${ACC2}" stroke-width="2"/>`;
     s+=T(A[0]+l*0.5*Math.cos(a0)+10,A[1]+l*0.5*Math.sin(a0),"모선 l",{s:11})+T(A[0],A[1]+l*0.62,`중심각 = 360° × r/l = ${Math.round(ang)}°`,{s:11,a:"middle",c:ACC})+T(A[0]+r+6,A[1]+l+r*0.35+18,"밑면 r",{s:10,c:ACC2})+T(A[0],A[1]+l+r*0.7+32,"호의 길이 = 밑면 둘레 2πr",{s:10,a:"middle",c:MUT})+T(w-10,22,"옆넓이 = ½·l·(2πr) = πrl",{s:11,c:MUT,a:"end"});
     return S(w,h,s); };
+
+  /* ===== 시험지용 도형 (학교 시험 필수 문제 · 수능 패턴 도감) ===== */
+  // 두 평행선 사이의 꺾은선 (Z 자) — a, b: 두 각 라벨, x: 꺾인 점 라벨
+  F.zFig=({a="35°",b="50°",x="x",w=320,h=190})=>{ let s=L(30,40,290,40,{c:INK})+L(30,150,290,150,{c:INK})+T(14,44,"l",{s:12,i:true})+T(14,154,"m",{s:12,i:true});
+    s+=L(90,40,170,95,{c:ACC,w:2.5})+L(170,95,250,150,{c:ACC,w:2.5})+L(170,95,290,95,{c:MUT,w:1,d:"4 3"});
+    s+=`<path d="M112,40 A24,24 0 0 1 108,53" fill="none" stroke="${ACC2}" stroke-width="2"/>`+T(118,60,a,{s:11,c:ACC2})+`<path d="M232,150 A24,24 0 0 0 237,137" fill="none" stroke="${ACC2}" stroke-width="2"/>`+T(200,146,b,{s:11,c:ACC2})+C(170,95,4,{f:ACC,c:"none"})+T(150,88,x,{s:13,c:ACC,w:700})+T(200,30,"l ∥ m",{s:11,c:MUT}); return S(w,h,s); };
+  // 좌표평면 위 다각형 (점 라벨 포함)
+  F.coordPoly=({pts=[[0,0,"O"],[4,0,"A(4,0)"],[0,6,"B(0,6)"]],xr=[-1,6],yr=[-1,7],fill=true,w=300,h=230,extra=[]})=>{ const px=28,py=14,W=w-px-12,H=h-py-24; const X=x=>px+(x-xr[0])/(xr[1]-xr[0])*W, Y=y=>py+(yr[1]-y)/(yr[1]-yr[0])*H;
+    let s=L(px,Y(0),px+W,Y(0),{c:MUT,w:1.5})+L(X(0),py,X(0),py+H,{c:MUT,w:1.5})+T(px+W-4,Y(0)-6,"x",{s:11,c:MUT,a:"end"})+T(X(0)+6,py+10,"y",{s:11,c:MUT});
+    if(fill) s+=P(pts.map(p=>`${X(p[0])},${Y(p[1])}`).join(" "),{f:"rgba(47,111,237,.12)"}); pts.forEach(p=>{ s+=C(X(p[0]),Y(p[1]),3.5,{f:INK,c:"none"}); if(p[2]) s+=T(X(p[0])+(p[3]||6),Y(p[1])+(p[4]||-6),p[2],{s:11}); });
+    extra.forEach(e=>{ if(e.seg) s+=L(X(e.seg[0]),Y(e.seg[1]),X(e.seg[2]),Y(e.seg[3]),{c:e.c||ACC2,d:e.d||"4 3",w:1.5}); if(e.t) s+=T(X(e.at[0]),Y(e.at[1]),e.t,{s:11,c:e.c||ACC2}); }); return S(w,h,s); };
+  // 원과 그 위의 점·현·각 (각도로 점 배치) — pts:[{d,label}], segs:[[i,j]], center:true/false, angles:[{at:i,label}], arcs:[[i,j,label]]
+  F.circlePts=({pts=[],segs=[],center=true,angles=[],arcs=[],title="",w=300,h=230,r=85})=>{ const O=[w/2,h/2+6]; const pt=d=>[O[0]+r*Math.cos(-d*Math.PI/180),O[1]+r*Math.sin(-d*Math.PI/180)]; const Pz=pts.map(p=>pt(p.d)); let s=C(O[0],O[1],r,{c:INK});
+    if(center) s+=C(O[0],O[1],3,{f:INK,c:"none"})+T(O[0]+6,O[1]+14,"O",{s:12});
+    segs.forEach(([i,j])=>{ const a=i==="O"?O:Pz[i], b=j==="O"?O:Pz[j]; s+=L(...a,...b,{c:ACC,w:2}); });
+    arcs.forEach(([i,j,label,c])=>{ const d1=pts[i].d,d2=pts[j].d; const a=pt(d1),b=pt(d2); const large=((d2-d1+360)%360)>180?1:0; s+=`<path d="M${a} A${r},${r} 0 ${large} 0 ${b}" fill="none" stroke="${c||ACC2}" stroke-width="4"/>`; if(label){ const m=pt((d1+((d2-d1+360)%360)/2)); s+=T(m[0]+(m[0]-O[0])*0.18,m[1]+(m[1]-O[1])*0.18+4,label,{s:11,c:c||ACC2,a:"middle"}); } });
+    pts.forEach((p,i)=>{ const q=Pz[i]; s+=C(q[0],q[1],3.5,{f:INK,c:"none"}); const dx=q[0]-O[0],dy=q[1]-O[1],n=Math.hypot(dx,dy); s+=T(q[0]+dx/n*14,q[1]+dy/n*14+4,p.label,{s:12,a:"middle"}); });
+    angles.forEach(a=>{ const V=a.at==="O"?O:Pz[a.at]; s+=T(V[0]+(a.dx||0),V[1]+(a.dy||0),a.label,{s:11,c:ACC2,w:700,a:"middle"}); });
+    if(title) s+=T(10,16,title,{s:11,c:MUT}); return S(w,h,s); };
+  // 중심각이 있는 부채꼴 (반지름 r, 각 deg) + 활꼴 음영 옵션
+  F.sectorFig=({deg=60,label="θ",rl="1",segment=false,w=300,h=220})=>{ const O=[60,180], r=150; const t=deg*Math.PI/180; const A=[O[0]+r,O[1]], B=[O[0]+r*Math.cos(t),O[1]-r*Math.sin(t)]; let s=`<path d="M${O} L${A} A${r},${r} 0 0 0 ${B} Z" fill="rgba(47,111,237,.12)" stroke="${INK}" stroke-width="2"/>`;
+    if(segment) s+=`<path d="M${A} A${r},${r} 0 0 0 ${B} Z" fill="rgba(255,138,61,.35)" stroke="${ACC2}" stroke-width="1.5"/>`+L(...A,...B,{c:ACC2,w:1.5});
+    s+=`<path d="M${O[0]+30},${O[1]} A30,30 0 0 0 ${O[0]+30*Math.cos(t)},${O[1]-30*Math.sin(t)}" fill="none" stroke="${ACC2}" stroke-width="2"/>`+T(O[0]+36,O[1]-10,label,{s:12,c:ACC2})+T(O[0]-10,O[1]+16,"O",{s:12})+T(A[0]+4,A[1]+16,"A",{s:12})+T(B[0]+4,B[1]-6,"B",{s:12})+T((O[0]+A[0])/2,O[1]+16,rl,{s:11,a:"middle",c:MUT}); return S(w,h,s); };
+  // 정사각뿔 (밑면 한 변 a, 옆모서리 l)
+  F.pyramidFig=({a="6",l="√43",hLabel="h",w=300,h=220})=>{ const A=[60,170],B=[200,190],Cc=[250,150],D=[110,130],Tp=[155,30]; const M=[(A[0]+Cc[0])/2,(A[1]+Cc[1])/2];
+    let s=P(`${A} ${B} ${Cc} ${D}`,{f:"rgba(47,111,237,.08)",c:MUT})+L(...A,...Tp)+L(...B,...Tp)+L(...Cc,...Tp)+L(...D,...Tp,{d:"4 3",c:MUT})+L(...Tp,...M,{c:ACC2,d:"4 3"})+L(...A,...Cc,{c:MUT,d:"3 3",w:1})+RA(M[0],M[1],(Tp[0]-M[0])/Math.hypot(Tp[0]-M[0],Tp[1]-M[1]),(Tp[1]-M[1])/Math.hypot(Tp[0]-M[0],Tp[1]-M[1]),(Cc[0]-M[0])/Math.hypot(Cc[0]-M[0],Cc[1]-M[1]),(Cc[1]-M[1])/Math.hypot(Cc[0]-M[0],Cc[1]-M[1]),10);
+    s+=T((A[0]+B[0])/2-6,(A[1]+B[1])/2+16,a,{s:11,a:"middle"})+T((B[0]+Tp[0])/2+10,(B[1]+Tp[1])/2,l,{s:11,c:ACC})+T(M[0]+8,(Tp[1]+M[1])/2,hLabel,{s:11,c:ACC2,w:700})+T(A[0]-14,A[1]+6,"A",{s:11})+T(B[0]+4,B[1]+12,"B",{s:11})+T(Cc[0]+6,Cc[1]+4,"C",{s:11})+T(D[0]-14,D[1]-2,"D",{s:11}); return S(w,h,s); };
+  // 정육면체 ABCD-EFGH (윗면 ABCD, 아랫면 EFGH) + 강조 삼각형(꼭짓점 이름)
+  F.cubeFig=({tri=null,edge="2",w=300,h=240})=>{ const s0=120, dx=55, dy=-40; const E=[70,200],F_=[70+s0,200],G=[70+s0+dx,200+dy],H=[70+dx,200+dy]; const A=[E[0],E[1]-s0],B=[F_[0],F_[1]-s0],Cc=[G[0],G[1]-s0],D=[H[0],H[1]-s0]; const V={A,B,C:Cc,D,E,F:F_,G,H};
+    let s=""; if(tri){ s+=P(tri.map(k=>V[k].join(",")).join(" "),{f:"rgba(255,138,61,.35)",c:ACC2}); }
+    const edges=[["A","B"],["B","C"],["C","D"],["D","A"],["E","F"],["F","G"],["G","H"],["H","E"],["A","E"],["B","F"],["C","G"],["D","H"]]; const hidden=new Set(["GH","HE","DH"]);
+    edges.forEach(([p,q])=>{ s+=L(...V[p],...V[q],{c:INK,w:1.8,d:hidden.has(p+q)?"4 3":""}); });
+    Object.entries(V).forEach(([k,v])=>{ const off={A:[-14,-4],B:[6,-4],C:[6,-4],D:[-14,-4],E:[-14,14],F:[4,14],G:[6,14],H:[-14,12]}[k]; s+=T(v[0]+off[0],v[1]+off[1],k,{s:12}); });
+    s+=T(E[0]+s0/2,E[1]+16,edge,{s:11,a:"middle",c:MUT}); return S(w,h,s); };
+  // 정사각형 안에 중점을 이은 정사각형을 반복 (등비급수 도형)
+  F.nestedSquares=({n=4,side=4,w=260,h=240})=>{ let pts=[[20,20],[220,20],[220,220],[20,220]]; let s=T(130,236,`한 변 ${side}`,{s:11,a:"middle",c:MUT}); for(let k=0;k<n;k++){ s+=P(pts.map(p=>p.join(",")).join(" "),{f:k%2?"rgba(255,138,61,.25)":"rgba(47,111,237,.10)",c:INK,w:1.5}); const nx=pts.map((p,i)=>{ const q=pts[(i+1)%4]; return [(p[0]+q[0])/2,(p[1]+q[1])/2]; }); pts=nx; } return S(w,h,s); };
+  // 직사각형 (가로·세로 라벨, 대각선 옵션)
+  F.rectFig=({a="12",b="5",diag=null,w=300,h=190})=>{ const x0=50,y0=40,W=200,H=100; let s=R(x0,y0,W,H,{f:"rgba(47,111,237,.1)"})+T(x0+W/2,y0+H+18,a,{s:12,a:"middle"})+T(x0+W+8,y0+H/2+4,b,{s:12}); if(diag) s+=L(x0,y0+H,x0+W,y0,{c:ACC,d:"5 4"})+T(x0+W/2+10,y0+H/2-6,diag,{s:12,c:ACC,w:700}); s+=T(x0-14,y0+H+6,"A",{s:11})+T(x0+W+4,y0+H+6,"B",{s:11})+T(x0+W+4,y0-4,"C",{s:11})+T(x0-14,y0-4,"D",{s:11}); return S(w,h,s); };
+  // 원뿔 옆모습 (반지름 r, 모선 l, 높이 h)
+  F.coneSide=({r="5",l="13",hl="h",w=260,h=220})=>{ const O=[130,170],rx=100,ry=22; const Tp=[130,30]; let s=`<ellipse cx="${O[0]}" cy="${O[1]}" rx="${rx}" ry="${ry}" fill="rgba(47,111,237,.1)" stroke="${INK}" stroke-width="1.5"/>`+L(O[0]-rx,O[1],...Tp)+L(O[0]+rx,O[1],...Tp)+L(...O,...Tp,{c:ACC2,d:"4 3"})+L(...O,O[0]+rx,O[1],{c:ACC,d:"4 3"})+RA(O[0],O[1],1,0,0,-1,9);
+    s+=T(O[0]+rx/2,O[1]+16,r,{s:12,a:"middle",c:ACC})+T((O[0]+rx+Tp[0])/2+10,(O[1]+Tp[1])/2,l,{s:12,c:INK})+T(O[0]+8,(O[1]+Tp[1])/2,hl,{s:12,c:ACC2,w:700}); return S(w,h,s); };
+  // 표 (HTML) — head: [..], rows: [[..],..]
+  F.table=({head=[],rows=[],caption=""})=>`<table class="fig-table">${caption?`<caption>${caption}</caption>`:""}<thead><tr>${head.map(x=>`<th>${MT(x)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${MT(x)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  // 삼각형 안 내접원 / 외접원 (towns 의 일반형, 꼭짓점 라벨 A,B,C)
+  F.triCircle=({mode="in",labels=["A","B","C"],extra="",w=300,h=220})=>{ const A=mode==="circum"?[150,46]:[150,30],B=mode==="circum"?[62,166]:[40,190],Cc=mode==="circum"?[246,166]:[270,190]; const d=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]); const [ax,ay]=A,[bx,by]=B,[cx,cy]=Cc; let O,r;
+    if(mode==="circum"){ const Dd=2*(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by)); O=[((ax*ax+ay*ay)*(by-cy)+(bx*bx+by*by)*(cy-ay)+(cx*cx+cy*cy)*(ay-by))/Dd,((ax*ax+ay*ay)*(cx-bx)+(bx*bx+by*by)*(ax-cx)+(cx*cx+cy*cy)*(bx-ax))/Dd]; r=d(O,A); }
+    else { const a=d(B,Cc),b=d(Cc,A),c=d(A,B); O=[(a*ax+b*bx+c*cx)/(a+b+c),(a*ay+b*by+c*cy)/(a+b+c)]; r=Math.abs((bx-ax)*(cy-ay)-(cx-ax)*(by-ay))/(a+b+c); }
+    let s=P(`${A} ${B} ${Cc}`,{f:"rgba(47,111,237,.06)"})+C(O[0],O[1],r,{c:ACC,w:1.5})+C(O[0],O[1],3,{f:ACC,c:"none"})+T(O[0]+7,O[1]-6,mode==="circum"?"O":"I",{s:12,c:ACC,w:700});
+    [A,B,Cc].forEach((p,i)=>{ s+=T(p[0]+[-4,-16,6][i],p[1]+[-8,6,6][i],labels[i],{s:12}); }); if(mode==="in"){ [[A,B],[B,Cc],[Cc,A]].forEach(([p,q])=>{ /* 접점 */ const vx=q[0]-p[0],vy=q[1]-p[1],n=Math.hypot(vx,vy); const t=((O[0]-p[0])*vx+(O[1]-p[1])*vy)/(n*n); const F=[p[0]+vx*t,p[1]+vy*t]; s+=L(...O,...F,{c:ACC2,d:"3 3",w:1}); }); } else { [A,B,Cc].forEach(p=>s+=L(...O,...p,{c:ACC2,d:"3 3",w:1})); }
+    return S(w,h,s+extra); };
 })();

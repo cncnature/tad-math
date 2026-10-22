@@ -305,3 +305,39 @@ table select{padding:4px 6px;border:1px solid var(--line);border-radius:8px;back
 .stq .st-chk{margin-left:auto;font-size:.85rem;color:var(--muted);cursor:pointer}
 .stq.done{border-color:var(--ok);background:rgba(31,157,85,.04)}
 .stq.done .qn{background:var(--ok)}
+.fig-table{border-collapse:collapse;margin:8px auto;font-size:.95rem}
+.fig-table th,.fig-table td{border:1px solid var(--line);padding:5px 12px;text-align:center}
+.fig-table th{background:var(--bg);font-weight:700}
+.fig-table caption{caption-side:top;font-size:.82rem;color:var(--muted);padding-bottom:4px}
+
+/* 문제 + 그림 나란히, 5지선다, 시험지 모드 */
+.qrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start}
+.qrow p{margin:0}
+.qfig{margin:0;max-width:300px}.qfig svg{width:100%;height:auto;display:block}.qfig .figwrap{margin:0}
+@media(max-width:700px){.qrow{grid-template-columns:1fr}.qfig{max-width:100%}}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;margin:10px 0}
+.choice{text-align:left;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;cursor:pointer;font:inherit;color:var(--ink)}
+.choice .num{color:var(--muted);margin-right:4px}
+.choice:hover{border-color:var(--acc)}
+.choice.ok{border-color:var(--ok);background:rgba(31,157,85,.12)}.choice.bad{border-color:var(--bad);background:rgba(214,69,69,.12)}
+.tag.kind{background:var(--bg);color:var(--ink)}
+.paper{background:#fff;color:#111;border:1px solid #cfd6e4;padding:28px 32px;font-family:"Pretendard Variable",Pretendard,"Noto Sans KR",serif;max-width:900px;margin:0 auto}
+.paper .katex{color:#111}
+.paper-head{border:2px solid #333;padding:10px 14px;margin-bottom:14px}
+.paper-top{display:flex;justify-content:space-between;font-size:.8rem;color:#444}
+.paper h1{text-align:center;font-size:1.5rem;letter-spacing:.2em;margin:6px 0 2px}
+.paper-sub{text-align:center;font-size:.85rem;color:#333;margin-bottom:8px}
+.paper-info{display:flex;border-top:1px solid #333;border-bottom:1px solid #333;padding:6px 0;font-size:.85rem}
+.paper-info span{flex:1;padding:0 8px;border-right:1px solid #999}.paper-info span:last-child{border:0}
+.paper-notes{font-size:.75rem;color:#444;margin:6px 0 0;padding-left:16px}
+.paper-body{column-count:2;column-gap:28px;column-rule:1px solid #999}
+.pq{break-inside:avoid;margin-bottom:16px;font-size:.92rem;line-height:1.55}
+.pq .pq-q{margin-bottom:6px}
+.pfig{margin:4px 0;max-width:230px}.pfig svg{width:100%;height:auto;display:block}.pfig .figwrap{margin:0}
+.pq-opts{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.88rem}
+.pq-blank{height:70px;border-bottom:1px dashed #bbb}
+.paper-ans{column-span:all;border-top:2px solid #333;margin-top:16px;padding-top:8px;font-size:.85rem}
+.paper-ans h2{font-size:1rem;margin:4px 0 8px}.paper-ans li{margin-bottom:4px}
+:root[data-theme="dark"] .paper{color:#111}
+@media(max-width:700px){.paper{padding:16px}.paper-body{column-count:1}}
+@media print{body *{visibility:hidden}.paper,.paper *{visibility:visible}.paper{position:absolute;left:0;top:0;width:100%;border:0;max-width:none}.noprint{display:none!important}@page{margin:14mm}}

@@ -7,6 +7,9 @@
   const BAND = { m11:"중학교", m12:"중학교", m21:"중학교", g22:"중학교", g31:"중학교", g32:"중학교", h11:"고등학교", h12:"고등학교", h2a:"고등학교", h2c:"고등학교", h2p:"고등학교", h3c:"고등학교", h3g:"고등학교" };
   D.curriculum.grades = G;
   D.curriculum.units = [...D.curriculum.units, ...(D.curriculumExtra||[])].sort((a,b)=>gradeRank(a.grade)-gradeRank(b.grade));
+  // 시험 문항 그림·보기(data/exam-figs.js): 학교 시험 필수 문제 + 수능 패턴 도감
+  (D.schoolExams||[]).forEach(e=>e.items.forEach((it,i)=>{ const x=(D.schoolExamExtra||{})[e.grade+":"+e.term+":"+i]; if(!x) return; Object.assign(it,x); if(it.opts&&it.opts.length===5){ const k=(i*2+e.grade.length+(e.term==="mid"?0:e.term==="final"?3:1))%5; it.opts=it.opts.map((_,j)=>it.opts[(j+k)%5]); it.a=(it.a-k+5)%5; } }));
+  (D.suneung?D.suneung.patterns:[]).forEach(x=>{ const f=(D.patternFigs||{})[x.id]; if(f) Object.assign(x,f); });
   // 공식이 태어나는 이야기(data/stories-*.js): 아직 없는 소단원에 붙임
   D.curriculum.units.forEach(u=>u.lessons.forEach(l=>{ if(!l.story&&(D.stories||{})[l.id]) l.story=D.stories[l.id]; }));
   // 2차 심화(data/deepen-*.js): 오개념·출제 포인트·심화 퀴즈를 기존 항목 뒤에 이어 붙임
@@ -150,6 +153,7 @@
   }
   // 도해: 소단원/공식에 붙는 그림 (data/lesson-figs.js + js/figures.js)
   function figOf(id){ const m=(D.lessonFigs||{})[id]; if(!m||!window.FIG||!window.FIG[m.fig]) return ""; try{ return `<figure class="lfig"><div class="figwrap">${window.FIG[m.fig](m.p||{})}</div>${m.cap?`<figcaption>${md(m.cap)}</figcaption>`:""}</figure>`; }catch(e){ console.warn("fig",id,e); return ""; } }
+  function figAny(x,cls="lfig"){ if(!x||!x.fig||!window.FIG||!window.FIG[x.fig]) return ""; try{ return `<figure class="${cls}"><div class="figwrap">${window.FIG[x.fig](x.figp||{})}</div></figure>`; }catch(e){ console.warn("fig",x.fig,e); return ""; } }
   function figOfFormula(f){ if(f.fig&&window.FIG&&window.FIG[f.fig]){ try{ return `<figure class="lfig"><div class="figwrap">${window.FIG[f.fig](f.figp||{})}</div>${f.figcap?`<figcaption>${md(f.figcap)}</figcaption>`:""}</figure>`; }catch(e){} } const l=lessonsAll.find(l=>l.formulas.includes(f.id)&&(D.lessonFigs||{})[l.id]); return l?figOf(l.id):""; }
   function lesson(uid,lid){
     const u=byUnit(uid), l=byLesson(lid); if(!u||!l) return notFound();
@@ -489,7 +493,7 @@
     render(`<div class="lhead ${GCOL(x.subject==="m1"?"h2a":x.subject==="m2"?"h2c":x.subject==="pr"?"h2p":x.subject==="ca"?"h3c":"h3g")}"><div class="crumb"><a href="#/">홈</a> › <a href="#/patterns?s=${x.subject}">수능 패턴 도감</a> › ${subjName}</div><span class="tag">${subjName}</span> <span class="tag">${x.slot}</span><h1>${x.emoji} ${x.name}</h1><p class="lead">출제: ${x.years} · <span class="freq">${"●".repeat(x.freq)}${"○".repeat(10-x.freq)}</span></p></div>
     <div class="grid"><div class="card"><h3>👀 알아보는 신호</h3><ul>${x.signal.map(t=>`<li>${md(t)}</li>`).join("")}</ul></div><div class="card first-move"><h3>♟ 첫 수</h3><p>${md(x.first)}</p></div></div>
     <h2>동형 문제 <span class="muted" style="font-size:.9rem">실제 기출과 같은 구조, 다른 숫자</span></h2>
-    <div class="card"><p style="font-size:1.08rem">${md(x.q)}</p>
+    <div class="card"><div class="qrow"><p style="font-size:1.08rem">${md(x.q)}</p>${figAny(x,"qfig")}</div>
       <div class="reveal" id="rv"><button class="btn sm ghost" data-step="1">① 힌트 보기</button><button class="btn sm ghost" data-step="2">② 첫 줄만 보기</button><button class="btn sm" data-step="3">③ 전체 풀이</button></div>
       <div class="rv-box" id="rv1" hidden><b>힌트</b> — ${md(x.hint)}</div>
       <div class="rv-box" id="rv2" hidden><b>첫 줄</b> — ${md(x.steps[0])}</div>
@@ -504,7 +508,7 @@
     const SU=D.suneung; let score=0, n=0, cur=null; const total=8; const pool=shuffle(SU.patterns.slice());
     function next(){ if(n>=total||!pool.length) return finish(); cur=pool.pop(); n++; const others=shuffle(SU.patterns.filter(p=>p.id!==cur.id&&p.subject===cur.subject)).slice(0,3); const opts=shuffle([cur,...others]);
       render(`<div class="crumb"><a href="#/patterns">수능 패턴 도감</a> › 패턴 알아맞히기</div><div class="row"><span class="score">점수 ${score}</span><span class="muted">${n} / ${total}</span></div><div class="progress"><i style="width:${n/total*100}%"></i></div>
-      <div class="card game"><div class="eyebrow">이 문제는 어느 패턴일까요? (풀지 말고 구조만 보세요)</div><p style="font-size:1.05rem">${md(cur.q)}</p><div class="quiz" style="border:0"><div class="opts">${opts.map((o,j)=>`<button class="go" data-j="${j}">${o.emoji} ${o.name}</button>`).join("")}</div></div><div id="fb" class="muted"></div></div>`);
+      <div class="card game"><div class="eyebrow">이 문제는 어느 패턴일까요? (풀지 말고 구조만 보세요)</div><div class="qrow"><p style="font-size:1.05rem">${md(cur.q)}</p>${figAny(cur,"qfig")}</div><div class="quiz" style="border:0"><div class="opts">${opts.map((o,j)=>`<button class="go" data-j="${j}">${o.emoji} ${o.name}</button>`).join("")}</div></div><div id="fb" class="muted"></div></div>`);
       main.querySelectorAll(".go").forEach(b=>b.onclick=()=>{ const ok=opts[+b.dataset.j].id===cur.id; if(ok){ score+=10; b.classList.add("ok"); $("#fb").innerHTML=`✅ 신호: ${md(cur.signal[0])} → 첫 수: ${md(cur.first)}`; } else { b.classList.add("bad"); $("#fb").innerHTML=`❌ 정답은 <b>${cur.emoji} ${cur.name}</b> — ${md(cur.signal[0])}`; } typeset(); main.querySelectorAll(".go").forEach(x=>x.disabled=true); setTimeout(next,ok?1400:2600); }); }
     function finish(){ const best=store.get("best:pattern",0); if(score>best) store.set("best:pattern",score); render(`<div class="crumb"><a href="#/patterns">수능 패턴 도감</a></div><h1>🎯 ${score} / ${total*10}</h1><p class="lead">${score>=70?"구조가 보이기 시작했습니다. 이제 각 패턴의 '첫 수' 를 소리 내어 말해 보세요.":"틀린 패턴의 '알아보는 신호' 를 다시 읽고 한 번 더."} 최고 ${Math.max(best,score)}점</p><div class="row"><a class="btn" href="#/patterns/game" onclick="location.reload()">다시</a><a class="btn ghost" href="#/patterns">도감으로</a></div>`); }
     next();
@@ -521,10 +525,25 @@
     <div class="pill-row">${grades.map(g=>`<a class="pill ${g===grade?"on":""}" href="#/schooltest?g=${g}">${G[g]}</a>`).join("")}</div>
     <div class="pill-row">${sets.map(e=>`<a class="pill ${e.term===cur.term?"on":""}" href="#/schooltest?g=${grade}&t=${e.term}">${TN[e.term]}</a>`).join("")}</div>
     <h2>${cur.title} <span class="muted" style="font-size:.9rem;font-weight:400">${cur.range}</span></h2>
-    <div class="st-list">${cur.items.map((it,i)=>{ const k=cur.grade+":"+cur.term+":"+i; const l=byLesson(it.l); return `<div class="card stq ${done[k]?"done":""}"><div class="st-h"><span class="qn">${i+1}</span><span class="tag">${it.pts}점</span><span class="eyebrow">출제 의도 · ${it.intent}</span><label class="st-chk"><input type="checkbox" data-k="${k}" ${done[k]?"checked":""}> 맞힘</label></div><p style="font-size:1.05rem">${md(it.q)}</p><details class="sol"><summary>풀이 보기</summary><ol class="steps">${it.steps.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(it.ans)}</p>${l?`<p class="muted">📘 <a href="#/study/${l.unit}/${l.id}">${l.title}</a> 에서 개념 다시 보기</p>`:""}</details></div>`; }).join("")}</div>
-    <div class="row" style="margin-top:14px"><a class="btn ghost" href="#/exam">📝 시험 전 훑기(체크리스트)</a><a class="btn ghost" href="#/mix">🔀 섞어 풀기</a>${["h11","h12","h2a","h2c","h2p","h3c","h3g"].includes(grade)?`<a class="btn" href="#/patterns">🧭 수능 패턴 도감</a>`:""}</div>`);
+    <div class="st-list">${cur.items.map((it,i)=>{ const k=cur.grade+":"+cur.term+":"+i; const l=byLesson(it.l); return `<div class="card stq ${done[k]?"done":""}"><div class="st-h"><span class="qn">${i+1}</span>${it.kind?`<span class="tag kind">[${it.kind}]</span>`:""}<span class="tag">${it.pts}점</span><span class="eyebrow">출제 의도 · ${it.intent}</span><label class="st-chk"><input type="checkbox" data-k="${k}" ${done[k]?"checked":""}> 맞힘</label></div><div class="qrow"><p style="font-size:1.05rem">${md(it.q)}</p>${figAny(it,"qfig")}</div>${it.opts?`<div class="choices" data-a="${it.a}">${it.opts.map((o,j)=>`<button class="choice" data-j="${j}"><span class="num">${["①","②","③","④","⑤"][j]}</span> ${md(o)}</button>`).join("")}</div>`:'<p class="muted" style="font-size:.85rem">✍️ 서술형 — 풀이 과정을 쓰고 아래와 비교하세요.</p>'}<details class="sol"><summary>풀이 보기</summary><ol class="steps">${it.steps.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(it.ans)}</p>${l?`<p class="muted">📘 <a href="#/study/${l.unit}/${l.id}">${l.title}</a> 에서 개념 다시 보기</p>`:""}</details></div>`; }).join("")}</div>
+    <div class="row" style="margin-top:14px"><a class="btn" href="#/paper?g=${grade}&t=${cur.term}">🖨 시험지로 보기·인쇄</a><a class="btn ghost" href="#/exam">📝 시험 전 훑기(체크리스트)</a><a class="btn ghost" href="#/mix">🔀 섞어 풀기</a>${["h11","h12","h2a","h2c","h2p","h3c","h3g"].includes(grade)?`<a class="btn" href="#/patterns">🧭 수능 패턴 도감</a>`:""}</div>`);
+    main.querySelectorAll(".choices").forEach(box=>box.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{ if(box.dataset.done) return; box.dataset.done=1; const ok=+b.dataset.j===+box.dataset.a; b.classList.add(ok?"ok":"bad"); if(!ok) box.querySelector(`.choice[data-j="${box.dataset.a}"]`).classList.add("ok"); const card=box.closest(".card"); if(ok){ const c=card.querySelector(".st-chk input"); if(c&&!c.checked){ c.checked=true; c.dispatchEvent(new Event("change")); } } else card.querySelector("details.sol").open=true; }));
     main.querySelectorAll(".st-chk input").forEach(c=>c.onchange=()=>{ const d=store.get("st",{}); if(c.checked) d[c.dataset.k]=Date.now(); else delete d[c.dataset.k]; store.set("st",d); c.closest(".card").classList.toggle("done",c.checked); });
   }
+  // ---------- 시험지 모드 (실제 시험지 형식 + 인쇄) ----------
+  function paper(qs){
+    const pr=new URLSearchParams(qs||""); const grade=pr.get("g")||"g22", term=pr.get("t")||"final"; const set=D.schoolExams.find(e=>e.grade===grade&&e.term===term)||D.schoolExams[0];
+    const TN={mid:"중간고사",final:"기말고사",mock:"학력평가"}; const total=set.items.reduce((a,it)=>a+it.pts,0);
+    render(`<div class="crumb noprint"><a href="#/">홈</a> › <a href="#/schooltest?g=${grade}&t=${term}">학교 시험 필수 문제</a> › 시험지</div>
+    <div class="row noprint" style="margin-bottom:10px"><button class="btn" id="print">🖨 인쇄 / PDF 저장</button><button class="btn ghost" id="toggle-ans">정답·풀이 숨기기</button><a class="btn ghost" href="#/schooltest?g=${grade}&t=${term}">← 문제 풀기 화면</a></div>
+    <div class="paper" id="paper">
+      <div class="paper-head"><div class="paper-top"><span>수학 만지기</span><span>${G[grade]} · ${TN[set.term]}</span></div><h1>${set.title} 대비 필수 문제</h1><div class="paper-sub">[ 수 학 ] · 시험 범위: ${set.range}</div><div class="paper-info"><span>학년 &nbsp; 반 &nbsp; 번호</span><span>이름:</span><span>점수: &nbsp; / ${total}</span></div><ul class="paper-notes"><li>각 문항의 배점은 문제 끝에 표시되어 있습니다.</li><li>선택형은 ①~⑤ 중 하나를 고르고, 서술형은 풀이 과정을 씁니다.</li></ul></div>
+      <div class="paper-body">${set.items.map((it,i)=>`<div class="pq"><div class="pq-q"><b>${i+1}.</b> ${it.kind?`<b>[${it.kind}]</b> `:""}${md(it.q)} <b>[${it.pts}점]</b></div>${figAny(it,"pfig")}${it.opts?`<div class="pq-opts">${it.opts.map((o,j)=>`<span>${["①","②","③","④","⑤"][j]} ${md(o)}</span>`).join("")}</div>`:'<div class="pq-blank"></div>'}</div>`).join("")}</div>
+      <div class="paper-ans" id="ans"><h2>정답 및 풀이</h2><ol>${set.items.map(it=>`<li>${it.opts?`<b>${["①","②","③","④","⑤"][it.a]}</b> — `:""}${it.steps.map(s=>md(s)).join(" ")} <b>답: ${md(it.ans)}</b></li>`).join("")}</ol></div>
+    </div>`);
+    $("#print").onclick=()=>window.print(); $("#toggle-ans").onclick=e=>{ const a=$("#ans"); a.hidden=!a.hidden; e.target.textContent=a.hidden?"정답·풀이 보이기":"정답·풀이 숨기기"; };
+  }
+
   // ---------- 오답 노트 ----------
   function notes(){ const n=store.get("notes",[]); const TAGS=["계산 실수","개념 오류","문제 해석","풀이 못함"]; const tags=store.get("notetags",{});
     const key=x=>x.key+"#"+x.i+"#"+x.when; const cnt={}; n.forEach(x=>{const t=tags[key(x)]; if(t) cnt[t]=(cnt[t]||0)+1;}); const byUnitC={}; n.forEach(x=>{const l=byLesson(x.key.replace("lesson:","")); if(l){ byUnitC[l.unitTitle]=(byUnitC[l.unitTitle]||0)+1; }});
@@ -574,6 +593,7 @@
     if(r==="people") return people();
     if(r==="patterns") return patterns(p[1],qs);
     if(r==="schooltest") return schooltest(qs);
+    if(r==="paper") return paper(qs);
     if(r==="notes") return notes();
     if(r==="search") return search(decodeURIComponent((new URLSearchParams(qs||"")).get("q")||""));
     if(r==="about") return about();
