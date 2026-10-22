@@ -62,9 +62,9 @@
   function descendants(id,set=new Set()){ succs(id).forEach(p=>{ if(!set.has(p)){ set.add(p); descendants(p,set);} }); return set; }
 
   // ---------- 퀴즈 공통 ----------
-  function quizHtml(items, key){
-    return items.map((q,i)=>`<div class="quiz" data-key="${key}" data-i="${i}" data-a="${q.a}" data-q="${esc(q.q.replace(/\*\*/g,""))}">
-      <span class="qn">Q${i+1}${i>=2?' <em>심화</em>':''}${q.tag?` <em>${q.tag}</em>`:''}</span> ${md(q.q)}
+  function quizHtml(items, key, base){
+    return items.map((q,i)=>`<div class="quiz ${base!=null?"gen":""}" data-key="${key}" data-i="${base!=null?base+"-"+i:i}" data-a="${q.a}" data-q="${esc(q.q.replace(/\*\*/g,""))}">
+      <span class="qn">Q${i+1}${i>=2&&base==null?' <em>심화</em>':''}${q.tag?` <em>${q.tag}</em>`:''}</span> ${md(q.q)}
       <div class="opts">${q.opts.map((o,j)=>`<button data-j="${j}">${["①","②","③","④"][j]} ${md(o)}</button>`).join("")}</div>
       <div class="exp" hidden>${md(q.exp||"")}</div></div>`).join("");
   }
@@ -74,12 +74,103 @@
     const ok = Number(b.dataset.j)===Number(q.dataset.a);
     b.classList.add(ok?"ok":"bad"); q.querySelector(`.opts button[data-j="${q.dataset.a}"]`).classList.add("ok");
     q.querySelector(".exp").hidden=false;
-    const prog = store.get("quiz",{}); prog[q.dataset.key+"#"+q.dataset.i]=ok; store.set("quiz",prog);
+    if(!q.dataset.key.startsWith("gen:")){ const prog = store.get("quiz",{}); prog[q.dataset.key+"#"+q.dataset.i]=ok; store.set("quiz",prog); }
+    logQ(q.dataset.key,q.dataset.i,ok);
+    if(q.dataset.key.startsWith("gen:")){ const l=byLesson(q.dataset.key.slice(4)); const m=l?mastery(l):null; const fb=q.querySelector(".exp"); if(m&&fb) fb.insertAdjacentHTML("afterend",`<p class="muted small">${ok?"✅ 목표율 +5% → ":"목표율 "}<b>${m.pct}%</b></p>`); }
     if(!ok){ const notes=store.get("notes",[]); const text=q.dataset.q; notes.unshift({key:q.dataset.key,i:q.dataset.i,q:text,when:Date.now()}); store.set("notes",notes.slice(0,200)); }
   });
 
+  // ---------- 개인 학습 시스템 (프로필 · 목표율 · 컨설팅 · 생성 문제) ----------
+  const todayKey=d=>{ d=d||new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+  const profile=()=>store.get("me",null);
+  function logQ(key,i,ok){ const L=store.get("qlog",[]); L.push({k:key,i:String(i),ok:ok?1:0,t:Date.now()}); if(L.length>3000) L.splice(0,L.length-3000); store.set("qlog",L); }
+  const lessonOfKey=k=>{ const m=/^(lesson|gen|mix):(.+)$/.exec(k||""); return m?m[2]:null; };
+  // 소단원 목표율: 퀴즈 60 · 개념 읽기 10 · 공식 카드 15 · 시험/서술형 15 (없는 항목은 퀴즈로 이관) + 생성 문제 정답당 +5 (최대 +50)
+  function mastery(l){
+    const prog=store.get("quiz",{}); const L=store.get("qlog",[]); const srs=srsAll(); const visit=store.get("visit",{}); const st=store.get("st",{}); const es=store.get("essay",{});
+    const keys=Object.keys(prog).filter(k=>k.startsWith("lesson:"+l.id+"#")); const qc=keys.filter(k=>prog[k]).length; const quizPct=Math.min(100,100*qc/Math.max(1,l.quiz.length));
+    const fs=l.formulas.filter(byFormula); const rc=fs.filter(f=>srs[f]&&srs[f].n>=1).length; const recallPct=fs.length?100*rc/fs.length:null;
+    const items=[]; (D.schoolExams||[]).forEach(e=>e.items.forEach((it,i)=>{ if(it.l===l.id) items.push(e.grade+":"+e.term+":"+i); })); const essays=D.essay.filter(e=>e.lesson===l.id);
+    const pn=items.length+essays.length; const pc=items.filter(k=>st[k]).length+essays.filter(e=>es[e.id]&&es[e.id].score!=null).length; const practPct=pn?100*pc/pn:null;
+    let wq=60, wv=10, wr=15, wp=15; if(recallPct===null){ wq+=wr; wr=0; } if(practPct===null){ wq+=wp; wp=0; }
+    const base=(quizPct*wq+(visit[l.id]?100:0)*wv+(recallPct||0)*wr+(practPct||0)*wp)/100;
+    const gl=L.filter(x=>x.k==="gen:"+l.id); const gok=gl.filter(x=>x.ok).length; const extra=Math.min(50,5*gok);
+    const att=L.filter(x=>lessonOfKey(x.k)===l.id); const acc=att.length?att.filter(x=>x.ok).length/att.length:null;
+    return {pct:Math.round(base+extra),base:Math.round(base),extra,quizPct:Math.round(quizPct),qc,qn:l.quiz.length,recallPct,practPct,visited:!!visit[l.id],gen:gl.length,gok,attempts:att.length,acc};
+  }
+  const STATUS=p=>p<=0?["미시작","s0"]:p<40?["시작","s1"]:p<80?["학습 중","s2"]:p<100?["거의 다","s3"]:p===100?["목표 달성","s4"]:["초과 달성","s5"];
+  function activeDays(){ const L=store.get("qlog",[]); const daily=store.get("daily",{}); const set=new Set(Object.keys(daily)); L.forEach(x=>set.add(todayKey(new Date(x.t)))); let streak=0; const d=new Date(); for(;;){ const k=todayKey(d); if(set.has(k)){ streak++; d.setDate(d.getDate()-1); } else break; } return {streak,total:set.size}; }
+  const LV_OF={m11:"M1",m12:"M1",m21:"M1",g22:"A",g31:"B",g32:"B",h11:"H",h12:"H",h2a:"H2",h2c:"H2",h2p:"H2",h3c:"H3",h3g:"H3"};
+  // 컨설팅: 진단 → 약점(정답률) → 선수 개념 → 다음 할 일 → 복습 → 오답 유형 → 꾸준함 → 강점 심화
+  function consult(me,M){
+    const out=[]; const g=me.grade; const ls=lessonsAll.filter(l=>l.grade===g); const diag=store.get("diag",[]); const last=diag[0];
+    if(!last) out.push({pri:1,icon:"🧭",title:"먼저 끊긴 고리를 찾으세요",body:"학년이 아니라 개념으로 진단합니다. 10분이면 어디서부터 보강할지가 정해지고, 컨설팅이 그 결과를 반영합니다.",href:"#/diagnostic/"+(LV_OF[g]||"ALL"),label:"진단 시작"});
+    else if(last.broken&&nodeOf(last.broken)){ const n=nodeOf(last.broken); const lsn=lessonsOfNode(last.broken); const weakM=lsn.length?Math.round(lsn.reduce((a,l)=>a+M[l.id].pct,0)/lsn.length):0; if(!lsn.length||weakM<100) out.push({pri:1,icon:"🔗",title:`끊긴 고리 「${n.label}」 부터`,body:`지난 진단(${new Date(last.when).toLocaleDateString("ko")})에서 처음 막힌 개념입니다. 이 위에 쌓이는 개념 ${[...descendants(last.broken)].length}개가 함께 흔들립니다.${lsn.length?` 관련 소단원 목표율 ${weakM}%.`:""}`,href:lsn.length?`#/study/${lsn[0].unit}/${lsn[0].id}`:`#/roadmap/${last.broken}`,label:lsn.length?"보강 학습":"지도에서 보기"}); }
+    const weak=ls.map(l=>({l,m:M[l.id]})).filter(x=>x.m.attempts>=3&&x.m.acc<0.6).sort((a,b)=>a.m.acc-b.m.acc).slice(0,3);
+    weak.forEach(x=>out.push({pri:2,icon:"⚠️",title:`${x.l.title} — 정답률 ${Math.round(x.m.acc*100)}%`,body:`${x.m.attempts}문제 중 ${Math.round(x.m.acc*x.m.attempts)}개 정답. '오개념·함정' 을 다시 읽고 생성 문제 5개로 확인하세요. 3개 이상 맞히면 넘어가도 됩니다.`,href:`#/practice/${x.l.id}`,label:"5문제 생성"}));
+    ls.filter(l=>M[l.id].pct<60&&M[l.id].attempts>0).forEach(l=>{ const pre=[...ancestors(l.node)].flatMap(n=>lessonsOfNode(n)).filter(p=>p.grade!==g&&M[p.id].attempts>=2&&M[p.id].acc<0.6); if(pre.length&&!out.some(o=>o.icon==="⛓")){ const p=pre[0]; out.push({pri:2,icon:"⛓",title:`${l.title} 이 막히는 이유: 선수 개념 「${p.title}」`,body:`${p.title}(${G[p.grade]}) 의 정답률이 ${Math.round(M[p.id].acc*100)}% 입니다. 아래 학년이라도 먼저 메우는 쪽이 빠릅니다.`,href:`#/study/${p.unit}/${p.id}`,label:"선수 개념 학습"}); } });
+    const next=ls.find(l=>M[l.id].pct<100);
+    if(next) out.push({pri:3,icon:"▶️",title:`다음 할 일: ${next.title}`,body:`${byUnit(next.unit).title} · 목표율 ${M[next.id].pct}% — ${M[next.id].visited?"퀴즈 5문항을 끝내고 공식 카드까지 넘기면 목표 달성":"핵심 개념 → 왜 그런지 → 퀴즈 순으로 20분"}.`,href:`#/study/${next.unit}/${next.id}`,label:"학습"});
+    else out.push({pri:3,icon:"🏁",title:`${G[g]} 목표율 100% 달성`,body:"생성 문제로 150% 까지 올리거나, 다음 학기·수능 패턴 도감·서술형으로 확장하세요.",href:"#/patterns",label:"수능 패턴"});
+    const due=srsDue().filter(r=>ls.some(l=>l.formulas.includes(r.f))); if(due.length) out.push({pri:3,icon:"🧠",title:`오늘 복습할 공식 ${due.length}개`,body:"간격 반복: 오늘 넘기면 내일은 두 배로 쌓입니다. 3분이면 됩니다.",href:"#/recall/run",label:"복습"});
+    const tags=store.get("notetags",{}); const cnt={}; Object.values(tags).forEach(t=>{ if(t) cnt[t]=(cnt[t]||0)+1; }); const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0]; const tot=Object.values(cnt).reduce((a,b)=>a+b,0);
+    if(top&&top[1]>=3) out.push({pri:4,icon:"📒",title:`오답의 ${Math.round(100*top[1]/tot)}% 가 「${top[0]}」`,body:{"계산 실수":"풀이를 한 줄에 하나씩, 답을 쓴 뒤 역산 검산 10초. 생성 문제를 '시간 재지 않고' 풀어 정확도부터 잡으세요.","개념 오류":"틀린 문제 소단원의 '왜 그런지' 와 오개념 항목을 소리 내어 설명해 보세요(자기설명). 공식 카드도 함께.","문제 해석":"조건에 밑줄, 구하는 것을 첫 줄에 쓰기. 섞어 풀기로 '어느 단원 문제인지' 식별 훈련.","풀이 못함":"예제 → 퀴즈 Q1~Q3 → 생성 문제 순으로 난도를 올리세요. 서술형 모범 답안의 '첫 수' 를 따라 쓰기."}[top[0]]||"",href:"#/notes",label:"오답 노트"});
+    const days=activeDays(); if(days.streak===0&&days.total>0) out.push({pri:4,icon:"📅",title:"오늘 아직 한 문제도 안 풀었어요",body:"연속 학습이 끊기면 재시작 비용이 큽니다. 하루 10분 코스로 가볍게 시작하세요.",href:"#/daily",label:"하루 10분"});
+    const strong=ls.filter(l=>M[l.id].pct>=100&&M[l.id].acc>=0.85); if(strong.length>=2){ const l=strong[0]; const pat=(D.suneung.patterns||[]).find(p=>p.lesson===l.id); const oly=D.olympiad.items.find(o=>o.lesson===l.id); out.push({pri:5,icon:"🚀",title:`강점 ${strong.length}개 소단원 → 심화로`,body:`${strong.slice(0,3).map(x=>x.title).join(", ")} 은 목표 달성·정답률 85% 이상. ${pat?"수능 패턴":oly?"올림피아드 퀴즈":"서술형"}으로 올라갈 때입니다.`,href:pat?`#/patterns/${pat.id}`:oly?`#/olympiad/${oly.id}`:"#/essay",label:"심화"}); }
+    return out.sort((a,b)=>a.pri-b.pri).slice(0,6);
+  }
+  function weekPlan(me,M){ const ls=lessonsAll.filter(l=>l.grade===me.grade); const todo=ls.filter(l=>M[l.id].pct<100); const weak=ls.filter(l=>M[l.id].attempts>=3&&M[l.id].acc<0.6); const DN=["일","월","화","수","목","금","토"]; const plan=[]; let j=0, prevId=null;
+    for(let i=0;i<7;i++){ const d=new Date(); d.setDate(d.getDate()+i); const wd=d.getDay(); const items=[];
+      if(wd===0){ items.push({t:"🔀 섞어 풀기 6문제 + 오답 노트 다시 풀기",h:"#/mix"}); if(weak[0]) items.push({t:`⚠️ ${weak[0].title} 생성 5문제`,h:"#/practice/"+weak[0].id}); }
+      else { const l=todo.length?todo[Math.min(todo.length-1,Math.floor(j*todo.length/6))]:null; j++;
+        if(l&&l.id!==prevId){ items.push({t:`📘 ${l.title} (${M[l.id].pct}% → 100%)`,h:`#/study/${l.unit}/${l.id}`}); prevId=l.id; }
+        else if(l){ items.push({t:`➕ ${l.title} 생성 5문제 (→ 120%)`,h:"#/practice/"+l.id}); }
+        else { const s=ls[i%ls.length]; items.push({t:`➕ ${s.title} 생성 5문제 (초과 달성)`,h:"#/practice/"+s.id}); }
+        if(i%2===1&&weak.length){ const w=weak[Math.floor(i/2)%weak.length]; if(w.id!==prevId) items.push({t:`⚠️ ${w.title} 생성 5문제`,h:"#/practice/"+w.id}); }
+        items.push({t:"🧠 공식 카드 3장",h:"#/recall/run"}); }
+      plan.push({label:`${d.getMonth()+1}/${d.getDate()} (${DN[wd]})`,items,today:i===0}); }
+    return plan; }
+  function setup(){ const p=profile()||{};
+    render(`<section class="hero"><div class="hero-art">${["1F4D0","2B55","1F4C8","1F3B2","1F9EE","1F53A"].map(c=>ico(c,"ico float")).join("")}</div><div class="eyebrow">TAD 수학 만지기 · 개인 학습 시스템</div><h1>어느 학기부터 시작할까요?</h1><p class="lead">학기를 고르면 소단원마다 <b>목표율</b>이 생기고, 퀴즈·공식 카드·시험 문제를 풀 때마다 채워집니다. 컨설팅은 진단 결과·정답률·오답 유형을 읽고 <b>지금 무엇을 더 해야 하는지</b>를 매일 다시 계산합니다. 어떤 문제든 '추가 생성' 을 누르면 같은 유형의 새 문제가 나오고, 맞히면 목표율이 100% 를 넘어 120%, 150% 까지 올라갑니다.</p></section>
+    <div class="grid">${GORDER.map(g=>`<button class="card link gsel ${GCOL(g)} ${p.grade===g?"on":""}" data-g="${g}">${tag(g)}<h3>${G[g]}</h3><p class="muted">${D.curriculum.units.filter(u=>u.grade===g).length}단원 · ${lessonsAll.filter(l=>l.grade===g).length}소단원</p></button>`).join("")}</div>
+    <div class="card" style="margin-top:12px"><div class="row"><label>이름(선택) <input id="me-name" value="${esc(p.name||"")}" placeholder="예: 민준" style="width:120px"></label><label>시험일(선택) <input id="me-exam" type="date" value="${p.examDate||""}"></label></div><p class="muted">학기를 누르면 바로 시작됩니다. 기록은 이 브라우저(로그인하면 계정)에만 저장됩니다. <a href="#/intro">사이트 소개 · $x^2-x-6=0$ 이야기 보기</a></p></div>`);
+    main.querySelectorAll(".gsel").forEach(b=>b.onclick=()=>{ const np={...p,grade:b.dataset.g,name:$("#me-name").value.trim(),examDate:$("#me-exam").value,since:p.since||Date.now()}; store.set("me",np); location.hash="#/me"; if(location.hash==="#/me") route(); });
+  }
+  function me(qs){
+    const p=profile(); if(!p) return setup();
+    const pr=new URLSearchParams(qs||""); if(pr.get("g")&&G[pr.get("g")]&&pr.get("g")!==p.grade){ p.grade=pr.get("g"); store.set("me",p); }
+    const g=p.grade; const units=D.curriculum.units.filter(u=>u.grade===g); const M={}; lessonsAll.forEach(l=>M[l.id]=mastery(l));
+    const ls=lessonsAll.filter(l=>l.grade===g); const avgX=a=>a.length?Math.round(a.reduce((s,l)=>s+M[l.id].pct,0)/a.length):0;
+    const overall=avgX(ls); const L=store.get("qlog",[]); const week=L.filter(x=>Date.now()-x.t<7*864e5); const acc7=week.length?Math.round(100*week.filter(x=>x.ok).length/week.length):null; const days=activeDays(); const gen=L.filter(x=>x.k.startsWith("gen:")).length;
+    const advice=consult(p,M); const plan=weekPlan(p,M); const diag=store.get("diag",[])[0];
+    const stNum=Object.keys(store.get("st",{})).length, pat=Object.keys(store.get("pat",{})).length, oly=Object.values(store.get("oly",{})).filter(r=>r.ok).length, ns=Object.keys(store.get("ns",{})).length, ess=Object.values(store.get("essay",{})).filter(r=>r.score!=null).length;
+    const dday=p.examDate?Math.ceil((new Date(p.examDate)-new Date())/864e5):null;
+    render(`<div class="me-head"><div><div class="eyebrow">내 학습 · ${G[g]}${dday!=null?` · 시험 D${dday>=0?"-"+dday:"+"+(-dday)}`:""}</div><h1>${p.name?esc(p.name)+" 님의 ":""}개인 학습 대시보드</h1><p class="muted">목표율 = 퀴즈 60 · 개념 읽기 10 · 공식 카드 15 · 시험/서술형 15. 생성 문제를 맞힐 때마다 +5% (최대 150%).</p></div><div class="ring" style="--p:${Math.min(100,overall)}"><b>${overall}%</b><span>학기 목표율</span></div></div>
+    <div class="pill-row">${GORDER.map(x=>`<a class="pill ${x===g?"on":""}" href="#/me?g=${x}">${G[x]}</a>`).join("")}</div>
+    <div class="stats me-stats"><div><b>${days.streak}</b>연속 학습일</div><div><b>${days.total}</b>총 학습일</div><div><b>${L.length}</b>푼 문제</div><div><b>${acc7!=null?acc7+"%":"—"}</b>최근 7일 정답률</div><div><b>${gen}</b>생성 문제</div><div><b>${ls.filter(l=>M[l.id].pct>=100).length}/${ls.length}</b>목표 달성 소단원</div></div>
+    <h2>🧑‍🏫 학습 컨설팅 <span class="muted" style="font-weight:400;font-size:.9rem">— 지금 가장 효과가 큰 순서로</span></h2>
+    <div class="grid wide">${advice.map(a=>`<div class="card adv p${a.pri}"><h3>${a.icon} ${a.title}</h3><p>${a.body}</p><a class="btn sm" href="${a.href}">${a.label} →</a></div>`).join("")}</div>
+    <h2>📅 이번 주 계획 <span class="muted" style="font-weight:400;font-size:.9rem">— 약한 곳 우선 · 하루 20분 · 일요일은 섞어 풀기</span></h2>
+    <div class="week">${plan.map(d=>`<div class="day ${d.today?"today":""}"><div class="eyebrow">${d.label}${d.today?" · 오늘":""}</div>${d.items.map(it=>`<a href="${it.h}">${it.t}</a>`).join("")}</div>`).join("")}</div>
+    <h2>📘 ${G[g]} 소단원별 목표율</h2>
+    ${units.map(u=>{ const ul=u.lessons.map(l=>byLesson(l.id)); const up=avgX(ul); return `<div class="card unit-prog"><div class="row" style="justify-content:space-between"><h3 style="margin:0">${ico(UNIT_ICON[u.id]||"1F4D8","ico sm")} <a href="#/study/${u.id}">${u.title}</a></h3><b>${up}%</b></div><div class="progress"><i style="width:${Math.min(100,up)}%"></i></div>
+      <table class="mtable">${ul.map(l=>{ const m=M[l.id]; const [sn,sc]=STATUS(m.pct); return `<tr><td><a href="#/study/${u.id}/${l.id}">${l.title}</a></td><td class="bar"><div class="mbar"><i style="width:${Math.min(100,m.pct)}%"></i>${m.pct>100?`<em style="width:${Math.min(100,(m.pct-100)*2)}%"></em>`:""}</div></td><td class="num">${m.pct}%</td><td><span class="st ${sc}">${sn}</span></td><td class="muted small">퀴즈 ${m.qc}/${m.qn}${m.acc!=null?` · 정답률 ${Math.round(m.acc*100)}%`:""}${m.recallPct!=null?` · 공식 ${Math.round(m.recallPct)}%`:""}${m.gok?` · 생성 +${m.extra}%`:""}</td><td><a class="btn sm ghost" href="#/practice/${l.id}">➕ 생성</a></td></tr>`; }).join("")}</table></div>`; }).join("")}
+    <h2>📊 기록</h2><div class="grid">
+      <div class="card"><h3>🧭 진단</h3><p>${diag?`${new Date(diag.when).toLocaleDateString("ko")} · ${diag.score}/${diag.total} · 끊긴 고리: <b>${diag.broken&&nodeOf(diag.broken)?nodeOf(diag.broken).label:"없음 🎉"}</b>`:"아직 진단 전"}</p><a class="btn sm ghost" href="#/diagnostic">진단</a></div>
+      <div class="card"><h3>🏫 학교 시험 문제</h3><p>맞힘 체크 ${stNum}개</p><a class="btn sm ghost" href="#/schooltest">가기</a></div>
+      <div class="card"><h3>✍️ 서술형 · 논술</h3><p>자기채점 ${ess}편 · 논술 ${ns}문제</p><a class="btn sm ghost" href="#/essay">가기</a></div>
+      <div class="card"><h3>🧭 수능 패턴 · 🏅 올림피아드</h3><p>패턴 ${pat}개 체크 · 메달 ${oly}개</p><a class="btn sm ghost" href="#/patterns">가기</a></div>
+    </div>
+    <div class="row" style="margin-top:16px"><a class="btn ghost" href="#/setup">⚙️ 학기·이름·시험일 바꾸기</a><a class="btn ghost" href="#/intro">📖 사이트 소개 · $x^2-x-6=0$ 이야기</a><a class="btn ghost" href="#/notes">📒 오답 노트 · 기록 내보내기</a></div>`);
+  }
+  function practice(lid,qs){ const l=byLesson(lid); if(!l) return notFound(); const n=Math.min(10,Math.max(1,+(new URLSearchParams(qs||"")).get("n")||5)); const items=window.GEN?window.GEN.make(l.id,l.node,n):[]; const m=mastery(l);
+    render(`<div class="lhead ${GCOL(l.grade)}"><div class="crumb"><a href="#/me">내 학습</a> › <a href="#/study/${l.unit}/${l.id}">${l.title}</a> › 생성 문제</div>${tag(l.grade)} <span class="tag">목표율 ${m.pct}%</span> <span class="tag">정답률 ${m.acc!=null?Math.round(m.acc*100)+"%":"—"}</span><h1>➕ ${l.title} 생성 문제 ${items.length}</h1><p class="lead muted">같은 유형, 다른 숫자. 맞힐 때마다 목표율 +5% (최대 +50%). 틀리면 오답 노트에 들어가고 풀이가 열립니다.</p></div>
+    ${items.length?quizHtml(items,"gen:"+l.id,Date.now()):'<div class="box warn">이 소단원은 아직 생성기가 없습니다.</div>'}
+    <div class="row" style="margin-top:14px"><a class="btn" href="#/practice/${l.id}?n=${n}" onclick="setTimeout(()=>location.reload(),0)">➕ ${n}문제 더</a><a class="btn ghost" href="#/practice/${l.id}?n=10" onclick="setTimeout(()=>location.reload(),0)">10문제</a><a class="btn ghost" href="#/study/${l.unit}/${l.id}">📘 소단원</a><a class="btn ghost" href="#/me">🏠 대시보드</a></div>`); }
+
   // ---------- 홈 ----------
-  function home(){
+  function home(){ return profile()?me():setup(); }
+  function intro(){
     const nCore=D.formulas.filter(f=>f.core).length;
     const due = srsDue().length;
     render(`
@@ -88,7 +179,7 @@
       <div class="eyebrow">중1 ~ 고3 · 무료 · 오픈소스 · 로그인으로 기록 이어하기</div>
       <h1>수학, 외우기 전에 먼저 만져 보세요</h1>
       <p class="lead">중1 소인수분해부터 고3 미적분·기하까지 한 장의 개념 지도로 이어집니다. 개념마다 손으로 밀고 당기는 판, 공식이 태어나는 이야기, 오개념과 출제 포인트. 왜 그런지를 본 공식은 잊어도 다시 만들 수 있습니다.</p>
-      <div class="row"><a class="btn" href="#/diagnostic">🧭 끊긴 곳부터 진단하기</a><a class="btn ghost" href="#/lab">🔬 그냥 만져 보기</a><a class="btn ghost" href="#/study">📚 학기 고르기</a>${due?`<a class="btn ghost" href="#/recall">🧠 오늘 복습할 공식 ${due}개</a>`:""}</div>
+      <div class="row"><a class="btn" href="#/me">🏠 내 학습 대시보드</a><a class="btn ghost" href="#/diagnostic">🧭 끊긴 곳부터 진단하기</a><a class="btn ghost" href="#/lab">🔬 그냥 만져 보기</a><a class="btn ghost" href="#/study">📚 학기 고르기</a>${due?`<a class="btn ghost" href="#/recall">🧠 오늘 복습할 공식 ${due}개</a>`:""}</div>
       <div class="stats">
         <div><b>${lessonsAll.length}</b>소단원</div><div><b>${D.formulas.length}</b>공식</div><div><b>${nCore}</b>정말 외울 것</div><div><b>${D.roadmap.nodes.length}</b>개념 노드</div><div><b>${Object.keys(window.WIDGETS).length}</b>만지는 위젯</div><div><b>${D.life.length}</b>생활 속 수학</div>
       </div>
@@ -165,7 +256,8 @@
     const node=nodeOf(l.node); const pre=preds(l.node).map(nodeOf), post=succs(l.node).map(nodeOf);
     const widgets=Object.entries(window.WIDGETS).filter(([k,w])=>w.node===l.node);
     const lifeItems=D.life.filter(x=>x.node===l.node).slice(0,3); const ppl=D.people.filter(p=>p.link===l.id||p.node===l.node).slice(0,2);
-    render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span><h1>${l.title}</h1><p class="lead">${teaser(l.concept[0],90)}</p></div>
+    { const v=store.get("visit",{}); v[l.id]={n:(v[l.id]?v[l.id].n:0)+1,last:Date.now()}; store.set("visit",v); } const mst=mastery(l); const [stn,stc]=STATUS(mst.pct);
+    render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span> <span class="st ${stc}">목표율 ${mst.pct}% · ${stn}</span><h1>${l.title}</h1><p class="lead">${teaser(l.concept[0],90)}</p></div>
     <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["story","이야기"],["pit","오개념"],["pt","출제 포인트"],["f","공식"],["ex","예제"],["quiz","퀴즈"],["bridge","개념 연결"],["place","개념의 자리"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
     <h2 id="c">핵심 개념</h2><div class="concept-row"><ul>${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>${figOf(l.id)}</div>
     <h2 id="why">왜 그런지</h2><div class="box">${md(l.why)}</div>
@@ -175,7 +267,8 @@
     ${widgets.length?`<h2>만져 보기</h2>${widgets.map(([k,w])=>`<div class="widget" id="w-${k}"><b>${MF(w.title)}</b><p class="muted">${MF(w.desc)}</p></div>`).join("")}`:""}
     ${l.formulas.length?`<h2 id="f">이 단원의 공식</h2><div class="grid">${l.formulas.map(f=>byFormula(f)).filter(Boolean).map(f=>`<a class="card link" href="#/formulas/${f.id}"><h3>${f.title} ${f.core?'<span class="tag">외울 것</span>':'<span class="tag">되살릴 것</span>'}</h3><div class="formula">$${texCard(f.tex)}$</div></a>`).join("")}</div>`:""}
     <h2 id="ex">예제</h2><div class="card"><p><b>문제.</b> ${md(l.example.q)}</p><details class="sol"><summary>풀이 보기</summary><ol class="steps">${l.example.sol.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(l.example.ans)}</p></details></div>
-    <h2 id="quiz">확인 퀴즈</h2>${quizHtml(l.quiz,"lesson:"+l.id)}
+    <h2 id="quiz">확인 퀴즈 <span class="muted" style="font-weight:400;font-size:.9rem">맞힌 ${mst.qc}/${mst.qn}</span></h2>${quizHtml(l.quiz,"lesson:"+l.id)}
+    <div id="gen-box"></div><div class="row"><button class="btn ghost" id="gen-more">➕ 문제 추가 생성 (3문제 · 맞히면 목표율 +5%)</button><a class="btn ghost" href="#/practice/${l.id}">🎯 생성 문제 5개 모아 풀기</a></div>
     ${(()=>{const bs=D.bridge.filter(b=>b.nodes.includes(l.node)); return bs.length?`<h2 id="bridge">🔗 이 개념이 다른 단원과 만나는 문제</h2><div class="grid wide">${bs.map(b=>`<a class="card link ${GCOL(b.grade)}" href="#/bridge/${b.id}">${tag(b.grade)}<h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div></a>`).join("")}</div>`:"";})()}
     ${(()=>{const es=D.essay.filter(e=>e.lesson===l.id||e.node===l.node); return es.length?`<h2 id="essay">✍️ 서술형·증명</h2><div class="row">${es.map(e=>`<a class="btn ghost sm" href="#/essay/${e.id}">${e.title}</a>`).join("")}</div>`:"";})()}
     <h2 id="place">이 개념의 자리</h2>
@@ -183,6 +276,7 @@
     ${lifeItems.length||ppl.length?`<h2>이어서 보기</h2><div class="grid">${lifeItems.map(x=>`<a class="card link" href="#/life"><div class="eyebrow">🌍 생활 속 수학</div><h3>${x.title}</h3></a>`).join("")}${ppl.map(p=>`<a class="card link" href="#/people"><div class="eyebrow">👤 수학 인물</div><h3>${p.name}</h3><p class="muted">${p.years}</p></a>`).join("")}</div>`:""}
     <div class="row" style="margin-top:24px">${prev?`<a class="btn ghost" href="#/study/${u.id}/${prev.id}">← ${prev.title}</a>`:""}${next?`<a class="btn" href="#/study/${u.id}/${next.id}">${next.title} →</a>`:`<a class="btn" href="#/study">다음 단원 고르기 →</a>`}</div>`);
     widgets.forEach(([k,w])=>w.render($("#w-"+k)));
+    const gb=$("#gen-more"); if(gb) gb.onclick=()=>{ const items=window.GEN?window.GEN.make(l.id,l.node,3):[]; if(!items.length){ gb.textContent="이 소단원은 생성기가 없습니다"; return; } $("#gen-box").insertAdjacentHTML("beforeend",quizHtml(items,"gen:"+l.id,Date.now())); typeset(); };
     main.querySelectorAll("[data-to]").forEach(b=>b.onclick=()=>{ const t=document.getElementById(b.dataset.to); if(t) t.scrollIntoView({behavior:"smooth",block:"start"}); });
   }
 
@@ -367,7 +461,7 @@
       let unitRight=null;
       main.querySelectorAll("#u-opts button").forEach(b=>b.onclick=()=>{ if(unitRight!==null)return; unitRight=b.dataset.u===l.unit; if(unitRight)idOk++; b.classList.add(unitRight?"ok":"bad"); main.querySelector(`#u-opts button[data-u="${l.unit}"]`).classList.add("ok"); $("#stage2").hidden=false; typeset(); });
       let ans=null;
-      main.querySelectorAll("#a-opts button").forEach(b=>b.onclick=()=>{ if(ans!==null)return; ans=Number(b.dataset.j)===q.a; if(ans)score++; b.classList.add(ans?"ok":"bad"); main.querySelector(`#a-opts button[data-j="${q.a}"]`).classList.add("ok"); $("#exp").hidden=false; $("#next").hidden=false; log.push({l,ok:ans,unitRight});
+      main.querySelectorAll("#a-opts button").forEach(b=>b.onclick=()=>{ if(ans!==null)return; ans=Number(b.dataset.j)===q.a; if(ans)score++; b.classList.add(ans?"ok":"bad"); main.querySelector(`#a-opts button[data-j="${q.a}"]`).classList.add("ok"); $("#exp").hidden=false; $("#next").hidden=false; log.push({l,ok:ans,unitRight}); logQ("mix:"+l.id,picked[i].i,ans);
         if(!ans){ const notes=store.get("notes",[]); notes.unshift({key:"lesson:"+l.id,i:picked[i].i,q:q.q.replace(/\*\*/g,""),when:Date.now()}); store.set("notes",notes.slice(0,200)); } });
       $("#next").onclick=()=>{ i++; step(); };
     }
@@ -503,7 +597,7 @@
       <div class="rv-box" id="rv2" hidden><b>첫 줄</b> — ${md(x.steps[0])}</div>
       <div class="rv-box" id="rv3" hidden><ol class="steps">${x.steps.map(st=>`<li>${md(st)}</li>`).join("")}</ol><p><b>답:</b> ${md(x.ans)}</p></div></div>
     <div class="grid"><div class="card"><h3>⚠️ 이 패턴의 함정</h3><p>${md(x.trap)}</p></div><div class="card"><h3>🔁 변형(킬러 축소판)</h3><p>${md(x.twist)}</p></div></div>
-    <div class="row" style="margin-top:14px"><button class="btn ${seen[id]?"ghost":""}" id="mark">${seen[id]?"✓ 익힘 취소":"✓ 익혔어요"}</button>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a>`:""}<a class="btn ghost" href="#/roadmap/${x.node}">🗺 개념의 자리</a><a class="btn ghost" href="#/patterns/game">🎮 알아맞히기</a></div>
+    <div class="row" style="margin-top:14px"><button class="btn ${seen[id]?"ghost":""}" id="mark">${seen[id]?"✓ 익힘 취소":"✓ 익혔어요"}</button>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a><a class="btn ghost" href="#/practice/${ls.id}">➕ 기본 유형 생성</a>`:""}<a class="btn ghost" href="#/roadmap/${x.node}">🗺 개념의 자리</a><a class="btn ghost" href="#/patterns/game">🎮 알아맞히기</a></div>
     <div class="row" style="margin-top:10px">${(()=>{const l=SU.patterns.filter(p=>p.subject===x.subject);const i=l.indexOf(x);return `${l[i-1]?`<a class="btn sm ghost" href="#/patterns/${l[i-1].id}">← ${l[i-1].name}</a>`:""}${l[i+1]?`<a class="btn sm ghost" href="#/patterns/${l[i+1].id}">${l[i+1].name} →</a>`:`<a class="btn sm ghost" href="#/patterns?s=${x.subject}">목록</a>`}`;})()}</div>`);
     main.querySelectorAll("#rv [data-step]").forEach(b=>b.onclick=()=>{ const n=+b.dataset.step; for(let i=1;i<=n;i++){ const el=$("#rv"+i); if(el) el.hidden=false; } typeset(); });
     $("#mark").onclick=()=>{ const sm=store.get("pat",{}); if(sm[id]) delete sm[id]; else sm[id]=Date.now(); store.set("pat",sm); patterns(id,qs); };
@@ -560,7 +654,7 @@
           <div class="row"><button class="btn" id="ns-score">자기채점 저장</button><span id="ns-res" class="muted">${cur?`저장됨 ${cur.score}/${max}`:""}</span></div>
           <h3>감점 포인트</h3><div class="grid">${P.pitfalls.map(x=>`<div class="box warn">⚠️ ${md(x)}</div>`).join("")}</div></div>
       </div>
-      <div class="row" style="margin-top:14px">${pi<u.problems.length-1?`<a class="btn" href="#/nonsul/${id}?p=${pi+1}">다음 문제 →</a>`:`<a class="btn" href="#/nonsul?t=${u.type}">목록</a>`}<a class="btn ghost" href="#/nonsul/guide">✍️ 답안 쓰기 트레이너</a>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a>`:""}${P.node?`<a class="btn ghost" href="#/roadmap/${P.node}">🗺 개념의 자리</a>`:""}</div>`);
+      <div class="row" style="margin-top:14px">${pi<u.problems.length-1?`<a class="btn" href="#/nonsul/${id}?p=${pi+1}">다음 문제 →</a>`:`<a class="btn" href="#/nonsul?t=${u.type}">목록</a>`}<a class="btn ghost" href="#/nonsul/guide">✍️ 답안 쓰기 트레이너</a>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a><a class="btn ghost" href="#/practice/${ls.id}">➕ 기본 유형 생성</a>`:""}${P.node?`<a class="btn ghost" href="#/roadmap/${P.node}">🗺 개념의 자리</a>`:""}</div>`);
       const ob=$("#ns-open"); if(ob) ob.onclick=()=>{ stage=1; draw(); };
       const sb=$("#ns-score"); if(sb) sb.onclick=()=>{ const boxes=[...main.querySelectorAll(".rubric input")]; const got=boxes.map(b=>b.checked); const score=boxes.reduce((a,b)=>a+(b.checked?+b.dataset.p:0),0); const rr=store.get("ns",{}); rr[key]={score,max,got,when:Date.now()}; store.set("ns",rr); $("#ns-res").textContent=`저장됨 ${score}/${max}`+(score===max?" 🎉 만점!":score>=max*0.7?" 👍 합격권":" — 감점 포인트를 다시 읽어 보세요"); };
       typeset(); }
@@ -590,7 +684,7 @@
         <div class="oly-hints">${x.hints.map((h,i)=>`<div class="hint ${i<hintsUsed?"open":""}" data-i="${i}"><button class="btn sm ghost" ${i>hintsUsed||done?"disabled":""}>💡 힌트 ${i+1}${i>=hintsUsed&&!done?` (−${SC[i]-SC[i+1]}점)`:""}</button><span class="hint-t">${i<hintsUsed?md(h):""}</span></div>`).join("")}</div>
         <div id="oly-sol" ${done?"":"hidden"}><h3>풀이</h3><ol class="steps">${x.sol.map(t=>`<li>${md(t)}</li>`).join("")}</ol><div class="box ok"><b>💡 아하!</b> ${md(x.aha)}</div><p class="muted">정답: ${md(x.ans)}${done?` · 이 문제 ${cur.score!=null?cur.score:0}점`:""}</p></div>
       </div>
-      <div class="row" style="margin-top:14px"><a class="btn" href="#/olympiad/random">🎲 다음 문제</a>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a>`:""}<a class="btn ghost" href="#/roadmap/${x.node}">🗺 개념의 자리</a><a class="btn ghost" href="#/olympiad?b=${x.band}">목록</a></div>`);
+      <div class="row" style="margin-top:14px"><a class="btn" href="#/olympiad/random">🎲 다음 문제</a>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a><a class="btn ghost" href="#/practice/${ls.id}">➕ 교과 유사 문제</a>`:""}<a class="btn ghost" href="#/roadmap/${x.node}">🗺 개념의 자리</a><a class="btn ghost" href="#/olympiad?b=${x.band}">목록</a></div>`);
       main.querySelectorAll(".oly-hints .hint button").forEach(b=>b.onclick=()=>{ const i=+b.closest(".hint").dataset.i; if(i!==hintsUsed) return; hintsUsed++; draw(); });
       const inp=$("#oly-in"); if(inp){ inp.focus(); const check=()=>{ const v=inp.value.trim().replace(/\s/g,""); if(!v) return; const norm=t=>String(t).replace(/\s/g,"").replace(/°/g,"").toLowerCase(); let ok=false; const nv=Number(v.replace(/[^0-9.\-\/]/g,"")); const na=Number(String(x.ans).replace(/[^0-9.\-]/g,"")); if(norm(v)===norm(x.ans)) ok=true; else if(/^-?\d+\/\d+$/.test(v)&&/^-?\d+\/\d+$/.test(x.ans)){ const f=t=>t.split("/").map(Number); const [a,b]=f(v),[c,d]=f(x.ans); ok=a*d===b*c; } else if(!isNaN(nv)&&!isNaN(na)&&/^-?[\d.]+$/.test(v)) ok=Math.abs(nv-na)<=(x.tol||1e-9);
         if(ok){ done=true; const sc=SC[hintsUsed]; const rr=store.get("oly",{}); const prev=rr[id]; if(!prev||!prev.ok||prev.score<sc) rr[id]={ok:true,score:sc,when:Date.now()}; store.set("oly",rr); draw(); $("#oly-fb").innerHTML=`<div class="box ok">🎉 정답! <b>${sc}점</b> ${MEDAL(x.level)} — 아래 '아하' 를 꼭 읽어 보세요.</div>`; $("#oly-sol").scrollIntoView({behavior:"smooth",block:"center"}); }
@@ -610,7 +704,7 @@
     <div class="pill-row">${grades.map(g=>`<a class="pill ${g===grade?"on":""}" href="#/schooltest?g=${g}">${G[g]}</a>`).join("")}</div>
     <div class="pill-row">${sets.map(e=>`<a class="pill ${e.term===cur.term?"on":""}" href="#/schooltest?g=${grade}&t=${e.term}">${TN[e.term]}</a>`).join("")}</div>
     <h2>${cur.title} <span class="muted" style="font-size:.9rem;font-weight:400">${cur.range}</span></h2>
-    <div class="st-list">${cur.items.map((it,i)=>{ const k=cur.grade+":"+cur.term+":"+i; const l=byLesson(it.l); return `<div class="card stq ${done[k]?"done":""}"><div class="st-h"><span class="qn">${i+1}</span>${it.kind?`<span class="tag kind">[${it.kind}]</span>`:""}<span class="tag">${it.pts}점</span><span class="eyebrow">출제 의도 · ${it.intent}</span><label class="st-chk"><input type="checkbox" data-k="${k}" ${done[k]?"checked":""}> 맞힘</label></div><div class="qrow"><p style="font-size:1.05rem">${md(it.q)}</p>${figAny(it,"qfig")}</div>${it.opts?`<div class="choices" data-a="${it.a}">${it.opts.map((o,j)=>`<button class="choice" data-j="${j}"><span class="num">${["①","②","③","④","⑤"][j]}</span> ${md(o)}</button>`).join("")}</div>`:'<p class="muted" style="font-size:.85rem">✍️ 서술형 — 풀이 과정을 쓰고 아래와 비교하세요.</p>'}<details class="sol"><summary>풀이 보기</summary><ol class="steps">${it.steps.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(it.ans)}</p>${l?`<p class="muted">📘 <a href="#/study/${l.unit}/${l.id}">${l.title}</a> 에서 개념 다시 보기</p>`:""}</details></div>`; }).join("")}</div>
+    <div class="st-list">${cur.items.map((it,i)=>{ const k=cur.grade+":"+cur.term+":"+i; const l=byLesson(it.l); return `<div class="card stq ${done[k]?"done":""}"><div class="st-h"><span class="qn">${i+1}</span>${it.kind?`<span class="tag kind">[${it.kind}]</span>`:""}<span class="tag">${it.pts}점</span><span class="eyebrow">출제 의도 · ${it.intent}</span><label class="st-chk"><input type="checkbox" data-k="${k}" ${done[k]?"checked":""}> 맞힘</label></div><div class="qrow"><p style="font-size:1.05rem">${md(it.q)}</p>${figAny(it,"qfig")}</div>${it.opts?`<div class="choices" data-a="${it.a}">${it.opts.map((o,j)=>`<button class="choice" data-j="${j}"><span class="num">${["①","②","③","④","⑤"][j]}</span> ${md(o)}</button>`).join("")}</div>`:'<p class="muted" style="font-size:.85rem">✍️ 서술형 — 풀이 과정을 쓰고 아래와 비교하세요.</p>'}<details class="sol"><summary>풀이 보기</summary><ol class="steps">${it.steps.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(it.ans)}</p>${l?`<p class="muted">📘 <a href="#/study/${l.unit}/${l.id}">${l.title}</a> 에서 개념 다시 보기 · <a href="#/practice/${l.id}">➕ 유사 문제 생성</a></p>`:""}</details></div>`; }).join("")}</div>
     <div class="row" style="margin-top:14px"><a class="btn" href="#/paper?g=${grade}&t=${cur.term}">🖨 시험지로 보기·인쇄</a><a class="btn ghost" href="#/exam">📝 시험 전 훑기(체크리스트)</a><a class="btn ghost" href="#/mix">🔀 섞어 풀기</a>${["h11","h12","h2a","h2c","h2p","h3c","h3g"].includes(grade)?`<a class="btn" href="#/patterns">🧭 수능 패턴 도감</a>`:""}</div>`);
     main.querySelectorAll(".choices").forEach(box=>box.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{ if(box.dataset.done) return; box.dataset.done=1; const ok=+b.dataset.j===+box.dataset.a; b.classList.add(ok?"ok":"bad"); if(!ok) box.querySelector(`.choice[data-j="${box.dataset.a}"]`).classList.add("ok"); const card=box.closest(".card"); if(ok){ const c=card.querySelector(".st-chk input"); if(c&&!c.checked){ c.checked=true; c.dispatchEvent(new Event("change")); } } else card.querySelector("details.sol").open=true; }));
     main.querySelectorAll(".st-chk input").forEach(c=>c.onchange=()=>{ const d=store.get("st",{}); if(c.checked) d[c.dataset.k]=Date.now(); else delete d[c.dataset.k]; store.set("st",d); c.closest(".card").classList.toggle("done",c.checked); });
@@ -658,6 +752,10 @@
     const h=location.hash.replace(/^#\/?/,""); const [path,qs]=h.split("?"); const p=path.split("/").filter(Boolean);
     const r=p[0]||"";
     if(r==="") return home();
+    if(r==="me") return me(qs);
+    if(r==="setup") return setup();
+    if(r==="intro") return intro();
+    if(r==="practice") return practice(p[1],qs);
     if(r==="study") return p[2]?lesson(p[1],p[2]):p[1]?unit(p[1]):study();
     if(r==="roadmap") return roadmap(p[1]);
     if(r==="formulas") return p[1]?formula(p[1]):formulas(qs);
