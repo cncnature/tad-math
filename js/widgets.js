@@ -349,4 +349,102 @@
       conds.forEach((cd,i)=>{ const b=el("button",{class:"pill"+(i===0?" on":"")},cd[0]); b.onclick=()=>{ci=i;ctl.querySelectorAll(".pill").forEach(p=>p.classList.remove("on"));b.classList.add("on");draw();}; ctl.appendChild(b); });
       draw();
     }};
+
+  // ---------- 공통: 함수 그래프 보드 ----------
+  function board(ctx,w,h,ox,oy,s,col,xl=null,yl=null){ axes(ctx,w,h,ox,oy,s,col); for(let k=-30;k<=30;k++){ if(k===0)continue; const px=ox+k*s, py=oy-k*s; if(px>0&&px<w) txt(ctx,String(k),px,oy+14,col.muted,10,"center"); if(py>0&&py<h) txt(ctx,String(k),ox-6,py+4,col.muted,10,"right"); } txt(ctx,xl||"x",w-10,oy-6,col.muted,12,"right"); txt(ctx,yl||"y",ox+8,14,col.muted,12); }
+  function curve(ctx,w,ox,oy,s,f,color,width=3,dash=null,dom=null){ ctx.strokeStyle=color; ctx.lineWidth=width; ctx.setLineDash(dash||[]); ctx.beginPath(); let pen=false; for(let px=0;px<=w;px++){ const x=(px-ox)/s; if(dom&&(x<dom[0]||x>dom[1])){pen=false;continue;} const y=f(x); if(!isFinite(y)||Math.abs(y)>1e4){pen=false;continue;} const py=oy-y*s; if(!pen)ctx.moveTo(px,py); else ctx.lineTo(px,py); pen=true; } ctx.stroke(); ctx.setLineDash([]); }
+  function dot(ctx,x,y,color,r=6){ ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill(); }
+
+  // ---------- 16. 정비례·반비례 (중1) ----------
+  W.proportion = { title:"y = ax 와 y = a/x: a 를 밀어 보기", grade:"m11", node:"proportion",
+    desc:"a 를 밀면 정비례 직선의 기울기와 반비례 곡선의 모양이 바뀝니다. a 가 음수가 되는 순간 어느 사분면으로 가는지 보세요.",
+    render(root){ const {ctx,w,h}=makeCanvas(root); const ctl=el("div",{class:"ctrl"}); const out=el("div",{class:"readout"}); root.append(ctl,out); let a=2, x0=2;
+      function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const ox=w/2,oy=h/2,s=32; board(ctx,w,h,ox,oy,s,col);
+        curve(ctx,w,ox,oy,s,x=>a*x,col.acc); curve(ctx,w,ox,oy,s,x=>a/x,col.acc2,3,null,[-20,-0.05]); curve(ctx,w,ox,oy,s,x=>a/x,col.acc2,3,null,[0.05,20]);
+        dot(ctx,ox+x0*s,oy-a*x0*s,col.acc); dot(ctx,ox+x0*s,oy-(a/x0)*s,col.acc2);
+        txt(ctx,`y = ${a}x`,12,22,col.acc,15); txt(ctx,`y = ${a}/x`,12,44,col.acc2,15);
+        out.innerHTML=`x = <b>${x0}</b> 일 때 정비례 y = ${a}·${x0} = <b>${+(a*x0).toFixed(2)}</b>, 반비례 y = ${a}/${x0} = <b>${+(a/x0).toFixed(2)}</b><br>정비례: x 가 2배면 y 도 2배 · 반비례: x 가 2배면 y 는 절반 (xy = ${a} 로 일정)`; }
+      slider(ctl,"a",-4,4,0.5,a,v=>{a=v===0?0.5:v;draw();}); slider(ctl,"x 의 값",0.5,5,0.5,x0,v=>{x0=v;draw();}); draw(); }};
+
+  // ---------- 17. 일차함수 (중2-1) ----------
+  W.linear = { title:"y = ax + b: 기울기와 절편을 따로 밀기", grade:"m21", node:"linear-func",
+    desc:"a 는 기울기(1 칸 갈 때 오르는 높이), b 는 y절편(출발 높이). 둘째 직선과 평행해지는 순간 교점이 사라지는 것을 보세요.",
+    render(root){ const {ctx,w,h}=makeCanvas(root); const ctl=el("div",{class:"ctrl"}); const out=el("div",{class:"readout"}); root.append(ctl,out); let a=1,b=2, a2=-0.5,b2=4;
+      function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const ox=w/2,oy=h/2,s=32; board(ctx,w,h,ox,oy,s,col);
+        curve(ctx,w,ox,oy,s,x=>a2*x+b2,col.muted,2,[6,4]); curve(ctx,w,ox,oy,s,x=>a*x+b,col.acc);
+        // 기울기 계단
+        ctx.strokeStyle=col.acc2; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(ox+1*s,oy-(a+b)*s); ctx.lineTo(ox+2*s,oy-(a+b)*s); ctx.lineTo(ox+2*s,oy-(2*a+b)*s); ctx.stroke();
+        txt(ctx,"1",ox+1.5*s,oy-(a+b)*s+(a>=0?14:-6),col.acc2,11,"center"); txt(ctx,String(+a.toFixed(2)),ox+2*s+6,oy-(1.5*a+b)*s+4,col.acc2,11);
+        dot(ctx,ox,oy-b*s,col.ok); txt(ctx,`(0, ${b})`,ox+8,oy-b*s-8,col.ok,11); if(a!==0){ dot(ctx,ox-b/a*s,oy,col.ok); txt(ctx,`(${+(-b/a).toFixed(2)}, 0)`,ox-b/a*s+8,oy+18,col.ok,11); }
+        let cross="평행 — 만나지 않음 (연립방정식 해 없음)"; if(a!==a2){ const x=(b2-b)/(a-a2), y=a*x+b; dot(ctx,ox+x*s,oy-y*s,col.bad,7); cross=`교점 (<b>${+x.toFixed(2)}</b>, <b>${+y.toFixed(2)}</b>) = 연립방정식의 해`; } else if(b===b2) cross="일치 — 해가 무수히 많음";
+        txt(ctx,`y = ${a}x ${b>=0?"+":"−"} ${Math.abs(b)}`,12,22,col.acc,15); txt(ctx,`y = ${a2}x ${b2>=0?"+":"−"} ${Math.abs(b2)} (비교용)`,12,44,col.muted,13);
+        out.innerHTML=`기울기 a = <b>${a}</b> (${a>0?"증가":a<0?"감소":"상수"}) · y절편 <b>${b}</b> · x절편 <b>${a?+(-b/a).toFixed(2):"없음"}</b><br>${cross}`; }
+      slider(ctl,"a (기울기)",-3,3,0.25,a,v=>{a=v;draw();}); slider(ctl,"b (y절편)",-5,5,0.5,b,v=>{b=v;draw();}); slider(ctl,"비교 직선의 기울기",-3,3,0.25,a2,v=>{a2=v;draw();}); draw(); }};
+
+  // ---------- 18. 원과 직선 (고1) ----------
+  W.circleline = { title:"원과 직선: 중심까지의 거리 d 와 반지름 r", grade:"h12", node:"h-coord",
+    desc:"직선을 밀어 d 가 r 보다 작을 때(두 점), 같을 때(접함), 클 때(안 만남)를 눈으로 확인합니다. 판별식 없이 거리 하나로.",
+    render(root){ const {ctx,w,h}=makeCanvas(root); const ctl=el("div",{class:"ctrl"}); const out=el("div",{class:"readout"}); root.append(ctl,out); let m=1,k=1,r=3; const cx=1,cy=0;
+      function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const ox=w/2,oy=h/2,s=34; board(ctx,w,h,ox,oy,s,col);
+        ctx.strokeStyle=col.acc; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(ox+cx*s,oy-cy*s,r*s,0,7); ctx.stroke(); dot(ctx,ox+cx*s,oy-cy*s,col.acc,5);
+        curve(ctx,w,ox,oy,s,x=>m*x+k,col.acc2);
+        const d=Math.abs(m*cx-cy+k)/Math.hypot(m,1); const hx=(cx+m*(cy-k))/(1+m*m), hy=m*hx+k;
+        ctx.strokeStyle=col.ok; ctx.lineWidth=2; ctx.setLineDash([5,4]); ctx.beginPath(); ctx.moveTo(ox+cx*s,oy-cy*s); ctx.lineTo(ox+hx*s,oy-hy*s); ctx.stroke(); ctx.setLineDash([]);
+        const A=1+m*m, B=2*(m*(k-cy)-cx), Cc=cx*cx+(k-cy)*(k-cy)-r*r, D=B*B-4*A*Cc; let rel;
+        if(D>1e-9){ const x1=(-B-Math.sqrt(D))/(2*A), x2=(-B+Math.sqrt(D))/(2*A); [x1,x2].forEach(x=>dot(ctx,ox+x*s,oy-(m*x+k)*s,col.bad)); rel="두 점에서 만남 (d < r)"; } else if(Math.abs(D)<=1e-9||Math.abs(d-r)<0.02){ dot(ctx,ox+hx*s,oy-hy*s,col.bad); rel="접함 (d = r)"; } else rel="만나지 않음 (d > r)";
+        txt(ctx,`(x−${cx})² + y² = ${r}²`,12,22,col.acc,14); txt(ctx,`y = ${m}x ${k>=0?"+":"−"} ${Math.abs(k)}`,12,44,col.acc2,14);
+        out.innerHTML=`중심 (${cx}, ${cy}) 에서 직선까지 거리 d = |${m}·${cx} − 0 + ${k}| / √(${m}²+1) = <b>${d.toFixed(2)}</b>, r = <b>${r}</b> → <b>${rel}</b><br>판별식으로 풀면 D = ${D.toFixed(2)} (부호가 같은 판정)`; }
+      slider(ctl,"직선의 기울기 m",-3,3,0.25,m,v=>{m=v;draw();}); slider(ctl,"직선의 y절편 k",-6,6,0.25,k,v=>{k=v;draw();}); slider(ctl,"반지름 r",1,5,0.5,r,v=>{r=v;draw();}); draw(); }};
+
+  // ---------- 19. 지수함수·로그함수 (고2) ----------
+  W.explog = { title:"y = aˣ 와 y = logₐx: 밑 a 를 밀면 둘이 함께 뒤집힌다", grade:"h2a", node:"h-explog",
+    desc:"밑 a 가 1 보다 클 때와 작을 때 증가·감소가 바뀌고, 두 그래프는 항상 y = x 에 대칭입니다. (0,1) 과 (1,0) 은 a 와 상관없이 지납니다.",
+    render(root){ const {ctx,w,h}=makeCanvas(root); const ctl=el("div",{class:"ctrl"}); const out=el("div",{class:"readout"}); root.append(ctl,out); let a=2, x0=3;
+      function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const ox=w/2,oy=h/2,s=34; board(ctx,w,h,ox,oy,s,col);
+        curve(ctx,w,ox,oy,s,x=>x,col.line,1.5,[4,4]); curve(ctx,w,ox,oy,s,x=>Math.pow(a,x),col.acc); curve(ctx,w,ox,oy,s,x=>Math.log(x)/Math.log(a),col.acc2,3,null,[0.001,30]);
+        dot(ctx,ox,oy-s,col.acc); dot(ctx,ox+s,oy,col.acc2); const y0=Math.pow(a,x0); if(Math.abs(y0)<30){ dot(ctx,ox+x0*s,oy-y0*s,col.ok); dot(ctx,ox+y0*s,oy-x0*s,col.ok); }
+        txt(ctx,`y = ${a}ˣ`,12,22,col.acc,15); txt(ctx,`y = log_${a} x`,12,44,col.acc2,15);
+        out.innerHTML=`a = <b>${a}</b>: ${a>1?"둘 다 증가":"둘 다 감소"} · 점근선: 지수함수 y=0, 로그함수 x=0<br>${a}^${x0} = <b>${+y0.toFixed(3)}</b> ⇔ log_${a}(${+y0.toFixed(3)}) = <b>${x0}</b> — 같은 사실을 x, y 만 바꿔 읽은 것`; }
+      slider(ctl,"밑 a (1 제외)",0.25,4,0.25,a,v=>{a=v===1?1.25:v;draw();}); slider(ctl,"x 의 값",-3,3,0.5,x0,v=>{x0=v;draw();}); draw(); }};
+
+  // ---------- 20. 할선 → 접선 (고2 미분) ----------
+  W.secant = { title:"h 를 0 으로 밀면 할선이 접선이 된다", grade:"h2c", node:"h-calc",
+    desc:"평균변화율 {f(a+h)−f(a)}/h 의 h 를 줄여 보세요. 할선의 기울기가 f′(a) = 2a 로 다가갑니다 (f(x) = x²).",
+    render(root){ const {ctx,w,h}=makeCanvas(root); const ctl=el("div",{class:"ctrl"}); const out=el("div",{class:"readout"}); root.append(ctl,out); let a=1, hh=2; const f=x=>x*x/2;
+      function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const ox=w/2-80,oy=h-60,s=34; board(ctx,w,h,ox,oy,s,col);
+        curve(ctx,w,ox,oy,s,f,col.acc); const m=(f(a+hh)-f(a))/hh, t=a;
+        curve(ctx,w,ox,oy,s,x=>f(a)+t*(x-a),col.ok,2,[6,4]); curve(ctx,w,ox,oy,s,x=>f(a)+m*(x-a),col.acc2,2.5);
+        dot(ctx,ox+a*s,oy-f(a)*s,col.acc2); dot(ctx,ox+(a+hh)*s,oy-f(a+hh)*s,col.acc2); txt(ctx,`(a, f(a))`,ox+a*s+8,oy-f(a)*s+16,col.acc2,11); txt(ctx,`(a+h, f(a+h))`,ox+(a+hh)*s+8,oy-f(a+hh)*s-8,col.acc2,11);
+        txt(ctx,"f(x) = x²/2",12,22,col.acc,15); txt(ctx,`할선 기울기 ${m.toFixed(3)}`,12,44,col.acc2,13); txt(ctx,`접선 기울기 f′(a) = a = ${a}`,12,64,col.ok,13);
+        out.innerHTML=`평균변화율 = {f(${a}+${hh}) − f(${a})}/${hh} = <b>${m.toFixed(3)}</b> → h → 0 이면 <b>${a}</b> = f′(${a})<br>식으로: {(a+h)²−a²}/(2h) = a + h/2 → h 가 0 으로 가면 a`; }
+      slider(ctl,"a (접점)",-2,4,0.5,a,v=>{a=v;draw();}); slider(ctl,"h (간격)",0.05,3,0.05,hh,v=>{hh=v;draw();}); draw(); }};
+
+  // ---------- 21. 정규분포 (고2 확통) ----------
+  W.normal = { title:"정규분포 N(m, σ²): 평균과 표준편차를 밀기", grade:"h2p", node:"h-prob",
+    desc:"m 은 종의 위치, σ 는 폭. 어떤 m, σ 라도 m±σ 안은 68%, m±2σ 안은 95% — 표준화 Z = (X−m)/σ 가 가능한 이유입니다.",
+    render(root){ const {ctx,w,h}=makeCanvas(root); const ctl=el("div",{class:"ctrl"}); const out=el("div",{class:"readout"}); root.append(ctl,out); let m=0, sd=1, kk=1;
+      function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const ox=w/2,oy=h-50,s=50; axes(ctx,w,h,ox,oy,s,col); for(let k=-6;k<=6;k++) txt(ctx,String(k),ox+k*s,oy+14,col.muted,10,"center");
+        const f=x=>Math.exp(-(x-m)*(x-m)/(2*sd*sd))/(sd*Math.sqrt(2*Math.PI))*250;
+        ctx.fillStyle="rgba(255,138,61,.35)"; ctx.beginPath(); ctx.moveTo(ox+(m-kk*sd)*s,oy); for(let x=m-kk*sd;x<=m+kk*sd;x+=0.02) ctx.lineTo(ox+x*s,oy-f(x)); ctx.lineTo(ox+(m+kk*sd)*s,oy); ctx.closePath(); ctx.fill();
+        curve(ctx,w,ox,oy,s,x=>f(x)/s,col.acc); ctx.strokeStyle=col.acc2; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(ox+m*s,oy); ctx.lineTo(ox+m*s,oy-f(m)); ctx.stroke(); ctx.setLineDash([]);
+        const P={1:68.27,2:95.45,3:99.73}[kk]||0; const P196=95;
+        txt(ctx,`N(${m}, ${sd}²)`,12,22,col.acc,15); txt(ctx,`m ± ${kk}σ 안: ${P}%`,12,44,col.acc2,13);
+        out.innerHTML=`평균 m = <b>${m}</b>, 표준편차 σ = <b>${sd}</b> → 구간 [${+(m-kk*sd).toFixed(2)}, ${+(m+kk*sd).toFixed(2)}] 의 확률 <b>${P}%</b><br>m, σ 를 아무리 바꿔도 비율은 그대로 — 그래서 표준정규분포표 한 장이면 충분`; }
+      slider(ctl,"평균 m",-3,3,0.5,m,v=>{m=v;draw();}); slider(ctl,"표준편차 σ",0.5,2,0.25,sd,v=>{sd=v;draw();}); slider(ctl,"k (m ± kσ)",1,3,1,kk,v=>{kk=v;draw();}); draw(); }};
+
+  // ---------- 22. 벡터의 내적 (고3 기하) ----------
+  W.dotprod = { title:"두 벡터의 각을 돌리면 내적이 어떻게 변하나", grade:"h3g", node:"h-geo",
+    desc:"b 의 각도를 밀어 보세요. 내적 = |a||b|cosθ = a₁b₁+a₂b₂ 두 계산이 항상 같고, 90° 에서 0 이 됩니다. 정사영(초록)이 내적의 정체.",
+    render(root){ const {ctx,w,h}=makeCanvas(root); const ctl=el("div",{class:"ctrl"}); const out=el("div",{class:"readout"}); root.append(ctl,out); let th=40, lb=3; const a=[4,1];
+      function arrow(x1,y1,x2,y2,color){ ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); const an=Math.atan2(y2-y1,x2-x1); ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-12*Math.cos(an-0.4),y2-12*Math.sin(an-0.4)); ctx.lineTo(x2-12*Math.cos(an+0.4),y2-12*Math.sin(an+0.4)); ctx.closePath(); ctx.fill(); }
+      function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const ox=w/2-60,oy=h/2+40,s=34; board(ctx,w,h,ox,oy,s,col);
+        const t=th*Math.PI/180; const b=[lb*Math.cos(t+Math.atan2(a[1],a[0])),lb*Math.sin(t+Math.atan2(a[1],a[0]))];
+        const la=Math.hypot(...a), dotv=a[0]*b[0]+a[1]*b[1]; const proj=dotv/la; const pu=[a[0]/la*proj,a[1]/la*proj];
+        ctx.strokeStyle=col.ok; ctx.lineWidth=2; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(ox+b[0]*s,oy-b[1]*s); ctx.lineTo(ox+pu[0]*s,oy-pu[1]*s); ctx.stroke(); ctx.setLineDash([]);
+        ctx.strokeStyle=col.ok; ctx.lineWidth=6; ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ox+pu[0]*s,oy-pu[1]*s); ctx.stroke();
+        arrow(ox,oy,ox+a[0]*s,oy-a[1]*s,col.acc); arrow(ox,oy,ox+b[0]*s,oy-b[1]*s,col.acc2);
+        txt(ctx,`a = (${a[0]}, ${a[1]})`,ox+a[0]*s+8,oy-a[1]*s,col.acc,12); txt(ctx,`b = (${b[0].toFixed(2)}, ${b[1].toFixed(2)})`,ox+b[0]*s+8,oy-b[1]*s-6,col.acc2,12);
+        txt(ctx,`θ = ${th}°`,12,22,col.ink,15); txt(ctx,`a·b = ${dotv.toFixed(2)}`,12,44,col.ok,14);
+        out.innerHTML=`|a||b|cosθ = ${la.toFixed(2)} × ${lb} × cos${th}° = <b>${(la*lb*Math.cos(t)).toFixed(2)}</b><br>a₁b₁ + a₂b₂ = ${a[0]}·${b[0].toFixed(2)} + ${a[1]}·${b[1].toFixed(2)} = <b>${dotv.toFixed(2)}</b> ${Math.abs(dotv)<0.05?"→ <b>수직!</b>":dotv<0?"(둔각 → 음수)":""}<br>초록 막대 = b 의 a 방향 정사영 길이 ${proj.toFixed(2)} — 내적 = |a| × 정사영`; }
+      slider(ctl,"θ (a 에서 b 까지의 각)",0,180,5,th,v=>{th=v;draw();}); slider(ctl,"|b|",1,5,0.5,lb,v=>{lb=v;draw();}); draw(); }};
 })();

@@ -238,3 +238,12 @@ table select{padding:4px 6px;border:1px solid var(--line);border-radius:8px;back
 .lhead.m1{background:linear-gradient(180deg,rgba(14,165,233,.12),transparent)}.lhead.m21{background:linear-gradient(180deg,rgba(20,184,166,.12),transparent)}.lhead.h1{background:linear-gradient(180deg,rgba(245,158,11,.12),transparent)}.lhead.h2{background:linear-gradient(180deg,rgba(239,68,68,.12),transparent)}.lhead.h3{background:linear-gradient(180deg,rgba(100,116,139,.14),transparent)}
 .map svg{min-width:1200px}.eco svg{min-width:1000px}
 .brand small{font-size:.7rem;color:var(--muted);font-weight:600;margin-left:4px}
+
+/* 도해 (lesson/formula figures) */
+.concept-row{display:grid;grid-template-columns:1fr minmax(0,360px);gap:18px;align-items:start}
+.concept-row ul{margin:0}
+.lfig{margin:0;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:10px 12px 8px}
+.lfig .figwrap{margin:0}
+.lfig svg{width:100%;height:auto;display:block}
+.lfig figcaption{font-size:.82rem;color:var(--muted);margin-top:6px;line-height:1.45}
+@media(max-width:760px){.concept-row{grid-template-columns:1fr}}

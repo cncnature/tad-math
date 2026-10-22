@@ -1,8 +1,8 @@
 // node scripts/check.js — 데이터 파일 간 id 참조 무결성 검사
 const vm=require("vm"),fs=require("fs"),path=require("path"); let D0;const root=path.join(__dirname,"..");
 const w={DATA:{},WIDGETS:{}};const ctx=vm.createContext({window:w,document:{createElement:()=>({}),documentElement:{}},getComputedStyle:()=>({getPropertyValue:()=>""})});
-for(const f of ["curriculum","curriculum-m1","curriculum-m21","curriculum-h1","curriculum-h23","formulas","formulas-extra","concepts","roadmap","diagnostic","recall","exam","life","people","slides","play","bridge","essay"]) vm.runInContext(fs.readFileSync(path.join(root,"data",f+".js"),"utf8"),ctx);
-D0=w.DATA; D0.curriculum.units=[...D0.curriculum.units,...(D0.curriculumExtra||[])];
+for(const f of ["curriculum","curriculum-m1","curriculum-m21","curriculum-h1","curriculum-h23","formulas","formulas-extra","concepts","roadmap","diagnostic","recall","exam","life","people","slides","play","bridge","essay","lesson-figs","content-extra","content-extra2"]) vm.runInContext(fs.readFileSync(path.join(root,"data",f+".js"),"utf8"),ctx);
+D0=w.DATA; D0.curriculum.units=[...D0.curriculum.units,...(D0.curriculumExtra||[]).flatMap(x=>x.units||x)];
 vm.runInContext(fs.readFileSync(path.join(root,"js/widgets.js"),"utf8"),ctx);
 const D=w.DATA,W=w.WIDGETS; const nodeUnits=new Set(D.roadmap.nodes.map(n=>n.unit).filter(Boolean)); const unitIds=new Set(D.curriculum.units.map(u=>u.id)); nodeUnits.forEach(u=>{ if(!unitIds.has(u)) console.error("roadmap unit missing: "+u); });const nodes=new Set(D.roadmap.nodes.map(n=>n.id)),fids=new Set(D.formulas.map(f=>f.id));const lessons=[];D.curriculum.units.forEach(u=>u.lessons.forEach(l=>lessons.push(l)));const lids=new Set(lessons.map(l=>l.id));const err=[];
 lessons.forEach(l=>{if(!nodes.has(l.node))err.push("lesson node "+l.id+":"+l.node);l.formulas.forEach(f=>{if(!fids.has(f))err.push("lesson formula "+l.id+":"+f)});l.quiz.forEach((q,i)=>{if(q.a<0||q.a>=q.opts.length)err.push("quiz idx "+l.id+i)})});
@@ -19,6 +19,9 @@ Object.values(W).forEach(x=>{if(!nodes.has(x.node))err.push("widget node "+x.tit
 (D.bridge||[]).forEach(b=>{b.nodes.forEach(n=>{if(!nodes.has(n))err.push("bridge node "+b.id+":"+n)});b.steps.forEach(st=>{if(!nodes.has(st.node))err.push("bridge step node "+b.id)})});
 (D.essay||[]).forEach(e=>{if(!nodes.has(e.node))err.push("essay node "+e.id);if(!lids.has(e.lesson))err.push("essay lesson "+e.lesson)});
 const fdup=new Set(); D.formulas.forEach(f=>{if(fdup.has(f.id))err.push("dup formula "+f.id);fdup.add(f.id)});
+Object.keys(D.lessonFigs||{}).forEach(k=>{if(!lids.has(k))err.push("lessonFig lesson "+k)});
+lessons.forEach(l=>{if(!(D.lessonFigs||{})[l.id])err.push("lesson without fig "+l.id)});
+D.play.forEach(g=>{if(g.node&&!nodes.has(g.node))err.push("play node "+g.id)});
 const dup=new Set();lessons.forEach(l=>{if(dup.has(l.id))err.push("dup lesson "+l.id);dup.add(l.id)});
 if(err.length){console.error(err.join("\n"));process.exit(1);}
-console.log("OK — lessons",lessons.length,"formulas",D.formulas.length,"nodes",nodes.size,"edges",D.roadmap.edges.length,"widgets",Object.keys(W).length);
+console.log("OK — lessons",lessons.length,"stories",lessons.filter(l=>l.story).length,"concepts",D.concepts.length,"bridge",D.bridge.length,"essay",D.essay.length,"life",D.life.length,"people",D.people.length,"diag",D.diagnostic.length,"exam",D.exam.length,"recall",D.recall.length,"formulas",D.formulas.length,"nodes",nodes.size,"edges",D.roadmap.edges.length,"widgets",Object.keys(W).length);
