@@ -1,7 +1,7 @@
 // node scripts/check.js — 데이터 파일 간 id 참조 무결성 검사
 const vm=require("vm"),fs=require("fs"),path=require("path"); let D0;const root=path.join(__dirname,"..");
 const w={DATA:{},WIDGETS:{}};const ctx=vm.createContext({window:w,document:{createElement:()=>({}),documentElement:{}},getComputedStyle:()=>({getPropertyValue:()=>""})});
-for(const f of ["curriculum","curriculum-m1","curriculum-m21","curriculum-h1","curriculum-h23","formulas","formulas-extra","concepts","roadmap","diagnostic","recall","exam","life","people","slides","play","bridge","essay","lesson-figs","content-extra","content-extra2","deepen-m","deepen-h1","deepen-h23","deepen-core","stories-1","stories-2","suneung","school-exams"]) vm.runInContext(fs.readFileSync(path.join(root,"data",f+".js"),"utf8"),ctx);
+for(const f of ["curriculum","curriculum-m1","curriculum-m21","curriculum-h1","curriculum-h23","formulas","formulas-extra","concepts","roadmap","diagnostic","recall","exam","life","people","slides","play","bridge","essay","lesson-figs","content-extra","content-extra2","deepen-m","deepen-h1","deepen-h23","deepen-core","stories-1","stories-2","suneung","school-exams","olympiad"]) vm.runInContext(fs.readFileSync(path.join(root,"data",f+".js"),"utf8"),ctx);
 D0=w.DATA; D0.curriculum.units=[...D0.curriculum.units,...(D0.curriculumExtra||[]).flatMap(x=>x.units||x)];
 D0.curriculum.units.forEach(u=>u.lessons.forEach(l=>{const d=(D0.deepen||{})[l.id];if(!d)return;l.pitfalls=[...(l.pitfalls||[]),...(d.pitfalls||[])];l.points=[...(l.points||[]),...(d.points||[])];l.quiz=[...l.quiz,...(d.quiz||[])];}));
 D0.curriculum.units.forEach(u=>u.lessons.forEach(l=>{if(!l.story&&(D0.stories||{})[l.id])l.story=D0.stories[l.id];}));
@@ -30,6 +30,7 @@ Object.keys(D.stories||{}).forEach(k=>{if(!lids.has(k))err.push("story lesson "+
 lessons.forEach(l=>{if(!l.story)err.push("lesson without story "+l.id);else if(l.story.length<2)err.push("short story "+l.id)});
 (D.suneung.patterns).forEach(x=>{if(!nodes.has(x.node))err.push("pattern node "+x.id);if(!lids.has(x.lesson))err.push("pattern lesson "+x.id);if(!x.steps||!x.steps.length)err.push("pattern steps "+x.id)});
 D.schoolExams.forEach(e=>e.items.forEach((it,i)=>{if(!lids.has(it.l))err.push("schoolExam lesson "+e.title+" #"+i)}));
+D.olympiad.items.forEach(x=>{if(!nodes.has(x.node))err.push("oly node "+x.id);if(!lids.has(x.lesson))err.push("oly lesson "+x.id);if(x.hints.length!==3)err.push("oly hints "+x.id)});
 const dup=new Set();lessons.forEach(l=>{if(dup.has(l.id))err.push("dup lesson "+l.id);dup.add(l.id)});
 if(err.length){console.error(err.join("\n"));process.exit(1);}
 console.log("OK — lessons",lessons.length,"patterns",D.suneung.patterns.length,"schoolQ",D.schoolExams.reduce((a,e)=>a+e.items.length,0),"quiz",lessons.reduce((a,l)=>a+l.quiz.length,0),"pit",lessons.reduce((a,l)=>a+(l.pitfalls||[]).length,0),"pts",lessons.reduce((a,l)=>a+(l.points||[]).length,0),"stories",lessons.filter(l=>l.story).length,"concepts",D.concepts.length,"bridge",D.bridge.length,"essay",D.essay.length,"life",D.life.length,"people",D.people.length,"diag",D.diagnostic.length,"exam",D.exam.length,"recall",D.recall.length,"formulas",D.formulas.length,"nodes",nodes.size,"edges",D.roadmap.edges.length,"widgets",Object.keys(W).length);

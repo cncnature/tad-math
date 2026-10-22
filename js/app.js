@@ -117,6 +117,7 @@
     <h2>더 둘러보기</h2>
     <div class="grid">
       <a class="card link" href="#/patterns">${ico("1F9ED")}<h3>수능 패턴 도감</h3><p class="muted">10년간 해마다 나온 ${D.suneung.patterns.length}가지 구조 — 신호·첫 수·동형 문제 3단계 풀이, 패턴 알아맞히기.</p></a>
+      <a class="card link" href="#/olympiad">${ico("1F3C5")}<h3>올림피아드 퀴즈</h3><p class="muted">KMO·KJMO·AMC 에서 되풀이되는 '생각의 기술' ${D.olympiad.items.length}문제 — 비둘기집·홀짝·색칠·보조선. 힌트 3단계, 메달 수집.</p></a>
       <a class="card link" href="#/schooltest">${ico("1F3EB")}<h3>학교 시험 필수 문제</h3><p class="muted">학년·학기별 중간·기말·학력평가에서 꼭 나오는 ${D.schoolExams.reduce((a,e)=>a+e.items.length,0)}문항과 서술형 풀이.</p></a>
       <a class="card link" href="#/daily">${ico("1F3C6")}<h3>하루 10분 코스</h3><p class="muted">암기 3장 → 섞어 풀기 6문제 → 이야기 1편. 연속 일수 도장.</p></a>
       <a class="card link" href="#/essay">${ico("1F4A1")}<h3>서술형·증명·자기설명</h3><p class="muted">먼저 쓰고, 모범 답안과 비교하고, 채점 기준으로 자기 채점. ${D.essay.length}편.</p></a>
@@ -516,6 +517,41 @@
     next();
   }
 
+
+  // ---------- 올림피아드 퀴즈 ----------
+  function olympiad(id,qs){
+    const O=D.olympiad; const pr=new URLSearchParams(qs||""); const band=pr.get("b")||"중등"; const theme=pr.get("th")||""; const rec=store.get("oly",{});
+    const MEDAL=l=>["","🥉","🥈","🥇"][l]; const LV=["","동 (입문)","은 (도전)","금 (올림피아드)"];
+    const medalsOf=()=>{ const m={1:0,2:0,3:0}; O.items.forEach(x=>{ if(rec[x.id]&&rec[x.id].ok) m[x.level]++; }); return m; };
+    if(id==="random"){ const pool=O.items.filter(x=>!(rec[x.id]&&rec[x.id].ok)); const pick=(pool.length?pool:O.items)[rnd(0,(pool.length?pool:O.items).length-1)]; location.hash="#/olympiad/"+pick.id; return; }
+    if(!id){ const m=medalsOf(); const list=O.items.filter(x=>x.band===band&&(!theme||x.theme===theme));
+      return render(`<div class="crumb"><a href="#/">홈</a> › 올림피아드 퀴즈</div><h1>🏅 올림피아드 퀴즈</h1>
+      <p class="lead">최근 10년 KMO(한국수학올림피아드)·KJMO·AMC 에서 되풀이되는 <b>'생각의 기술' ${O.items.length}가지</b>를 교과 범위 안의 퀴즈로 다시 만들었습니다. 계산보다 <b>발상</b> — 비둘기집, 홀짝 불변량, 색칠, 보조선, 치환, 짝 짓기. 힌트는 3단계: 안 보고 맞히면 100점, 힌트를 열 때마다 70 → 40 → 20점.</p>
+      <div class="oly-board"><span>🥇 ${m[3]}</span><span>🥈 ${m[2]}</span><span>🥉 ${m[1]}</span><span class="muted">해결 ${Object.values(rec).filter(r=>r.ok).length}/${O.items.length}</span><a class="btn" href="#/olympiad/random">🎲 아무 문제나 도전</a></div>
+      <div class="pill-row"><a class="pill ${band==="중등"?"on":""}" href="#/olympiad?b=중등${theme?"&th="+theme:""}">중등 ${O.items.filter(x=>x.band==="중등").length}</a><a class="pill ${band==="고등"?"on":""}" href="#/olympiad?b=고등${theme?"&th="+theme:""}">고등 ${O.items.filter(x=>x.band==="고등").length}</a></div>
+      <div class="pill-row"><a class="pill ${!theme?"on":""}" href="#/olympiad?b=${band}">전체</a>${O.themes.map(t=>`<a class="pill ${theme===t.id?"on":""}" href="#/olympiad?b=${band}&th=${t.id}">${t.emoji} ${t.name}</a>`).join("")}</div>
+      ${theme?`<p class="muted">${O.themes.find(t=>t.id===theme).desc}</p>`:""}
+      <div class="grid wide">${list.map(x=>{ const r=rec[x.id]; const th=O.themes.find(t=>t.id===x.theme); return `<a class="card link oly ${r&&r.ok?"done":""}" href="#/olympiad/${x.id}"><div class="row" style="justify-content:space-between"><span class="tag">${th.emoji} ${th.name}</span><span class="tag">${MEDAL(x.level)} ${LV[x.level]}</span></div><h3>${x.title}</h3><p class="muted">${teaser(x.q,70)}</p>${r&&r.ok?`<div class="eyebrow" style="color:var(--ok)">✓ 해결 · ${r.score}점</div>`:""}</a>`; }).join("")}</div>`);
+    }
+    const x=O.items.find(o=>o.id===id); if(!x) return notFound(); const th=O.themes.find(t=>t.id===x.theme); const ls=byLesson(x.lesson); const r=rec[id]||{};
+    let hintsUsed=r.ok?3:0, done=!!r.ok;
+    const SC=[100,70,40,20];
+    function draw(){ const cur=store.get("oly",{})[id]||{}; render(`<div class="lhead ${x.band==="중등"?"g22":"h2a"}"><div class="crumb"><a href="#/">홈</a> › <a href="#/olympiad?b=${x.band}">올림피아드 퀴즈</a> › ${th.emoji} ${th.name}</div><span class="tag">${x.band}</span> <span class="tag">${MEDAL(x.level)} ${LV[x.level]}</span><h1>${x.title}</h1><p class="lead muted">${x.src}</p></div>
+      <div class="card oly-q"><div class="qrow"><p style="font-size:1.12rem">${md(x.q)}</p>${figAny(x,"qfig")}</div>
+        <div class="oly-answer" ${done?"hidden":""}><input id="oly-in" placeholder="답 입력" autocomplete="off"><button class="btn" id="oly-go">정답 확인</button><span class="muted">지금 맞히면 <b id="oly-sc">${SC[hintsUsed]}</b>점</span></div>
+        <div id="oly-fb" class="oly-fb"></div>
+        <div class="oly-hints">${x.hints.map((h,i)=>`<div class="hint ${i<hintsUsed?"open":""}" data-i="${i}"><button class="btn sm ghost" ${i>hintsUsed||done?"disabled":""}>💡 힌트 ${i+1}${i>=hintsUsed&&!done?` (−${SC[i]-SC[i+1]}점)`:""}</button><span class="hint-t">${i<hintsUsed?md(h):""}</span></div>`).join("")}</div>
+        <div id="oly-sol" ${done?"":"hidden"}><h3>풀이</h3><ol class="steps">${x.sol.map(t=>`<li>${md(t)}</li>`).join("")}</ol><div class="box ok"><b>💡 아하!</b> ${md(x.aha)}</div><p class="muted">정답: ${md(x.ans)}${done?` · 이 문제 ${cur.score!=null?cur.score:0}점`:""}</p></div>
+      </div>
+      <div class="row" style="margin-top:14px"><a class="btn" href="#/olympiad/random">🎲 다음 문제</a>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a>`:""}<a class="btn ghost" href="#/roadmap/${x.node}">🗺 개념의 자리</a><a class="btn ghost" href="#/olympiad?b=${x.band}">목록</a></div>`);
+      main.querySelectorAll(".oly-hints .hint button").forEach(b=>b.onclick=()=>{ const i=+b.closest(".hint").dataset.i; if(i!==hintsUsed) return; hintsUsed++; draw(); });
+      const inp=$("#oly-in"); if(inp){ inp.focus(); const check=()=>{ const v=inp.value.trim().replace(/\s/g,""); if(!v) return; const norm=t=>String(t).replace(/\s/g,"").replace(/°/g,"").toLowerCase(); let ok=false; const nv=Number(v.replace(/[^0-9.\-\/]/g,"")); const na=Number(String(x.ans).replace(/[^0-9.\-]/g,"")); if(norm(v)===norm(x.ans)) ok=true; else if(/^-?\d+\/\d+$/.test(v)&&/^-?\d+\/\d+$/.test(x.ans)){ const f=t=>t.split("/").map(Number); const [a,b]=f(v),[c,d]=f(x.ans); ok=a*d===b*c; } else if(!isNaN(nv)&&!isNaN(na)&&/^-?[\d.]+$/.test(v)) ok=Math.abs(nv-na)<=(x.tol||1e-9);
+        if(ok){ done=true; const sc=SC[hintsUsed]; const rr=store.get("oly",{}); const prev=rr[id]; if(!prev||!prev.ok||prev.score<sc) rr[id]={ok:true,score:sc,when:Date.now()}; store.set("oly",rr); draw(); $("#oly-fb").innerHTML=`<div class="box ok">🎉 정답! <b>${sc}점</b> ${MEDAL(x.level)} — 아래 '아하' 를 꼭 읽어 보세요.</div>`; $("#oly-sol").scrollIntoView({behavior:"smooth",block:"center"}); }
+        else { $("#oly-fb").innerHTML=`<div class="box warn">❌ 아직 아니에요. ${hintsUsed<3?"힌트를 하나 열어 볼까요?":"풀이를 보고 싶으면 아래 버튼을."}</div>${hintsUsed>=3?'<button class="btn sm ghost" id="oly-show">풀이 보기 (0점)</button>':""}`; const sb=$("#oly-show"); if(sb) sb.onclick=()=>{ done=true; const rr=store.get("oly",{}); if(!rr[id]||!rr[id].ok) rr[id]={ok:true,score:0,when:Date.now()}; store.set("oly",rr); draw(); }; } };
+        $("#oly-go").onclick=check; inp.addEventListener("keydown",e=>{ if(e.key==="Enter") check(); }); }
+      typeset(); }
+    draw();
+  }
   // ---------- 학교 시험 필수 문제 ----------
   function schooltest(qs){
     const SE=D.schoolExams; const pr=new URLSearchParams(qs||""); const grade=pr.get("g")||"m11"; const term=pr.get("t")||"mid"; const done=store.get("st",{});
@@ -594,6 +630,7 @@
     if(r==="life") return life(qs);
     if(r==="people") return people();
     if(r==="patterns") return patterns(p[1],qs);
+    if(r==="olympiad") return olympiad(p[1],qs);
     if(r==="schooltest") return schooltest(qs);
     if(r==="paper") return paper(qs);
     if(r==="notes") return notes();

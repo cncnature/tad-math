@@ -341,3 +341,13 @@ table select{padding:4px 6px;border:1px solid var(--line);border-radius:8px;back
 :root[data-theme="dark"] .paper{color:#111}
 @media(max-width:700px){.paper{padding:16px}.paper-body{column-count:1}}
 @media print{body *{visibility:hidden}.paper,.paper *{visibility:visible}.paper{position:absolute;left:0;top:0;width:100%;border:0;max-width:none}.noprint{display:none!important}@page{margin:14mm}}
+/* 올림피아드 퀴즈 */
+.oly-board{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:1.05rem;margin:8px 0 10px}
+.oly.done{border-color:var(--ok)}
+.oly-answer{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.oly-answer input{font:inherit;font-size:1.05rem;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);min-width:160px}
+.oly-hints .hint{display:flex;gap:10px;align-items:flex-start;margin:6px 0}
+.oly-hints .hint-t{padding-top:6px}
+.oly-hints .hint.open .hint-t{color:var(--ink)}
+.oly-fb{margin:6px 0}
+[hidden]{display:none!important}
