@@ -4,6 +4,8 @@
   --g22:#3b82f6;--g31:#8b5cf6;--g32:#ec4899;
   --r:14px;--sh:0 2px 10px rgba(20,30,60,.06);
 }
+  --m1:#0ea5e9;--m21:#14b8a6;--h1:#f59e0b;--h2:#ef4444;--h3:#64748b;
+}
 :root[data-theme="dark"]{
   --bg:#0f1420;--card:#171d2b;--ink:#e6ebf5;--muted:#9aa5b8;--line:#2a3345;--sh:0 2px 10px rgba(0,0,0,.4);
 }
@@ -226,3 +228,13 @@ textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px
 .heat{display:flex;gap:6px;flex-wrap:wrap}.heat span{width:34px;height:34px;border-radius:8px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--muted)}
 .heat span.on{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:700}
 table select{padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+
+/* 학년대 색 (중1 하늘, 중2-1 청록, 고1 주황, 고2 빨강, 고3 회청) */
+.tag.m1{background:#e0f2fe;color:#0369a1;border-color:#bae6fd}.tag.m21{background:#ccfbf1;color:#0f766e;border-color:#99f6e4}
+.tag.h1{background:#fef3c7;color:#b45309;border-color:#fde68a}.tag.h2{background:#fee2e2;color:#b91c1c;border-color:#fecaca}.tag.h3{background:#e2e8f0;color:#334155;border-color:#cbd5e1}
+:root[data-theme="dark"] .tag.m1{background:#0c3a52;color:#bae6fd}:root[data-theme="dark"] .tag.m21{background:#0f3d38;color:#99f6e4}:root[data-theme="dark"] .tag.h1{background:#4a2f08;color:#fde68a}:root[data-theme="dark"] .tag.h2{background:#4c1515;color:#fecaca}:root[data-theme="dark"] .tag.h3{background:#2b3442;color:#cbd5e1}
+.card.m1{border-top-color:var(--m1)}.card.m21{border-top-color:var(--m21)}.card.h1{border-top-color:var(--h1)}.card.h2{border-top-color:var(--h2)}.card.h3{border-top-color:var(--h3)}
+.node.m1 rect{stroke:var(--m1)}.node.m21 rect{stroke:var(--m21)}.node.h1 rect{stroke:var(--h1)}.node.h2 rect{stroke:var(--h2)}.node.h3 rect{stroke:var(--h3)}
+.lhead.m1{background:linear-gradient(180deg,rgba(14,165,233,.12),transparent)}.lhead.m21{background:linear-gradient(180deg,rgba(20,184,166,.12),transparent)}.lhead.h1{background:linear-gradient(180deg,rgba(245,158,11,.12),transparent)}.lhead.h2{background:linear-gradient(180deg,rgba(239,68,68,.12),transparent)}.lhead.h3{background:linear-gradient(180deg,rgba(100,116,139,.14),transparent)}
+.map svg{min-width:1200px}.eco svg{min-width:1000px}
+.brand small{font-size:.7rem;color:var(--muted);font-weight:600;margin-left:4px}

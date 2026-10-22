@@ -1,7 +1,13 @@
 /* 중등수학 만지기 — 단일 페이지 앱 (해시 라우터). 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. */
 (function(){
   const D = window.DATA, $ = s=>document.querySelector(s), main = $("#main");
-  const G = D.curriculum.grades;
+  // 학년 체계 (2022 개정): 중1 ~ 고3. 순서가 곧 학습 순서.
+  const G = { m11:"중1-1", m12:"중1-2", m21:"중2-1", g22:"중2-2", g31:"중3-1", g32:"중3-2", h11:"고1 공통수학1", h12:"고1 공통수학2", h2a:"고2 대수", h2c:"고2 미적분Ⅰ", h2p:"고2 확률과 통계", h3c:"고3 미적분Ⅱ", h3g:"고3 기하" };
+  const GORDER = Object.keys(G); const gradeRank = g=>GORDER.indexOf(g);
+  const BAND = { m11:"중학교", m12:"중학교", m21:"중학교", g22:"중학교", g31:"중학교", g32:"중학교", h11:"고등학교", h12:"고등학교", h2a:"고등학교", h2c:"고등학교", h2p:"고등학교", h3c:"고등학교", h3g:"고등학교" };
+  D.curriculum.grades = G;
+  D.curriculum.units = [...D.curriculum.units, ...(D.curriculumExtra||[])].sort((a,b)=>gradeRank(a.grade)-gradeRank(b.grade));
+  const GCOL = g=>({m11:"m1",m12:"m1",m21:"m21",g22:"g22",g31:"g31",g32:"g32",h11:"h1",h12:"h1",h2a:"h2",h2c:"h2",h2p:"h2",h3c:"h3",h3g:"h3"})[g]||g; // 색상용 열 id
   const lessonsAll = []; D.curriculum.units.forEach(u=>u.lessons.forEach(l=>lessonsAll.push({...l, unit:u.id, grade:u.grade, unitTitle:u.title})));
   const byLesson = id=>lessonsAll.find(l=>l.id===id);
   const byUnit = id=>D.curriculum.units.find(u=>u.id===id);
@@ -18,9 +24,9 @@
   // ---------- 유틸 ----------
   const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const md = s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
-  const tag = g=>`<span class="tag ${g}">${G[g]||g}</span>`;
+  const tag = g=>`<span class="tag ${GCOL(g)}">${G[g]||({m1:"중1",m21:"중2-1",h1:"고1",h2:"고2",h3:"고3"})[g]||g}</span>`;
   const ico = (code,cls="ico")=>`<img class="${cls}" src="assets/openmoji/${code}.svg" alt="" loading="lazy">`;
-  const UNIT_ICON={u1:"1F53A",u2:"1F7E6",u3:"1F5FA",u4:"1F4D0",u5:"1F3B2",u6:"1F522",u7:"2716",u8:"1F9EE",u9:"1F4C8",u10:"1F3D4",u11:"2B55",u12:"1F4CA"};
+  const UNIT_ICON={u1:"1F53A",u2:"1F7E6",u3:"1F5FA",u4:"1F4D0",u5:"1F3B2",u6:"1F522",u7:"2716",u8:"1F9EE",u9:"1F4C8",u10:"1F3D4",u11:"2B55",u12:"1F4CA",m1u1:"1F9E9",m1u2:"1F321",m1u3:"1F524",m1u4:"2696",m1u5:"1F4CD",m1u6:"1F4CF",m1u7:"1F536",m1u8:"1F9CA",m1u9:"1F4CA",m2u1:"267B",m2u2:"1F522",m2u3:"2696",m2u4:"1F500",m2u5:"1F4C8",h1u1:"1F9EE",h1u2:"1F9EC",h1u3:"1F3B2",h1u4:"1F5C2",h1u5:"1F4CD",h1u6:"1F300",h1u7:"1F517",h2u1:"1F4C8",h2u2:"1F3A1",h2u3:"1F9F1",h2u4:"267E",h2u5:"1F3CE",h2u6:"1F30A",h2u7:"1F3B2",h2u8:"1F4CA",h3u1:"267E",h3u2:"1F680",h3u3:"1F30A",h3u4:"1FA90",h3u5:"27A1",h3u6:"1F9CA"};
   const SEC_ICON={study:"1F4D8",roadmap:"1F5FA",formulas:"1F4D0",bridge:"1F517",mix:"1F500",eco:"1F310",diag:"1F9ED",lab:"1F52C",slides:"1F39E",play:"1F3AE",concepts:"1F4D6",recall:"1F9E0",exam:"1F4DD",life:"1F30D",people:"1F3DB",notes:"1F4D2"};
   function typeset(){ if(window.renderMathInElement) renderMathInElement(main,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false}); }
   function render(html){ main.innerHTML = html; window.scrollTo(0,0); typeset(); document.querySelectorAll("details.more[open]").forEach(d=>d.removeAttribute("open")); }
@@ -57,9 +63,9 @@
     render(`
     <section class="hero">
       <div class="hero-art">${["1F4D0","2B55","1F4C8","1F3B2","1F9EE","1F53A"].map(c=>ico(c,"ico float")).join("")}</div>
-      <div class="eyebrow">중2-2 · 중3-1 · 중3-2 전용 · 무료 · 오픈소스</div>
-      <h1>중등수학, 외우기 전에 먼저 만져 보세요</h1>
-      <p class="lead">피타고라스부터 삼각비·원주각·통계까지, 개념마다 손으로 밀고 당기는 판이 붙어 있습니다. 왜 그런지를 본 공식은 잊어도 다시 만들 수 있습니다.</p>
+      <div class="eyebrow">중1 ~ 고3 · 무료 · 오픈소스 · 로그인으로 기록 이어하기</div>
+      <h1>수학, 외우기 전에 먼저 만져 보세요</h1>
+      <p class="lead">중1 소인수분해부터 고3 미적분·기하까지 한 장의 개념 지도로 이어집니다. 개념마다 손으로 밀고 당기는 판, 공식이 태어나는 이야기, 오개념과 출제 포인트. 왜 그런지를 본 공식은 잊어도 다시 만들 수 있습니다.</p>
       <div class="row"><a class="btn" href="#/diagnostic">🧭 끊긴 곳부터 진단하기</a><a class="btn ghost" href="#/lab">🔬 그냥 만져 보기</a><a class="btn ghost" href="#/study">📚 학기 고르기</a>${due?`<a class="btn ghost" href="#/recall">🧠 오늘 복습할 공식 ${due}개</a>`:""}</div>
       <div class="stats">
         <div><b>${lessonsAll.length}</b>소단원</div><div><b>${D.formulas.length}</b>공식</div><div><b>${nCore}</b>정말 외울 것</div><div><b>${D.roadmap.nodes.length}</b>개념 노드</div><div><b>${Object.keys(window.WIDGETS).length}</b>만지는 위젯</div><div><b>${D.life.length}</b>생활 속 수학</div>
@@ -74,7 +80,7 @@
       <div class="card"><h3>④ 길로 보기</h3><p>이차방정식 별 하나 아래에는 중1 식의 계산부터 선수 개념이, 위로는 고1 복소수·도형의 방정식이 이어집니다.</p><a href="#/roadmap">🗺 개념 지도 열기 →</a></div>
     </div>
     <h2>🔗 개념이 만나는 자리</h2><p class="muted">한 문제에 두세 단원. 풀이 단계마다 어느 개념을 썼는지 보이는 '다리 문제' ${D.bridge.length}편.</p>
-    <div class="grid wide">${D.bridge.slice(0,3).map(b=>`<a class="card link ${b.grade}" href="#/bridge/${b.id}">${tag(b.grade)}<h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div></a>`).join("")}</div>
+    <div class="grid wide">${D.bridge.slice(0,3).map(b=>`<a class="card link ${GCOL(b.grade)}" href="#/bridge/${b.id}">${tag(b.grade)}<h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div></a>`).join("")}</div>
     <div class="row" style="margin:10px 0 4px"><a class="btn ghost sm" href="#/bridge">전체 보기 →</a></div>
     <div class="card evidence"><div class="eyebrow">🔬 학습 과학에 근거한 네 가지 장치</div><div class="grid" style="margin-top:8px">
       <div><h4>🔀 섞어 풀기</h4><p class="muted">단원을 섞어 '어느 개념인지' 부터 고르게 합니다. 7학년 787명 무작위 실험에서 한 달 뒤 시험 61% vs 38% (Rohrer 외, 2020).</p><a href="#/mix">오늘의 6문제 →</a></div>
@@ -83,7 +89,9 @@
       <div><h4>⚠️ 오개념 먼저</h4><p class="muted">소단원마다 '가장 많이 틀리는 지점' 을 먼저 보여 줍니다. 틀린 문제는 자동으로 오답 노트에.</p><a href="#/notes">오답 노트 →</a></div>
     </div></div>
     <h2>학기별로 바로 가기</h2>
-    <div class="grid">${D.curriculum.units.map(u=>`<a class="card link unit ${u.grade}" href="#/study/${u.id}">${ico(UNIT_ICON[u.id],"ico big")}<div>${tag(u.grade)}</div><h3>${u.title}</h3><p class="muted">${u.desc}</p></a>`).join("")}</div>
+    <div class="pill-row">${GORDER.map(g=>`<a class="pill" href="#/study">${G[g]} ${D.curriculum.units.filter(u=>u.grade===g).length}</a>`).join("")}</div>
+    <div class="grid">${D.curriculum.units.filter(u=>["g22","g31","g32"].includes(u.grade)).map(u=>`<a class="card link unit ${GCOL(u.grade)}" href="#/study/${u.id}">${ico(UNIT_ICON[u.id]||"1F4D8","ico big")}<div>${tag(u.grade)}</div><h3>${u.title}</h3><p class="muted">${u.desc}</p></a>`).join("")}</div>
+    <p class="muted">중1·중2-1·고1~고3 단원은 <a href="#/study">수학 학습</a>에서. 중2-2~중3-2 가 가장 깊게 구성되어 있고 나머지 학년은 핵심 소단원부터 채워 가는 중입니다.</p>
     <h2>더 둘러보기</h2>
     <div class="grid">
       <a class="card link" href="#/daily">${ico("1F3C6")}<h3>하루 10분 코스</h3><p class="muted">암기 3장 → 섞어 풀기 6문제 → 이야기 1편. 연속 일수 도장.</p></a>
@@ -105,14 +113,17 @@
   function study(){
     const prog=store.get("quiz",{});
     const done=l=>{ const keys=Object.keys(prog).filter(k=>k.startsWith("lesson:"+l.id+"#")); return keys.length? Math.round(100*keys.filter(k=>prog[k]).length/l.quiz.length):0; };
-    render(`<div class="crumb"><a href="#/">홈</a> › 수학 학습</div><h1>🧮 수학 학습</h1><p class="lead">소단원마다 개요 → 핵심 개념 → 왜 그런지 → 공식 → 예제 → 퀴즈 → 이 개념의 자리 순서로 이어집니다.</p>
-    ${Object.keys(G).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.curriculum.units.filter(u=>u.grade===g).map(u=>`<div class="card ${u.grade}">${ico(UNIT_ICON[u.id],"ico big")}<h3><a href="#/study/${u.id}">${u.title}</a></h3><p class="muted">${u.desc}</p><ol style="padding-left:18px;margin:0">${u.lessons.map(l=>`<li><a href="#/study/${u.id}/${l.id}">${l.title}</a> <span class="muted" style="font-size:.8rem">${done(l)?`퀴즈 ${done(l)}%`:""}</span></li>`).join("")}</ol></div>`).join("")}</div>`).join("")}
+    const bands=[["중학교",GORDER.filter(g=>BAND[g]==="중학교")],["고등학교",GORDER.filter(g=>BAND[g]==="고등학교")]];
+    render(`<div class="crumb"><a href="#/">홈</a> › 수학 학습</div><h1>${ico(SEC_ICON.study,"ico")} 수학 학습 <span class="muted" style="font-size:1rem">중1 ~ 고3 · ${D.curriculum.units.length}단원 ${lessonsAll.length}소단원</span></h1><p class="lead">소단원마다 핵심 개념 → 왜 그런지 → (공식이 태어나는 이야기) → 오개념 → 출제 포인트 → 공식 → 예제 → 퀴즈 → 이 개념의 자리 순서로 이어집니다. 중2-2~중3-2 는 가장 깊게, 다른 학년은 핵심 소단원 중심으로 구성되어 있으며 계속 확장됩니다.</p>
+    <div class="pill-row">${GORDER.map(g=>`<a class="pill" href="#g-${g}">${G[g]}</a>`).join("")}</div>
+    ${bands.map(([bn,gs])=>`<h2 style="margin-top:1.6em">${bn}</h2>`+gs.map(g=>{ const us=D.curriculum.units.filter(u=>u.grade===g); return us.length?`<h3 id="g-${g}">${tag(g)} ${G[g]} <span class="muted" style="font-weight:400;font-size:.9rem">${us.length}단원 · ${us.reduce((a,u)=>a+u.lessons.length,0)}소단원</span></h3><div class="grid wide">${us.map(u=>`<div class="card ${GCOL(u.grade)}">${ico(UNIT_ICON[u.id]||"1F4D8","ico big")}<h3><a href="#/study/${u.id}">${u.title}</a></h3><p class="muted">${u.desc}</p><ol style="padding-left:18px;margin:0">${u.lessons.map(l=>`<li><a href="#/study/${u.id}/${l.id}">${l.title}</a> <span class="muted" style="font-size:.8rem">${done(l)?`퀴즈 ${done(l)}%`:""}</span></li>`).join("")}</ol></div>`).join("")}</div>`:""; }).join("")).join("")}
     <h2>🌿 줄기로 보기</h2><p class="muted">학년은 꼬리표일 뿐입니다. 개념의 선후관계로 한 줄에 세우면 이렇게 됩니다.</p>
-    ${[["geo","도형과 측정"],["alg","변화와 관계"],["num","수와 연산"],["stat","자료와 가능성"]].map(([s,n])=>`<div class="box"><b>${n}</b> — ${D.roadmap.nodes.filter(x=>x.strand===s&&x.unit).map(x=>`<a href="#/study/${x.unit}">${x.label}</a>`).join(" → ")}</div>`).join("")}`);
+    ${[["geo","도형과 측정"],["alg","변화와 관계"],["num","수와 연산"],["stat","자료와 가능성"]].map(([st,n])=>`<div class="box"><b>${n}</b> — ${D.roadmap.nodes.filter(x=>x.strand===st&&x.unit).map(x=>`<a href="#/study/${x.unit}">${x.label}</a>`).join(" → ")}</div>`).join("")}`);
+    main.querySelectorAll('a[href^="#g-"]').forEach(a=>a.onclick=e=>{ e.preventDefault(); const t=document.getElementById(a.getAttribute("href").slice(1)); if(t) t.scrollIntoView({behavior:"smooth"}); });
   }
   function unit(id){
     const u=byUnit(id); if(!u) return notFound();
-    render(`<div class="lhead ${u.grade}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › ${G[u.grade]}</div><div class="row">${ico(UNIT_ICON[u.id],"ico hero")}<div>${tag(u.grade)}<h1>${u.title}</h1><p class="lead">${u.desc}</p></div></div></div>
+    render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › ${G[u.grade]}</div><div class="row">${ico(UNIT_ICON[u.id]||"1F4D8","ico hero")}<div>${tag(u.grade)}<h1>${u.title}</h1><p class="lead">${u.desc}</p></div></div></div>
     <div class="grid wide">${u.lessons.map((l,i)=>`<a class="card link" href="#/study/${u.id}/${l.id}"><div class="eyebrow">소단원 ${i+1}</div><h3>${l.title}</h3><p class="muted">${l.concept[0].replace(/\*\*/g,"").slice(0,70)}…</p><div>${l.formulas.map(f=>byFormula(f)?`<span class="tag">📐 ${byFormula(f).title}</span>`:"").join("")}</div></a>`).join("")}</div>
     <h2>이 단원과 이어진 것</h2><div class="row">${[...new Set(u.lessons.map(l=>l.node))].map(n=>`<a class="btn ghost sm" href="#/roadmap/${n}">🗺 ${nodeOf(n).label} 의 자리</a>`).join("")}${Object.values(window.WIDGETS).some(w=>u.lessons.some(l=>l.node===w.node))?`<a class="btn ghost sm" href="#/lab">🔬 관련 위젯</a>`:""}<a class="btn ghost sm" href="#/exam">📝 시험 전 훑기</a></div>`);
   }
@@ -122,7 +133,7 @@
     const node=nodeOf(l.node); const pre=preds(l.node).map(nodeOf), post=succs(l.node).map(nodeOf);
     const widgets=Object.entries(window.WIDGETS).filter(([k,w])=>w.node===l.node);
     const lifeItems=D.life.filter(x=>x.node===l.node).slice(0,3); const ppl=D.people.filter(p=>p.link===l.id||p.node===l.node).slice(0,2);
-    render(`<div class="lhead ${u.grade}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span><h1>${l.title}</h1><p class="lead">${md(l.concept[0]).replace(/<[^>]+>/g,"").slice(0,90)}…</p></div>
+    render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span><h1>${l.title}</h1><p class="lead">${md(l.concept[0]).replace(/<[^>]+>/g,"").slice(0,90)}…</p></div>
     <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["story","이야기"],["pit","오개념"],["pt","출제 포인트"],["f","공식"],["ex","예제"],["quiz","퀴즈"],["bridge","개념 연결"],["place","개념의 자리"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
     <h2 id="c">핵심 개념</h2><ul>${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>
     <h2 id="why">왜 그런지</h2><div class="box">${md(l.why)}</div>
@@ -133,7 +144,7 @@
     ${l.formulas.length?`<h2 id="f">이 단원의 공식</h2><div class="grid">${l.formulas.map(f=>byFormula(f)).filter(Boolean).map(f=>`<a class="card link" href="#/formulas/${f.id}"><h3>${f.title} ${f.core?'<span class="tag">외울 것</span>':'<span class="tag">되살릴 것</span>'}</h3><div class="formula">$${f.tex}$</div></a>`).join("")}</div>`:""}
     <h2 id="ex">예제</h2><div class="card"><p><b>문제.</b> ${md(l.example.q)}</p><details class="sol"><summary>풀이 보기</summary><ol class="steps">${l.example.sol.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(l.example.ans)}</p></details></div>
     <h2 id="quiz">확인 퀴즈</h2>${quizHtml(l.quiz,"lesson:"+l.id)}
-    ${(()=>{const bs=D.bridge.filter(b=>b.nodes.includes(l.node)); return bs.length?`<h2 id="bridge">🔗 이 개념이 다른 단원과 만나는 문제</h2><div class="grid wide">${bs.map(b=>`<a class="card link ${b.grade}" href="#/bridge/${b.id}">${tag(b.grade)}<h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div></a>`).join("")}</div>`:"";})()}
+    ${(()=>{const bs=D.bridge.filter(b=>b.nodes.includes(l.node)); return bs.length?`<h2 id="bridge">🔗 이 개념이 다른 단원과 만나는 문제</h2><div class="grid wide">${bs.map(b=>`<a class="card link ${GCOL(b.grade)}" href="#/bridge/${b.id}">${tag(b.grade)}<h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div></a>`).join("")}</div>`:"";})()}
     ${(()=>{const es=D.essay.filter(e=>e.lesson===l.id||e.node===l.node); return es.length?`<h2 id="essay">✍️ 서술형·증명</h2><div class="row">${es.map(e=>`<a class="btn ghost sm" href="#/essay/${e.id}">${e.title}</a>`).join("")}</div>`:"";})()}
     <h2 id="place">이 개념의 자리</h2>
     <div class="card"><p><b>${node.label}</b> 별에 닿는 길: ${pre.length?pre.map(n=>`<a href="#/roadmap/${n.id}">${n.label}</a>`).join(" · "):"(시작점)"} → <b>${node.label}</b> → ${post.length?post.map(n=>`<a href="#/roadmap/${n.id}">${n.label}</a>`).join(" · "):"(끝)"}</p><a class="btn sm ghost" href="#/roadmap/${l.node}">🗺 지도에서 보기</a></div>
@@ -145,18 +156,18 @@
 
   // ---------- 개념 지도 ----------
   function roadmap(sel){
-    const cols=D.roadmap.columns; const colX={}; cols.forEach((c,i)=>colX[c.id]=120+i*200);
+    const cols=D.roadmap.columns; const colX={}; cols.forEach((c,i)=>colX[c.id]=110+i*170);
     const pos={}; cols.forEach(c=>{ const ns=D.roadmap.nodes.filter(n=>n.col===c.id); ns.forEach((n,i)=>pos[n.id]=[colX[c.id],70+i*52]); });
     const H=70+52*Math.max(...cols.map(c=>D.roadmap.nodes.filter(n=>n.col===c.id).length))+20;
     const up=sel?ancestors(sel):new Set(), down=sel?descendants(sel):new Set();
-    const edges=D.roadmap.edges.map(([a,b])=>{ const [x1,y1]=pos[a],[x2,y2]=pos[b]; const cls=sel&&((up.has(a)||a===sel)&&(up.has(b)||b===sel))?"on":sel&&((down.has(b)||b===sel)&&(down.has(a)||a===sel))?"next":""; return `<path class="edge ${cls}" d="M${x1+70},${y1} C${x1+120},${y1} ${x2-120},${y2} ${x2-70},${y2}"/>`; }).join("");
+    const edges=D.roadmap.edges.map(([a,b])=>{ const [x1,y1]=pos[a],[x2,y2]=pos[b]; const cls=sel&&((up.has(a)||a===sel)&&(up.has(b)||b===sel))?"on":sel&&((down.has(b)||b===sel)&&(down.has(a)||a===sel))?"next":""; return `<path class="edge ${cls}" d="M${x1+70},${y1} C${x1+110},${y1} ${x2-110},${y2} ${x2-70},${y2}"/>`; }).join("");
     const nodes=D.roadmap.nodes.map(n=>{ const [x,y]=pos[n.id]; const nf=D.formulas.filter(f=>f.node===n.id).length; const cls=`node ${n.col} ${n.id===sel?"on":""}`; return `<g class="${cls}" data-id="${n.id}" transform="translate(${x-70},${y-18})"><rect width="140" height="36"/><text x="70" y="23" text-anchor="middle">${n.label}</text>${nf?`<text x="134" y="12" text-anchor="end" style="font-size:9px;fill:var(--acc)">📐${nf}</text>`:""}</g>`; }).join("");
     const heads=cols.map(c=>`<text class="col-h" x="${colX[c.id]}" y="30" text-anchor="middle">${c.label}</text>`).join("");
     const n=sel&&nodeOf(sel);
     render(`<div class="crumb"><a href="#/">홈</a> › 개념 지도</div><h1>🗺 개념 지도</h1><p class="lead">별 하나를 누르면 그 개념까지 오는 길(주황)과 거기서 열리는 길(파랑)에 불이 켜집니다. 개념 ${D.roadmap.nodes.length}개 · 이어진 길 ${D.roadmap.edges.length}개.</p>
-    ${n?`<div class="box"><b>${n.label}</b> — 앞에 깔린 개념 <b>${up.size}</b>개, 여기서 열리는 개념 <b>${down.size}</b>개. ${n.unit?`<a href="#/study/${n.unit}">📘 ${byUnit(n.unit).title} 단원으로 →</a>`:"(이 사이트 범위 밖)"} ${D.formulas.filter(f=>f.node===sel).length?` · <a href="#/formulas?node=${sel}">📐 공식 ${D.formulas.filter(f=>f.node===sel).length}편</a>`:""}${lessonsOfNode(sel).length?` · 소단원: ${lessonsOfNode(sel).map(l=>`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`).join(", ")}`:""}</div>`:`<div class="box warn">별을 하나 골라 보세요. 예: <a href="#/roadmap/quadratic-eq">이차방정식</a></div>`}
-    <div class="map"><svg viewBox="0 0 1100 ${H}" width="1100" height="${H}">${heads}${edges}${nodes}</svg></div>
-    <p class="muted">화면이 좁으면 지도를 좌우로 밀어 보세요. 줄기별 색: 중2-2 파랑, 중3-1 보라, 중3-2 분홍.</p>`);
+    ${n?`<div class="box"><b>${n.label}</b> — 앞에 깔린 개념 <b>${up.size}</b>개, 여기서 열리는 개념 <b>${down.size}</b>개. ${n.unit?`<a href="#/study/${n.unit}">📘 ${byUnit(n.unit).title} 단원으로 →</a>`:"(단원 준비 중)"} ${D.formulas.filter(f=>f.node===sel).length?` · <a href="#/formulas?node=${sel}">📐 공식 ${D.formulas.filter(f=>f.node===sel).length}편</a>`:""}${lessonsOfNode(sel).length?` · 소단원: ${lessonsOfNode(sel).map(l=>`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`).join(", ")}`:""}</div>`:`<div class="box warn">별을 하나 골라 보세요. 예: <a href="#/roadmap/quadratic-eq">이차방정식</a></div>`}
+    <div class="map"><svg viewBox="0 0 ${110+170*cols.length} ${H}" width="${110+170*cols.length}" height="${H}">${heads}${edges}${nodes}</svg></div>
+    <p class="muted">화면이 좁으면 지도를 좌우로 밀어 보세요. 중1 ~ 고3 전 구간 · 색은 학년대.</p>`);
     main.querySelectorAll(".node").forEach(g=>g.addEventListener("click",()=>location.hash="#/roadmap/"+g.dataset.id));
   }
 
@@ -164,8 +175,8 @@
   function formulas(q){
     const p=new URLSearchParams(q||""); const node=p.get("node"), grade=p.get("grade"), core=p.get("core");
     let list=D.formulas.slice(); if(node) list=list.filter(f=>f.node===node); if(grade) list=list.filter(f=>f.grade===grade); if(core==="1") list=list.filter(f=>f.core);
-    render(`<div class="crumb"><a href="#/">홈</a> › 공식 사전</div><h1>📐 공식 사전</h1><p class="lead">공식 ${D.formulas.length}편 가운데 정말 외워야 하는 것은 <b>${D.formulas.filter(f=>f.core).length}편</b>입니다. 나머지는 유도 한 줄이면 그 자리에서 되살아납니다.</p>
-    <div class="pill-row"><a class="pill ${!grade&&!core?"on":""}" href="#/formulas">전체</a>${Object.keys(G).map(g=>`<a class="pill ${grade===g?"on":""}" href="#/formulas?grade=${g}">${G[g]}</a>`).join("")}<a class="pill ${core?"on":""}" href="#/formulas?core=1">🔑 정말 외울 것</a></div>
+    render(`<div class="crumb"><a href="#/">홈</a> › 공식 사전</div><h1>📐 공식 사전</h1><p class="lead">중1 ~ 고3 공식 ${D.formulas.length}편. 그중 정말 외워야 하는 것은 <b>${D.formulas.filter(f=>f.core).length}편</b>, 나머지는 유도 한 줄이면 그 자리에서 되살아납니다.</p>
+    <div class="pill-row"><a class="pill ${!grade&&!core?"on":""}" href="#/formulas">전체 ${D.formulas.length}</a><a class="pill ${core?"on":""}" href="#/formulas?core=1">🔑 정말 외울 것 ${D.formulas.filter(f=>f.core).length}</a></div><div class="pill-row">${GORDER.map(g=>`<a class="pill ${grade===g?"on":""}" href="#/formulas?grade=${g}">${G[g]} ${D.formulas.filter(f=>f.grade===g).length}</a>`).join("")}</div>
     <div class="grid wide">${list.map(f=>`<a class="card link" href="#/formulas/${f.id}">${tag(f.grade)} ${f.core?'<span class="tag">🔑 외울 것</span>':'<span class="tag">↻ 되살릴 것</span>'}<h3>${f.title}</h3><div class="formula">$${f.tex}$</div></a>`).join("")}</div>`);
   }
   function formula(id){
@@ -181,27 +192,27 @@
 
   // ---------- 수학의 생태계 ----------
   function ecosystem(){
-    const nodes=D.roadmap.nodes.filter(n=>n.unit); const cx=550, cy=330, R=230; const pos={};
+    const nodes=D.roadmap.nodes.filter(n=>n.unit); const cx=600, cy=380, R=300; const pos={};
     nodes.forEach((n,i)=>{ const t=-Math.PI/2+i*2*Math.PI/nodes.length; pos[n.id]=[cx+R*Math.cos(t),cy+R*Math.sin(t),t]; });
     let svg="", legend="";
     // 중심 간선
     D.roadmap.edges.filter(([a,b])=>pos[a]&&pos[b]).forEach(([a,b])=>{ svg+=`<line x1="${pos[a][0]}" y1="${pos[a][1]}" x2="${pos[b][0]}" y2="${pos[b][1]}" stroke-width="1"/>`; });
     nodes.forEach(n=>{ const [x,y,t]=pos[n.id]; const sat=[["📐",D.formulas.filter(f=>f.node===n.id).length,"var(--acc)"],["👤",D.people.filter(p=>p.node===n.id).length,"var(--g31)"],["🌍",D.life.filter(l=>l.node===n.id).length,"var(--ok)"],["🔬",Object.values(window.WIDGETS).filter(w=>w.node===n.id).length,"var(--acc2)"]];
-      sat.forEach(([ic,cnt,col],k)=>{ if(!cnt)return; const rr=70+k*22; const sx=x+rr*Math.cos(t), sy=y+rr*Math.sin(t); svg+=`<line x1="${x}" y1="${y}" x2="${sx}" y2="${sy}"/><circle cx="${sx}" cy="${sy}" r="${9+cnt}" fill="${col}" opacity=".85"/><text x="${sx}" y="${sy+4}" text-anchor="middle" style="fill:#fff;font-size:10px">${ic}${cnt}</text>`; });
+      sat.forEach(([ic,cnt,col],k)=>{ if(!cnt)return; const rr=60+k*20; const sx=x+rr*Math.cos(t), sy=y+rr*Math.sin(t); svg+=`<line x1="${x}" y1="${y}" x2="${sx}" y2="${sy}"/><circle cx="${sx}" cy="${sy}" r="${9+cnt}" fill="${col}" opacity=".85"/><text x="${sx}" y="${sy+4}" text-anchor="middle" style="fill:#fff;font-size:10px">${ic}${cnt}</text>`; });
       svg+=`<g class="eco-node" data-id="${n.id}"><circle cx="${x}" cy="${y}" r="26" fill="var(--card)" stroke="var(--${n.col})" stroke-width="3"/><text x="${x}" y="${y+4}" text-anchor="middle" style="font-weight:700">${n.label.length>7?n.label.slice(0,7)+"…":n.label}</text></g>`; });
     render(`<div class="crumb"><a href="#/">홈</a> › 수학의 생태계</div><h1>🌐 수학의 생태계</h1><p class="lead">중2-2 ~ 중3-2 의 개념 ${nodes.length}개를 둥글게 놓고, 각 개념에 걸린 📐공식 · 👤인물 · 🌍쓰임 · 🔬위젯을 위성처럼 붙였습니다. 가운데 선은 개념의 선후관계. 개념을 누르면 지도로 갑니다.</p>
-    <div class="eco"><svg viewBox="0 0 1100 660" width="1100" height="660"><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--line)" stroke-dasharray="4 4"/>${svg}</svg></div>
+    <div class="eco"><svg viewBox="0 0 1200 760" width="1200" height="760"><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--line)" stroke-dasharray="4 4"/>${svg}</svg></div>
     <div class="grid" style="margin-top:14px">${nodes.map(n=>`<div class="card"><h3><a href="#/roadmap/${n.id}">${n.label}</a> ${tag(n.col)}</h3><p class="muted">📐 ${D.formulas.filter(f=>f.node===n.id).map(f=>`<a href="#/formulas/${f.id}">${f.title}</a>`).join(" · ")||"—"}</p><p class="muted">👤 ${D.people.filter(p=>p.node===n.id).map(p=>p.name).join(", ")||"—"} &nbsp; 🌍 ${D.life.filter(l=>l.node===n.id).length}편</p></div>`).join("")}</div>`);
     main.querySelectorAll(".eco-node").forEach(g=>g.addEventListener("click",()=>location.hash="#/roadmap/"+g.dataset.id));
   }
 
   // ---------- 진단 ----------
   function diagnostic(level){
-    const sets={A:[0,9],B:[9,18],ALL:[0,18]}; 
+    const LV={ M1:{name:"중1·중2-1 진단",desc:"소인수분해·정수·일차방정식·그래프·도형·일차함수 8문항",bands:["M1"]}, A:{name:"중2-2 진단",desc:"선수 개념 3 + 삼각형·사각형·닮음·피타고라스·확률 6 = 9문항",bands:["P","A"]}, B:{name:"중3 진단",desc:"제곱근·곱셈공식·인수분해·이차방정식·이차함수·삼각비·원·통계 9문항",bands:["B"]}, H:{name:"고1 진단",desc:"다항식·복소수·근과 계수·도형의 방정식·집합·함수 6문항",bands:["H"]}, MID:{name:"중학교 전체",desc:"중1 ~ 중3 26문항, 약 15분",bands:["M1","P","A","B"]}, ALL:{name:"전체 진단",desc:"중1 ~ 고1 32문항",bands:["M1","P","A","B","H"]} };
     if(!level){ return render(`<div class="crumb"><a href="#/">홈</a> › 진단</div><h1>🧭 끊긴 곳부터 진단하기</h1><p class="lead">학년이 아니라 개념으로 짚습니다. 문항은 개념의 선후 순서대로 나오고, 처음 틀린 자리가 「끊긴 고리」입니다. 결과는 「중2 부족」이 아니라 「인수분해에서 끊김」처럼 개념 하나를 가리키고 그 소단원으로 바로 이어집니다.</p>
-      <div class="grid"><a class="card link" href="#/diagnostic/A"><h3>중2-2 진단</h3><p class="muted">선수 개념 3 + 삼각형·사각형·닮음·피타고라스·확률 6 = 9문항</p></a><a class="card link" href="#/diagnostic/B"><h3>중3 진단</h3><p class="muted">제곱근·곱셈공식·인수분해·이차방정식·이차함수·삼각비·원·통계 9문항</p></a><a class="card link" href="#/diagnostic/ALL"><h3>전체 진단</h3><p class="muted">중2-2 ~ 중3-2 18문항, 약 10분</p></a></div>
-      ${(()=>{const h=store.get("diag",[]); return h.length?`<h2>지난 진단</h2><ul>${h.slice(0,5).map(x=>`<li>${new Date(x.when).toLocaleDateString("ko")} · ${x.level} · ${x.score}/${x.total} · 끊긴 고리: <b>${x.broken?nodeOf(x.broken).label:"없음 🎉"}</b></li>`).join("")}</ul>`:"";})()}`); }
-    const [s,e]=sets[level]||sets.ALL; const items=D.diagnostic.slice(s,e); let i=0; const ans=[];
+      <div class="grid">${Object.entries(LV).map(([k,v])=>`<a class="card link" href="#/diagnostic/${k}"><h3>${v.name}</h3><p class="muted">${v.desc}</p></a>`).join("")}</div>
+      ${(()=>{const h=store.get("diag",[]); return h.length?`<h2>지난 진단</h2><ul>${h.slice(0,5).map(x=>`<li>${new Date(x.when).toLocaleDateString("ko")} · ${(LV[x.level]||{}).name||x.level} · ${x.score}/${x.total} · 끊긴 고리: <b>${x.broken&&nodeOf(x.broken)?nodeOf(x.broken).label:"없음 🎉"}</b></li>`).join("")}</ul>`:"";})()}`); }
+    const bands=(LV[level]||LV.ALL).bands; const items=D.diagnostic.filter(d=>bands.includes(d.band||"A")); let i=0; const ans=[];
     function step(){ if(i>=items.length) return result();
       const q=items[i]; render(`<div class="crumb"><a href="#/diagnostic">진단</a> › 문항 ${i+1}/${items.length}</div><div class="progress"><i style="width:${i/items.length*100}%"></i></div><p class="eyebrow">${q.label}</p><div class="quiz" style="border:0;padding:0"><h2 style="margin-top:0">${md(q.q)}</h2><div class="opts">${q.opts.map((o,j)=>`<button data-j="${j}" class="dq">${["①","②","③","④"][j]} ${md(o)}</button>`).join("")}</div></div>`);
       main.querySelectorAll(".dq").forEach(b=>b.addEventListener("click",()=>{ ans.push(Number(b.dataset.j)===q.a); i++; step(); },{once:true})); }
@@ -221,7 +232,7 @@
   function lab(id){
     const Wd=window.WIDGETS;
     if(id&&Wd[id]){ const w=Wd[id]; render(`<div class="crumb"><a href="#/">홈</a> › <a href="#/lab">매스랩</a></div>${tag(w.grade)}<h1>${w.title}</h1><p class="lead">${w.desc}</p><div class="widget" id="lab-w"></div><div class="row">${lessonsOfNode(w.node).map(l=>`<a class="btn sm ghost" href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`).join("")}<a class="btn sm ghost" href="#/roadmap/${w.node}">🗺 지도</a></div>`); w.render($("#lab-w")); return; }
-    render(`<div class="crumb"><a href="#/">홈</a> › 매스랩</div><h1>🔬 매스랩</h1><p class="lead">설명을 읽기 전에 먼저 밀어 보세요. 슬라이더 하나가 공식 한 줄을 설명합니다.</p>${Object.keys(G).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${Object.entries(Wd).filter(([k,w])=>w.grade===g).map(([k,w])=>`<a class="card link ${g}" href="#/lab/${k}">${tag(w.grade)}<h3>${w.title}</h3><p class="muted">${w.desc}</p></a>`).join("")}</div>`).join("")}
+    render(`<div class="crumb"><a href="#/">홈</a> › 매스랩</div><h1>🔬 매스랩</h1><p class="lead">설명을 읽기 전에 먼저 밀어 보세요. 슬라이더 하나가 공식 한 줄을 설명합니다.</p>${GORDER.filter(g=>Object.values(Wd).some(w=>w.grade===g)).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${Object.entries(Wd).filter(([k,w])=>w.grade===g).map(([k,w])=>`<a class="card link ${GCOL(g)}" href="#/lab/${k}">${tag(w.grade)}<h3>${w.title}</h3><p class="muted">${w.desc}</p></a>`).join("")}</div>`).join("")}
     <div class="box"><b>위젯 추가하기</b> — <code>js/widgets.js</code> 에 <code>WIDGETS.id = {title, desc, node, grade, render(container)}</code> 하나를 더하면 목록·소단원·생태계에 자동으로 연결됩니다.</div>`);
   }
 
@@ -264,9 +275,9 @@
   function bridge(id){
     if(!id) return render(`<div class="crumb"><a href="#/">홈</a> › 개념 연결·응용</div><h1>🔗 개념 연결·응용</h1><p class="lead">한 문제에서 두세 단원이 만납니다. 풀이의 각 단계에 <b>어느 개념을 썼는지</b> 표시해, 풀이가 곧 개념 지도가 되게 했습니다. 시험의 고난도 문항은 대부분 이런 '다리' 문제입니다.</p>
       <div class="box ok"><b>왜 따로 모았나</b> — 교과서 문제의 약 90% 는 같은 단원 안에서만 묶여 있지만(Rohrer 외, 2020), 실제 시험과 수학적 사고는 단원을 가로지릅니다. 여기서는 '어느 개념을 꺼낼지' 고르는 연습을 합니다.</div>
-      ${Object.keys(G).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.bridge.filter(b=>b.grade===g).map(b=>`<a class="card link ${g}" href="#/bridge/${b.id}"><h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div><p class="muted">${b.hook}</p></a>`).join("")}</div>`).join("")}`);
+      ${GORDER.filter(g=>D.bridge.some(b=>b.grade===g)).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.bridge.filter(b=>b.grade===g).map(b=>`<a class="card link ${GCOL(g)}" href="#/bridge/${b.id}"><h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div><p class="muted">${b.hook}</p></a>`).join("")}</div>`).join("")}`);
     const b=D.bridge.find(x=>x.id===id); if(!b) return notFound();
-    render(`<div class="lhead ${b.grade}"><div class="crumb"><a href="#/">홈</a> › <a href="#/bridge">개념 연결·응용</a></div>${tag(b.grade)}<h1>${b.title}</h1><p class="lead">${md(b.hook)}</p><div class="chain big">${b.nodes.map(n=>`<a class="chip" href="#/roadmap/${n}">${nodeOf(n).label}</a>`).join('<span class="arr">+</span>')}</div></div>
+    render(`<div class="lhead ${GCOL(b.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/bridge">개념 연결·응용</a></div>${tag(b.grade)}<h1>${b.title}</h1><p class="lead">${md(b.hook)}</p><div class="chain big">${b.nodes.map(n=>`<a class="chip" href="#/roadmap/${n}">${nodeOf(n).label}</a>`).join('<span class="arr">+</span>')}</div></div>
     <h2>문제</h2><div class="card"><p style="font-size:1.08rem">${md(b.q)}</p><details class="sol"><summary>먼저 풀어 본 뒤 열기 — 단계별 풀이</summary><ol class="steps bridge-steps">${b.steps.map(st=>`<li><span class="chip sm">${nodeOf(st.node).label}</span> ${md(st.t)}</li>`).join("")}</ol><p><b>답:</b> ${md(b.ans)}</p></details></div>
     <h2>이렇게 이어집니다</h2><div class="box">${md(b.link)}</div>
     <h2>같은 구조, 다른 숫자</h2><div class="card"><p>${md(b.variant.q)}</p><details class="sol"><summary>답 확인</summary><p>${md(b.variant.ans)}</p></details></div>
@@ -275,14 +286,15 @@
   }
 
   // ---------- 섞어 풀기 (교차 연습 + 인출 연습) ----------
-  function mix(){
-    const pool=[]; lessonsAll.forEach(l=>l.quiz.forEach((q,i)=>pool.push({l,q,i})));
+  function mix(qs){
+    const band=(new URLSearchParams(qs||"")).get("band")||store.get("mixband","중학교"); store.set("mixband",band);
+    const pool=[]; lessonsAll.filter(l=>band==="전체"||BAND[l.grade]===band).forEach(l=>l.quiz.forEach((q,i)=>pool.push({l,q,i})));
     // 서로 다른 단원에서 6문항
     const picked=[]; const usedUnits=new Set(); shuffle(pool).forEach(x=>{ if(picked.length<6 && !usedUnits.has(x.l.unit)){ picked.push(x); usedUnits.add(x.l.unit);} });
     let i=0, score=0, idOk=0; const log=[];
     function step(){ if(i>=picked.length) return done();
       const {l,q}=picked[i]; const units=shuffle([byUnit(l.unit), ...shuffle(D.curriculum.units.filter(u=>u.id!==l.unit)).slice(0,3)]);
-      render(`<div class="crumb"><a href="#/">홈</a> › 섞어 풀기 › ${i+1}/${picked.length}</div><div class="progress"><i style="width:${i/picked.length*100}%"></i></div>
+      render(`<div class="crumb"><a href="#/">홈</a> › 섞어 풀기 (${band}) › ${i+1}/${picked.length}</div><div class="progress"><i style="width:${i/picked.length*100}%"></i></div>
         <div class="card game"><div class="eyebrow">1단계 · 어느 단원의 문제인가?</div><p style="font-size:1.1rem">${md(q.q)}</p><div class="quiz" style="border:0;padding:0"><div class="opts" id="u-opts">${units.map(u=>`<button data-u="${u.id}">${u.title}</button>`).join("")}</div></div>
         <div id="stage2" hidden><div class="eyebrow" style="margin-top:14px">2단계 · 풀기</div><div class="quiz" style="border:0;padding:0"><div class="opts" id="a-opts">${q.opts.map((o,j)=>`<button data-j="${j}">${["①","②","③","④"][j]} ${md(o)}</button>`).join("")}</div><div class="exp" id="exp" hidden>${md(q.exp||"")}</div></div></div>
         <div class="row" style="margin-top:12px"><button class="btn" id="next" hidden>다음 →</button></div></div>`);
@@ -297,7 +309,7 @@
       render(`<div class="crumb"><a href="#/">홈</a> › 섞어 풀기</div><h1>${score} / ${picked.length} 정답 · 단원 알아맞히기 ${idOk} / ${picked.length}</h1>
       <div class="box ${score===picked.length?"ok":"warn"}">${score===picked.length?"전부 맞혔습니다. 내일 다시 오면 다른 조합이 나옵니다.":"틀린 문제는 오답 노트에 들어갔습니다. '단원 알아맞히기' 가 틀린 문제는 풀이보다 <b>개념 식별</b>이 약한 것이니 그 소단원의 '핵심 개념' 부터 다시 보세요."}</div>
       <table><tr><th>소단원</th><th>단원 식별</th><th>정답</th></tr>${log.map(x=>`<tr><td><a href="#/study/${x.l.unit}/${x.l.id}">${x.l.title}</a></td><td>${x.unitRight?"✅":"❌"}</td><td>${x.ok?"✅":"❌"}</td></tr>`).join("")}</table>
-      <div class="row" style="margin-top:14px"><a class="btn" href="#/mix" onclick="setTimeout(()=>location.reload(),0)">다른 6문제</a><a class="btn ghost" href="#/notes">📒 오답 노트</a></div>`); }
+      <div class="row" style="margin-top:14px"><a class="btn" href="#/mix" onclick="setTimeout(()=>location.reload(),0)">다른 6문제</a><a class="btn ghost" href="#/mix?band=중학교" onclick="setTimeout(()=>location.reload(),0)">중학교</a><a class="btn ghost" href="#/mix?band=고등학교" onclick="setTimeout(()=>location.reload(),0)">고등학교</a><a class="btn ghost" href="#/mix?band=전체" onclick="setTimeout(()=>location.reload(),0)">전체</a><a class="btn ghost" href="#/notes">📒 오답 노트</a></div>`); }
     step();
   }
 
@@ -306,9 +318,9 @@
   function essay(id){
     const st=store.get("essay",{});
     if(!id) return render(`<div class="crumb"><a href="#/">홈</a> › 서술형·증명</div><h1>✍️ 서술형 · 증명 · 자기설명</h1><p class="lead">모범 답안을 보기 전에 <b>자기 말로 먼저 씁니다</b>. 그다음 채점 기준(10점)으로 스스로 점수를 매깁니다. '왜 이 줄이 나오는지'를 말로 설명하는 자기설명은 이해를 가장 깊게 남기는 학습법 중 하나입니다.</p>
-      ${Object.keys(G).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.essay.filter(e=>e.grade===g).map(e=>{const r=st[e.id]; return `<a class="card link ${g}" href="#/essay/${e.id}">${tag(g)}${r?`<span class="tag">자기채점 ${r.score}/${e.pts}</span>`:""}<h3>${e.title}</h3><p class="muted">${md(e.q).slice(0,80)}…</p></a>`;}).join("")}</div>`).join("")}`);
+      ${GORDER.filter(g=>D.essay.some(e=>e.grade===g)).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.essay.filter(e=>e.grade===g).map(e=>{const r=st[e.id]; return `<a class="card link ${GCOL(g)}" href="#/essay/${e.id}">${tag(g)}${r?`<span class="tag">자기채점 ${r.score}/${e.pts}</span>`:""}<h3>${e.title}</h3><p class="muted">${md(e.q).slice(0,80)}…</p></a>`;}).join("")}</div>`).join("")}`);
     const e=D.essay.find(x=>x.id===id); if(!e) return notFound(); const r=st[id]||{text:"",score:null,checks:[]}; const l=byLesson(e.lesson);
-    render(`<div class="lhead ${e.grade}"><div class="crumb"><a href="#/essay">서술형·증명</a> › ${e.title}</div>${tag(e.grade)}<h1>${e.title}</h1></div>
+    render(`<div class="lhead ${GCOL(e.grade)}"><div class="crumb"><a href="#/essay">서술형·증명</a> › ${e.title}</div>${tag(e.grade)}<h1>${e.title}</h1></div>
     <div class="card"><p style="font-size:1.08rem"><b>문제.</b> ${md(e.q)}</p><div class="box warn"><b>생각 열기:</b> ${md(e.prompt)}</div>
     <h3>1단계 · 내 풀이를 쓴다</h3><textarea id="ans" rows="7" placeholder="증명·풀이를 자기 말로 써 보세요. 수식은 글로 풀어 써도 됩니다.">${esc(r.text)}</textarea>
     <div class="row" style="margin-top:8px"><button class="btn" id="reveal">썼다 → 모범 답안 보기</button><span class="muted">쓴 내용은 이 브라우저(로그인 시 계정)에 저장됩니다.</span></div></div>
@@ -355,7 +367,7 @@
 
   // ---------- 개념 사전 ----------
   function concepts(q){ const p=new URLSearchParams(q||""); const g=p.get("grade"); const list=D.concepts.filter(c=>!g||c.grade===g).sort((a,b)=>a.term.localeCompare(b.term,"ko"));
-    render(`<div class="crumb"><a href="#/">홈</a> › 개념 사전</div><h1>📖 개념 사전</h1><p class="lead">용어 ${D.concepts.length}개. 정의 한 줄과 영어 이름, 그리고 그 개념이 있는 자리.</p><div class="pill-row"><a class="pill ${!g?"on":""}" href="#/concepts">전체</a>${Object.keys(G).map(x=>`<a class="pill ${g===x?"on":""}" href="#/concepts?grade=${x}">${G[x]}</a>`).join("")}</div>
+    render(`<div class="crumb"><a href="#/">홈</a> › 개념 사전</div><h1>📖 개념 사전</h1><p class="lead">용어 ${D.concepts.length}개. 정의 한 줄과 영어 이름, 그리고 그 개념이 있는 자리.</p><div class="pill-row"><a class="pill ${!g?"on":""}" href="#/concepts">전체</a>${GORDER.filter(x=>D.concepts.some(c=>c.grade===x)).map(x=>`<a class="pill ${g===x?"on":""}" href="#/concepts?grade=${x}">${G[x]}</a>`).join("")}</div>
     <div class="grid wide">${list.map(c=>`<div class="card">${tag(c.grade)}<h3>${c.term} <span class="muted" style="font-weight:400;font-size:.85rem">${c.en}</span></h3><p>${md(c.def)}</p><a href="#/roadmap/${c.node}">🗺 ${nodeOf(c.node).label}</a>${lessonsOfNode(c.node).slice(0,1).map(l=>` · <a href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`).join("")}</div>`).join("")}</div>`); }
 
   // ---------- 공식 암기법 (간격 반복) ----------
@@ -417,7 +429,7 @@
     render(`<h1>🔍 "${esc(q)}" 검색 결과</h1>${L.length?`<h2>소단원</h2><ul>${L.map(l=>`<li><a href="#/study/${l.unit}/${l.id}">${l.title}</a> <span class="muted">${l.unitTitle}</span></li>`).join("")}</ul>`:""}${F.length?`<h2>공식</h2><ul>${F.map(f=>`<li><a href="#/formulas/${f.id}">${f.title}</a></li>`).join("")}</ul>`:""}${Cc.length?`<h2>개념</h2><ul>${Cc.map(c=>`<li><b>${c.term}</b> — ${md(c.def)}</li>`).join("")}</ul>`:""}${Lf.length?`<h2>생활 속 수학</h2><ul>${Lf.map(x=>`<li><a href="#/life">${x.title}</a></li>`).join("")}</ul>`:""}${P.length?`<h2>인물</h2><ul>${P.map(p=>`<li><a href="#/people">${p.name}</a></li>`).join("")}</ul>`:""}${!(L.length+F.length+Cc.length+Lf.length+P.length)?`<p class="muted">결과가 없습니다.</p>`:""}`); }
   $("#q").addEventListener("keydown",e=>{ if(e.key==="Enter"){ location.hash="#/search?q="+encodeURIComponent(e.target.value); } });
 
-  function about(){ render(`<h1>사이트 소개</h1><div class="card"><p><b>중등수학 만지기</b>는 중학교 2학년 2학기부터 3학년까지의 수학을 "외우기 전에 먼저 만져 보는" 방식으로 익히는 무료·오픈소스 학습 사이트입니다. 로그인·결제가 없고, 학습 기록은 사용자의 브라우저(localStorage)에만 저장됩니다.</p>
+  function about(){ render(`<h1>사이트 소개</h1><div class="card"><p><b>수학 만지기</b>는 중1부터 고3까지의 수학(중2-2~중3-2 를 가장 깊게)을 "외우기 전에 먼저 만져 보는" 방식으로 익히는 무료·오픈소스 학습 사이트입니다. 로그인·결제가 없고, 학습 기록은 사용자의 브라우저(localStorage)에만 저장됩니다.</p>
     <h3>단원 체계의 근거</h3><p>교육부 고시 2022 개정 수학과 교육과정(중학교 2·3학년 영역: 수와 연산, 변화와 관계, 도형과 측정, 자료와 가능성)의 성취기준을 따르며, 2015 개정 교육과정과 공통인 범위(이등변삼각형·사각형·닮음·피타고라스·확률 / 제곱근·인수분해·이차방정식·이차함수 / 삼각비·원·통계)를 다룹니다. 상자그림은 2022 개정에서 중3 통계에 추가된 내용입니다. 학교별 진도·범위는 교과서 차례로 확인하세요.</p>
     <h3>기술</h3><p>정적 HTML/CSS/JS, 수식 렌더링은 KaTeX(MIT), 위젯은 순수 Canvas 2D. 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. 콘텐츠는 <code>data/*.js</code> 파일을 고치면 바로 반영됩니다.</p>
     <h3>저작권</h3><p>본문·문항·위젯 코드는 이 저장소의 저작자가 작성했으며 MIT 라이선스로 공개합니다. 사이트 구조(개념 지도·공식 되살리기·끊긴 고리 진단 등)는 공개된 수학 학습 사이트들의 접근 방식을 참고하되 텍스트·코드·이미지를 복제하지 않았습니다. 인물 정보는 일반적으로 알려진 수학사 사실에 근거합니다.</p>
@@ -441,7 +453,7 @@
     if(r==="essay") return essay(p[1]);
     if(r==="daily") return daily();
     if(r==="teacher") return teacher();
-    if(r==="mix") return mix();
+    if(r==="mix") return mix(qs);
     if(r==="concepts") return concepts(qs);
     if(r==="recall") return recall(p[1]);
     if(r==="exam") return exam(p[1]);

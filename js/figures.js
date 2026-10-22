@@ -27,10 +27,21 @@
   // 건물 높이 재기 (tan)
   F.building = ({d="100 m",ang="30°",h="h = ?",eye="눈높이 1.6 m"})=>S(340,220, R(250,40,60,160,{f:"rgba(20,30,60,.12)",r:3})+L(20,200,320,200,{c:MUT})+C(60,170,6,{f:ACC})+L(60,170,250,40,{c:ACC,d:"6 4"})+L(60,170,250,170,{c:ACC2,d:"4 4"})+L(250,40,250,170,{c:ACC2,d:"4 4"})
       +T(155,190,d,{a:"middle",s:11})+T(258,110,h,{s:12,c:ACC2,w:700})+`<path d="M100,170 A40,40 0 0 0 95,147" fill="none" stroke="${ACC}" stroke-width="2"/>`+T(103,160,ang,{c:ACC,s:11})+T(20,165,eye,{s:10,c:MUT})+RA(250,170,-1,0,0,-1));
-  // 세 마을과 외심 / 내심
-  F.towns = ({mode="circum"})=>{ const A=[70,170],B=[270,160],Cc=[150,40]; const O=mode==="circum"?[163,113]:[158,112];
-    const circ = mode==="circum" ? C(163,113,94,{c:ACC,d:"6 4"}) : C(158,118,42,{c:ACC,d:"6 4"});
-    return S(340,210, P(`${A} ${B} ${Cc}`,{f:"rgba(47,111,237,.06)"})+circ+[A,B,Cc].map(p=>C(p[0],p[1],7,{f:ACC2,c:"none"})).join("")+C(O[0],O[1],6,{f:ACC,c:"none"})+T(O[0]+10,O[1]+4,mode==="circum"?"외심 = 우물":"내심 = 소방서",{c:ACC,w:700,s:12})+T(55,190,"마을 A",{s:11})+T(255,180,"마을 B",{s:11})+T(135,30,"마을 C",{s:11})); };
+  // 세 마을과 외심 / 내심 — 좌표에서 정확히 계산
+  F.towns = ({mode="circum"})=>{ const A=[70,170],B=[280,150],Cc=[150,40];
+    const d=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
+    // 외심: 수직이등분선의 교점 (공식)
+    const [ax,ay]=A,[bx,by]=B,[cx,cy]=Cc; const D=2*(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by));
+    const ox=((ax*ax+ay*ay)*(by-cy)+(bx*bx+by*by)*(cy-ay)+(cx*cx+cy*cy)*(ay-by))/D, oy=((ax*ax+ay*ay)*(cx-bx)+(bx*bx+by*by)*(ax-cx)+(cx*cx+cy*cy)*(bx-ax))/D; const R=d([ox,oy],A);
+    // 내심: 대변 길이 가중 평균, r = 2S/둘레
+    const a=d(B,Cc), b=d(Cc,A), c=d(A,B); const ix=(a*ax+b*bx+c*cx)/(a+b+c), iy=(a*ay+b*by+c*cy)/(a+b+c); const S2=Math.abs((bx-ax)*(cy-ay)-(cx-ax)*(by-ay)); const r=S2/(a+b+c);
+    const O=mode==="circum"?[ox,oy]:[ix,iy];
+    const aux = mode==="circum"
+      ? [[A,B],[B,Cc],[Cc,A]].map(([p,q])=>{ const m=[(p[0]+q[0])/2,(p[1]+q[1])/2]; return L(m[0],m[1],ox,oy,{c:MUT,w:1,d:"4 3"}); }).join("")+C(ox,oy,R,{c:ACC,d:"6 4"})
+      : [A,B,Cc].map(p=>L(p[0],p[1],ix,iy,{c:MUT,w:1,d:"4 3"})).join("")+C(ix,iy,r,{c:ACC,d:"6 4"});
+    return S(340,210, P(`${A} ${B} ${Cc}`,{f:"rgba(47,111,237,.06)"})+aux+[A,B,Cc].map(p=>C(p[0],p[1],7,{f:ACC2,c:"none"})).join("")+C(O[0],O[1],6,{f:ACC,c:"none"})
+      +T(O[0]+10,O[1]-8,mode==="circum"?"외심 = 우물":"내심 = 소방서",{c:ACC,w:700,s:12})+T(O[0]+10,O[1]+8,mode==="circum"?"세 마을까지 같은 거리":"세 도로까지 같은 거리",{c:MUT,s:10})
+      +T(55,190,"마을 A",{s:11})+T(265,172,"마을 B",{s:11})+T(135,30,"마을 C",{s:11})); };
   // 격자 36칸 (두 주사위)
   F.grid36 = ({cond=(a,b)=>a+b===7,label="합 = 7"})=>{ let g=""; for(let a=1;a<=6;a++)for(let b=1;b<=6;b++){ const hit=cond(a,b); g+=R(40+(b-1)*36,20+(a-1)*28,34,26,{f:hit?"rgba(255,138,61,.55)":"rgba(47,111,237,.08)",c:"var(--line)",w:1})+T(57+(b-1)*36,38+(a-1)*28,`${a},${b}`,{a:"middle",s:10,c:hit?"var(--ink)":MUT}); }
     let n=0; for(let a=1;a<=6;a++)for(let b=1;b<=6;b++) if(cond(a,b)) n++;
