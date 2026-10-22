@@ -3,7 +3,6 @@
   --acc:#2f6fed;--acc2:#ff8a3d;--ok:#1f9d55;--bad:#d64545;--warn:#e0a800;
   --g22:#3b82f6;--g31:#8b5cf6;--g32:#ec4899;
   --r:14px;--sh:0 2px 10px rgba(20,30,60,.06);
-}
   --m1:#0ea5e9;--m21:#14b8a6;--h1:#f59e0b;--h2:#ef4444;--h3:#64748b;
 }
 :root[data-theme="dark"]{

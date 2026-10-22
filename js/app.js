@@ -525,8 +525,9 @@
   $("#navtoggle").onclick=()=>$("#nav").classList.toggle("open");
   window.addEventListener("hashchange",()=>$("#nav").classList.remove("open"));
   // 테마
-  const th=store.get("theme",null); if(th) document.documentElement.dataset.theme=th;
-  $("#theme").onclick=()=>{ const cur=document.documentElement.dataset.theme==="dark"?"light":"dark"; document.documentElement.dataset.theme=cur; store.set("theme",cur); };
+  const applyTheme=t=>{ document.documentElement.dataset.theme=t; const b=$("#theme"); if(b){ b.textContent=t==="dark"?"☀️":"🌙"; b.title=t==="dark"?"라이트 모드로":"다크 모드로"; } const mc=document.querySelector('meta[name="theme-color"]'); if(mc) mc.content=t==="dark"?"#0f1420":"#f7f9fc"; };
+  const th=store.get("theme",null)||(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"); applyTheme(th);
+  $("#theme").onclick=()=>{ const cur=document.documentElement.dataset.theme==="dark"?"light":"dark"; applyTheme(cur); store.set("theme",cur); };
   // KaTeX 가 늦게 로드될 수 있으므로 로드 후 한 번 더 조판
   window.addEventListener("load",()=>setTimeout(typeset,50));
   route();
