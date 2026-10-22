@@ -170,3 +170,10 @@ h2 .katex{white-space:nowrap;font-size:1.05em}
   .stats div{min-width:96px;padding:8px 10px}.stats b{font-size:1.3rem}
 }
 @media print{.topbar,.foot,.pill-row,.btn{display:none}.card,.box{box-shadow:none;break-inside:avoid}}
+
+/* 동기화 로그인 */
+.sync-modal{position:fixed;inset:0;background:rgba(10,15,30,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.sync-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.sync-card h3{margin-top:0}
+.sync-card label{display:block;margin:10px 0;font-weight:600}
+.sync-card input{display:block;width:100%;margin-top:4px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:1rem}

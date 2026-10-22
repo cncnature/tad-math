@@ -12,7 +12,7 @@
   // ---------- 저장소 (브라우저 로컬) ----------
   const store = {
     get(k,d){ try{ return JSON.parse(localStorage.getItem("imm:"+k)) ?? d; }catch(e){ return d; } },
-    set(k,v){ try{ localStorage.setItem("imm:"+k, JSON.stringify(v)); }catch(e){} }
+    set(k,v){ try{ localStorage.setItem("imm:"+k, JSON.stringify(v)); if(k!=="theme"&&window.SYNC) window.SYNC.onChange(); }catch(e){} }
   };
 
   // ---------- 유틸 ----------
@@ -280,7 +280,7 @@
   function people(){ render(`<div class="crumb"><a href="#/">홈</a> › 수학 인물</div><h1>👤 수학 인물</h1><p class="lead">이 범위의 공식 뒤에 있는 사람들. 시대순.</p><div class="grid wide">${D.people.map(p=>{const l=byLesson(p.link); return `<div class="card"><div class="eyebrow">${p.years}</div><h3>${p.name}</h3><p>${md(p.body)}</p>${l?`<a href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`:""} · <a href="#/roadmap/${p.node}">🗺 ${nodeOf(p.node).label}</a></div>`;}).join("")}</div>`); }
 
   // ---------- 오답 노트 ----------
-  function notes(){ const n=store.get("notes",[]); render(`<div class="crumb"><a href="#/">홈</a> › 오답 노트</div><h1>📒 내 오답 노트</h1><p class="lead">소단원 퀴즈에서 틀린 문제가 자동으로 모입니다. 이 브라우저에만 저장되며, 아래에서 내보내기(JSON)·지우기를 할 수 있습니다.</p>
+  function notes(){ const n=store.get("notes",[]); render(`<div class="crumb"><a href="#/">홈</a> › 오답 노트</div><h1>📒 내 오답 노트</h1><p class="lead">소단원 퀴즈에서 틀린 문제가 자동으로 모입니다. 상단의 🔐 로그인 으로 아이디를 만들면 모든 기기에서 이어지고, 로그인하지 않으면 이 브라우저에만 저장됩니다. 아래에서 내보내기(JSON)·지우기를 할 수 있습니다.</p>
     <div class="row"><button class="btn ghost" id="exp">내보내기</button><button class="btn ghost" id="clr">모두 지우기</button></div>
     ${n.length?`<table><tr><th>날짜</th><th>문제</th><th>소단원</th></tr>${n.map(x=>{const l=byLesson(x.key.replace("lesson:","")); return `<tr><td>${new Date(x.when).toLocaleDateString("ko")}</td><td>${esc(x.q)}</td><td>${l?`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`:""}</td></tr>`;}).join("")}</table>`:`<p class="muted">아직 비어 있습니다. <a href="#/study">소단원 퀴즈</a>를 풀어 보세요.</p>`}`);
     $("#exp").onclick=()=>{ const blob=new Blob([JSON.stringify({notes:n,quiz:store.get("quiz",{}),diag:store.get("diag",[]),srs:store.get("srs",{}),exam:store.get("exam",{})},null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="my-math-record.json"; a.click(); };
