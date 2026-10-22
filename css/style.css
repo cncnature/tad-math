@@ -292,3 +292,16 @@ table select{padding:4px 6px;border:1px solid var(--line);border-radius:8px;back
 .rm-stats{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem;margin:8px 0}
 .rm-panel .o{color:var(--acc2)}.rm-panel .b{color:var(--acc)}
 .rm-panel p{margin:6px 0}
+
+/* 수능 패턴 도감 / 학교 시험 필수 문제 */
+.pat .pat-h{display:flex;gap:10px;align-items:center}.pat .pat-emoji{font-size:1.6rem}.pat h3{margin:0}
+.pat.done{border-color:var(--ok)}
+.freq{font-size:.72rem;letter-spacing:.08em;color:var(--acc2)}
+.first-move{background:linear-gradient(135deg,rgba(47,111,237,.08),rgba(255,138,61,.08))}
+.reveal{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.rv-box{background:var(--bg);border-radius:10px;padding:10px 12px;margin:8px 0}
+.stq .st-h{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.stq .qn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--card);font-weight:800;font-size:.85rem}
+.stq .st-chk{margin-left:auto;font-size:.85rem;color:var(--muted);cursor:pointer}
+.stq.done{border-color:var(--ok);background:rgba(31,157,85,.04)}
+.stq.done .qn{background:var(--ok)}
