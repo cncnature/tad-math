@@ -215,3 +215,14 @@ h2 .katex{white-space:nowrap;font-size:1.05em}
 .card.unit h3{margin-right:64px}
 .person .eyebrow{margin-bottom:2px}
 @media (prefers-reduced-motion:reduce){.hero-art .ico.float{animation:none}}
+
+/* ===== 생활 속 수학 도면 / 서술형 / 10분 코스 ===== */
+.figwrap{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:6px;margin-bottom:10px}
+.fig{width:100%;height:auto;display:block;font-family:inherit}
+.card.life h3{margin-top:6px}
+textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;line-height:1.6;resize:vertical}
+.rubric li{align-items:center}.rubric .pts{margin-left:auto;color:var(--acc2);white-space:nowrap}
+.steps.daily li{padding-right:8px}.steps.daily .btn{margin-left:8px}
+.heat{display:flex;gap:6px;flex-wrap:wrap}.heat span{width:34px;height:34px;border-radius:8px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--muted)}
+.heat span.on{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:700}
+table select{padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}

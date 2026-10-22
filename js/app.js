@@ -86,6 +86,8 @@
     <div class="grid">${D.curriculum.units.map(u=>`<a class="card link unit ${u.grade}" href="#/study/${u.id}">${ico(UNIT_ICON[u.id],"ico big")}<div>${tag(u.grade)}</div><h3>${u.title}</h3><p class="muted">${u.desc}</p></a>`).join("")}</div>
     <h2>더 둘러보기</h2>
     <div class="grid">
+      <a class="card link" href="#/daily">${ico("1F3C6")}<h3>하루 10분 코스</h3><p class="muted">암기 3장 → 섞어 풀기 6문제 → 이야기 1편. 연속 일수 도장.</p></a>
+      <a class="card link" href="#/essay">${ico("1F4A1")}<h3>서술형·증명·자기설명</h3><p class="muted">먼저 쓰고, 모범 답안과 비교하고, 채점 기준으로 자기 채점. ${D.essay.length}편.</p></a>
       <a class="card link" href="#/formulas">${ico(SEC_ICON.formulas)}<h3>공식 사전</h3><p class="muted">${D.formulas.length}편 중 정말 외울 것은 ${nCore}편. 나머지는 유도 한 줄.</p></a>
       <a class="card link" href="#/recall">${ico(SEC_ICON.recall)}<h3>공식 암기법</h3><p class="muted">기억 장치 + 간격 반복 카드. 내일 다시 묻습니다.</p></a>
       <a class="card link" href="#/exam">${ico(SEC_ICON.exam)}<h3>중간·기말 전 훑기</h3><p class="muted">시험 범위를 한 줄씩 체크. 6개 시험.</p></a>
@@ -132,6 +134,7 @@
     <h2 id="ex">예제</h2><div class="card"><p><b>문제.</b> ${md(l.example.q)}</p><details class="sol"><summary>풀이 보기</summary><ol class="steps">${l.example.sol.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(l.example.ans)}</p></details></div>
     <h2 id="quiz">확인 퀴즈</h2>${quizHtml(l.quiz,"lesson:"+l.id)}
     ${(()=>{const bs=D.bridge.filter(b=>b.nodes.includes(l.node)); return bs.length?`<h2 id="bridge">🔗 이 개념이 다른 단원과 만나는 문제</h2><div class="grid wide">${bs.map(b=>`<a class="card link ${b.grade}" href="#/bridge/${b.id}">${tag(b.grade)}<h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div></a>`).join("")}</div>`:"";})()}
+    ${(()=>{const es=D.essay.filter(e=>e.lesson===l.id||e.node===l.node); return es.length?`<h2 id="essay">✍️ 서술형·증명</h2><div class="row">${es.map(e=>`<a class="btn ghost sm" href="#/essay/${e.id}">${e.title}</a>`).join("")}</div>`:"";})()}
     <h2 id="place">이 개념의 자리</h2>
     <div class="card"><p><b>${node.label}</b> 별에 닿는 길: ${pre.length?pre.map(n=>`<a href="#/roadmap/${n.id}">${n.label}</a>`).join(" · "):"(시작점)"} → <b>${node.label}</b> → ${post.length?post.map(n=>`<a href="#/roadmap/${n.id}">${n.label}</a>`).join(" · "):"(끝)"}</p><a class="btn sm ghost" href="#/roadmap/${l.node}">🗺 지도에서 보기</a></div>
     ${lifeItems.length||ppl.length?`<h2>이어서 보기</h2><div class="grid">${lifeItems.map(x=>`<a class="card link" href="#/life"><div class="eyebrow">🌍 생활 속 수학</div><h3>${x.title}</h3></a>`).join("")}${ppl.map(p=>`<a class="card link" href="#/people"><div class="eyebrow">👤 수학 인물</div><h3>${p.name}</h3><p class="muted">${p.years}</p></a>`).join("")}</div>`:""}
@@ -298,6 +301,58 @@
     step();
   }
 
+
+  // ---------- 서술형 · 자기설명 ----------
+  function essay(id){
+    const st=store.get("essay",{});
+    if(!id) return render(`<div class="crumb"><a href="#/">홈</a> › 서술형·증명</div><h1>✍️ 서술형 · 증명 · 자기설명</h1><p class="lead">모범 답안을 보기 전에 <b>자기 말로 먼저 씁니다</b>. 그다음 채점 기준(10점)으로 스스로 점수를 매깁니다. '왜 이 줄이 나오는지'를 말로 설명하는 자기설명은 이해를 가장 깊게 남기는 학습법 중 하나입니다.</p>
+      ${Object.keys(G).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.essay.filter(e=>e.grade===g).map(e=>{const r=st[e.id]; return `<a class="card link ${g}" href="#/essay/${e.id}">${tag(g)}${r?`<span class="tag">자기채점 ${r.score}/${e.pts}</span>`:""}<h3>${e.title}</h3><p class="muted">${md(e.q).slice(0,80)}…</p></a>`;}).join("")}</div>`).join("")}`);
+    const e=D.essay.find(x=>x.id===id); if(!e) return notFound(); const r=st[id]||{text:"",score:null,checks:[]}; const l=byLesson(e.lesson);
+    render(`<div class="lhead ${e.grade}"><div class="crumb"><a href="#/essay">서술형·증명</a> › ${e.title}</div>${tag(e.grade)}<h1>${e.title}</h1></div>
+    <div class="card"><p style="font-size:1.08rem"><b>문제.</b> ${md(e.q)}</p><div class="box warn"><b>생각 열기:</b> ${md(e.prompt)}</div>
+    <h3>1단계 · 내 풀이를 쓴다</h3><textarea id="ans" rows="7" placeholder="증명·풀이를 자기 말로 써 보세요. 수식은 글로 풀어 써도 됩니다.">${esc(r.text)}</textarea>
+    <div class="row" style="margin-top:8px"><button class="btn" id="reveal">썼다 → 모범 답안 보기</button><span class="muted">쓴 내용은 이 브라우저(로그인 시 계정)에 저장됩니다.</span></div></div>
+    <div id="model" ${r.score===null&&!r.text?"hidden":""}><h2>2단계 · 모범 답안과 비교</h2><ol class="steps">${e.model.map(m=>`<li>${md(m)}</li>`).join("")}</ol>
+    <h2>3단계 · 채점 기준으로 자기 채점</h2><ul class="check rubric">${e.rubric.map(([t,p],i)=>`<li><input type="checkbox" data-i="${i}" data-p="${p}" ${r.checks&&r.checks[i]?"checked":""}><span>${md(t)}</span><b class="pts">${p}점</b></li>`).join("")}</ul>
+    <div class="box ok"><b>내 점수: <span id="score">${r.score??0}</span> / ${e.pts}</b> — 빠진 항목이 바로 다음에 보완할 지점입니다.</div>
+    <h2>4단계 · 자기설명</h2><p class="muted">모범 답안에서 <b>가장 이해가 안 되는 한 줄</b>을 골라, 왜 그 줄이 나오는지 자기 말로 써 보세요.</p><textarea id="selfx" rows="3" placeholder="예: 2단계에서 (b/2a)² 을 더하는 이유는 …">${esc(r.selfx||"")}</textarea>
+    <div class="row" style="margin-top:10px">${l?`<a class="btn ghost" href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`:""}<a class="btn ghost" href="#/essay">목록</a></div></div>`);
+    const save=()=>{ const checks=[...main.querySelectorAll(".rubric input")].map(c=>c.checked); const score=[...main.querySelectorAll(".rubric input")].reduce((a,c)=>a+(c.checked?Number(c.dataset.p):0),0); st[id]={text:$("#ans").value,selfx:($("#selfx")||{}).value||"",checks,score:main.querySelector("#model").hidden?null:score}; store.set("essay",st); if($("#score"))$("#score").textContent=score; };
+    $("#reveal").onclick=()=>{ $("#model").hidden=false; save(); typeset(); $("#model").scrollIntoView({behavior:"smooth"}); };
+    main.addEventListener("change",e=>{ if(e.target.matches(".rubric input")) save(); });
+    main.addEventListener("input",e=>{ if(e.target.id==="ans"||e.target.id==="selfx") save(); });
+  }
+
+  // ---------- 하루 10분 코스 ----------
+  function daily(){
+    const today=new Date().toISOString().slice(0,10); const log=store.get("daily",{}); const streak=(()=>{ let n=0; const d=new Date(); for(;;){ const k=d.toISOString().slice(0,10); if(log[k]) { n++; d.setDate(d.getDate()-1); } else break; } return n; })();
+    const due=srsDue().slice(0,3); const stories=lessonsAll.filter(l=>l.story); const st=stories[new Date().getDate()%stories.length];
+    render(`<div class="crumb"><a href="#/">홈</a> › 하루 10분</div><h1>⏱ 하루 10분 코스</h1><p class="lead">매일 같은 순서: 암기 카드 3장(간격 반복) → 섞어 풀기 6문제(교차·인출) → 이야기 1편(이해). 끝내면 오늘 칸에 도장이 찍힙니다.</p>
+    <div class="stats"><div><b>${streak}</b>연속 일수</div><div><b>${Object.keys(log).length}</b>총 완료일</div><div><b>${log[today]?"✅":"—"}</b>오늘</div></div>
+    <ol class="steps daily">
+      <li><b>① 암기 카드 ${due.length?due.length+"장":"(오늘 복습 없음)"}</b> — ${due.length?due.map(r=>byFormula(r.f).title).join(", "):"내일 다시"} <a class="btn sm" href="#/recall/run">시작</a></li>
+      <li><b>② 섞어 풀기 6문제</b> — 서로 다른 단원에서. 단원 식별 → 풀기 <a class="btn sm" href="#/mix">시작</a></li>
+      <li><b>③ 오늘의 이야기</b> — <a href="#/study/${st.unit}/${st.id}">${st.title}</a>: ${md(st.story[0].h)} <a class="btn sm ghost" href="#/study/${st.unit}/${st.id}">읽기</a></li>
+    </ol>
+    <div class="row"><button class="btn" id="done">오늘 코스 완료 도장 ✔</button>${log[today]?'<span class="muted">오늘은 이미 찍혔습니다.</span>':''}</div>
+    <h2>최근 2주</h2><div class="heat">${Array.from({length:14},(_,i)=>{const d=new Date();d.setDate(d.getDate()-13+i);const k=d.toISOString().slice(0,10);return `<span class="${log[k]?"on":""}" title="${k}">${d.getDate()}</span>`;}).join("")}</div>`);
+    $("#done").onclick=()=>{ log[today]=true; store.set("daily",log); daily(); };
+  }
+
+  // ---------- 교사 대시보드 ----------
+  function teacher(){
+    const code=store.get("class","");
+    render(`<div class="crumb"><a href="#/">홈</a> › 교사 대시보드</div><h1>🏫 교사 대시보드</h1><p class="lead">학생이 로그인 후 <b>학급 코드</b>를 입력하면 진단 결과·퀴즈 정답률·섞어 풀기·오답 노트 요약이 이 화면에 모입니다. 학생 기록은 요약만 공유되고, 상세 기록은 본인만 볼 수 있습니다.</p>
+    ${window.SYNC&&window.SYNC.enabled?`<div class="card"><label>학급 코드 <input id="cc" value="${esc(code)}" placeholder="예: 3-2"></label> <button class="btn sm" id="load">불러오기</button> <span class="muted">학생은 로그인 → 👤 버튼 → 학급 코드 입력</span></div><div id="dash"></div>`:`<div class="box warn">동기화(Firebase)가 설정되어야 사용할 수 있습니다.</div>`}`);
+    if(!(window.SYNC&&window.SYNC.enabled)) return;
+    $("#load").onclick=async()=>{ const c=$("#cc").value.trim(); store.set("class",c); $("#dash").innerHTML='<p class="muted">불러오는 중…</p>'; const rows=await window.SYNC.readClass(c); if(!rows){ $("#dash").innerHTML='<div class="box warn">읽을 수 없습니다. 로그인했는지, Firebase 규칙에 classes 항목을 추가했는지 확인하세요.</div>'; return; }
+      const arr=Object.values(rows); if(!arr.length){ $("#dash").innerHTML='<p class="muted">아직 이 학급 코드로 공유한 학생이 없습니다.</p>'; return; }
+      const broken={}; arr.forEach(r=>{ if(r.broken){ broken[r.broken]=(broken[r.broken]||0)+1; } });
+      $("#dash").innerHTML=`<h2>끊긴 고리 분포 (${arr.length}명)</h2><div class="row">${Object.entries(broken).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<span class="chip">${nodeOf(n)?nodeOf(n).label:n} <b>${c}</b></span>`).join("")||'<span class="muted">진단 기록 없음</span>'}</div>
+      <h2>학생별 요약</h2><table><tr><th>아이디</th><th>최근 진단</th><th>끊긴 고리</th><th>퀴즈 정답률</th><th>섞어 풀기</th><th>오답</th><th>10분 코스</th><th>최근 활동</th></tr>${arr.sort((a,b)=>(a.id||"").localeCompare(b.id||"")).map(r=>`<tr><td>${esc(r.id||"")}</td><td>${r.diagScore??"-"}</td><td>${r.broken?(nodeOf(r.broken)?nodeOf(r.broken).label:r.broken):"없음"}</td><td>${r.quizPct!=null?r.quizPct+"% ("+r.quizN+")":"-"}</td><td>${r.mix||"-"}</td><td>${r.notes??"-"}</td><td>${r.dailyDays??0}일</td><td>${r.updated?new Date(r.updated).toLocaleDateString("ko"):"-"}</td></tr>`).join("")}</table>`; };
+    if(code) $("#load").click();
+  }
+
   // ---------- 개념 사전 ----------
   function concepts(q){ const p=new URLSearchParams(q||""); const g=p.get("grade"); const list=D.concepts.filter(c=>!g||c.grade===g).sort((a,b)=>a.term.localeCompare(b.term,"ko"));
     render(`<div class="crumb"><a href="#/">홈</a> › 개념 사전</div><h1>📖 개념 사전</h1><p class="lead">용어 ${D.concepts.length}개. 정의 한 줄과 영어 이름, 그리고 그 개념이 있는 자리.</p><div class="pill-row"><a class="pill ${!g?"on":""}" href="#/concepts">전체</a>${Object.keys(G).map(x=>`<a class="pill ${g===x?"on":""}" href="#/concepts?grade=${x}">${G[x]}</a>`).join("")}</div>
@@ -333,14 +388,27 @@
   }
 
   // ---------- 생활 속 수학 / 인물 ----------
-  function life(){ render(`<div class="crumb"><a href="#/">홈</a> › 생활 속 수학</div><h1>🌍 생활 속 수학</h1><p class="lead">교과서 밖에서 같은 공식이 어떻게 쓰이는지. ${D.life.length}편.</p><div class="grid wide">${D.life.map(x=>`<div class="card"><span class="tag">${x.tag}</span> <a class="tag" href="#/roadmap/${x.node}">🗺 ${nodeOf(x.node).label}</a><h3>${x.title}</h3><p>${md(x.body)}</p></div>`).join("")}</div>`); }
+  function life(q){
+    const pr=new URLSearchParams(q||""); const cat=pr.get("cat")||"전체";
+    const list=D.life.filter(x=>cat==="전체"||x.cat===cat);
+    const fig=x=>{ if(!x.fig||!window.FIG||!window.FIG[x.fig]) return ""; try{ return `<div class="figwrap">${window.FIG[x.fig](x.figp||{})}</div>`; }catch(e){ return ""; } };
+    render(`<div class="crumb"><a href="#/">홈</a> › 생활 속 수학</div><h1>🌍 생활 속 수학</h1><p class="lead">교과서 밖에서 같은 공식이 어떻게 쓰이는지. ${D.life.length}편, 도면과 계산 과정 포함. 영역별로 보되 각 글은 개념 지도의 한 자리에 연결됩니다.</p>
+    <div class="pill-row"><a class="pill ${cat==="전체"?"on":""}" href="#/life">전체 ${D.life.length}</a>${D.lifeCats.map(c=>`<a class="pill ${cat===c?"on":""}" href="#/life?cat=${encodeURIComponent(c)}">${c} ${D.life.filter(x=>x.cat===c).length}</a>`).join("")}</div>
+    <div class="grid wide">${list.map((x,i)=>`<div class="card life ${nodeOf(x.node).col}">${fig(x)}<div class="row" style="gap:6px"><span class="tag">${x.cat}</span><span class="tag">${x.tag}</span>${tag(nodeOf(x.node).col)}</div><h3>${x.title}</h3><p>${md(x.body)}</p>
+      ${x.calc?`<details class="sol"><summary>계산해 보기</summary><ol class="steps">${x.calc.map(c=>`<li>${md(c)}</li>`).join("")}</ol></details>`:""}
+      <p class="muted" style="margin:8px 0 0"><a href="#/roadmap/${x.node}">🗺 ${nodeOf(x.node).label}</a>${lessonsOfNode(x.node).slice(0,1).map(l=>` · <a href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`).join("")}</p></div>`).join("")}</div>`);
+  }
   function people(){ render(`<div class="crumb"><a href="#/">홈</a> › 수학 인물</div><h1>👤 수학 인물</h1><p class="lead">이 범위의 공식 뒤에 있는 사람들. 시대순.</p><div class="grid wide">${D.people.map(p=>{const l=byLesson(p.link); return `<div class="card person"><div class="row">${p.img?`<img class="ico avatar" src="${p.img}" alt="${p.name}" style="object-fit:cover;padding:0">`:ico("1F3DB","ico avatar")}<div><div class="eyebrow">${p.years}</div><h3 style="margin:0">${p.name}</h3></div></div><p>${md(p.body)}</p>${l?`<a href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`:""} · <a href="#/roadmap/${p.node}">🗺 ${nodeOf(p.node).label}</a></div>`;}).join("")}</div>`); }
 
   // ---------- 오답 노트 ----------
-  function notes(){ const n=store.get("notes",[]); render(`<div class="crumb"><a href="#/">홈</a> › 오답 노트</div><h1>📒 내 오답 노트</h1><p class="lead">소단원 퀴즈에서 틀린 문제가 자동으로 모입니다. 상단의 🔐 로그인 으로 아이디를 만들면 모든 기기에서 이어지고, 로그인하지 않으면 이 브라우저에만 저장됩니다. 아래에서 내보내기(JSON)·지우기를 할 수 있습니다.</p>
-    <div class="row"><button class="btn ghost" id="exp">내보내기</button><button class="btn ghost" id="clr">모두 지우기</button></div>
-    ${n.length?`<table><tr><th>날짜</th><th>문제</th><th>소단원</th></tr>${n.map(x=>{const l=byLesson(x.key.replace("lesson:","")); return `<tr><td>${new Date(x.when).toLocaleDateString("ko")}</td><td>${esc(x.q)}</td><td>${l?`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`:""}</td></tr>`;}).join("")}</table>`:`<p class="muted">아직 비어 있습니다. <a href="#/study">소단원 퀴즈</a>를 풀어 보세요.</p>`}`);
-    $("#exp").onclick=()=>{ const blob=new Blob([JSON.stringify({notes:n,quiz:store.get("quiz",{}),diag:store.get("diag",[]),srs:store.get("srs",{}),exam:store.get("exam",{})},null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="my-math-record.json"; a.click(); };
+  function notes(){ const n=store.get("notes",[]); const TAGS=["계산 실수","개념 오류","문제 해석","풀이 못함"]; const tags=store.get("notetags",{});
+    const key=x=>x.key+"#"+x.i+"#"+x.when; const cnt={}; n.forEach(x=>{const t=tags[key(x)]; if(t) cnt[t]=(cnt[t]||0)+1;}); const byUnitC={}; n.forEach(x=>{const l=byLesson(x.key.replace("lesson:","")); if(l){ byUnitC[l.unitTitle]=(byUnitC[l.unitTitle]||0)+1; }});
+    render(`<div class="crumb"><a href="#/">홈</a> › 오답 노트</div><h1>📒 내 오답 노트</h1><p class="lead">퀴즈·섞어 풀기에서 틀린 문제가 자동으로 모입니다. 각 문제에 <b>틀린 이유</b>를 붙이세요 — 어떤 유형의 실수가 반복되는지 아는 것이 점수를 가장 빨리 올립니다.</p>
+    ${n.length?`<div class="grid"><div class="card"><h3>틀린 이유 분포</h3>${TAGS.map(t=>`<div class="row" style="justify-content:space-between"><span>${t}</span><b>${cnt[t]||0}</b></div><div class="progress"><i style="width:${n.length?(cnt[t]||0)/n.length*100:0}%"></i></div>`).join("")}<p class="muted" style="font-size:.85rem">미분류 ${n.length-Object.values(cnt).reduce((a,b)=>a+b,0)}</p></div><div class="card"><h3>단원별</h3>${Object.entries(byUnitC).sort((a,b)=>b[1]-a[1]).map(([u,c])=>`<div class="row" style="justify-content:space-between"><span>${u}</span><b>${c}</b></div>`).join("")}</div><div class="card"><h3>처방</h3><p class="muted">계산 실수 → 검산 습관(답을 식에 대입)<br>개념 오류 → 그 소단원 '오개념' 다시 읽기<br>문제 해석 → 문제를 그림·표로 옮기기<br>풀이 못함 → '왜 그런지'와 예제부터</p></div></div>`:""}
+    <div class="row" style="margin:12px 0"><button class="btn ghost" id="exp">내보내기</button><button class="btn ghost" id="clr">모두 지우기</button></div>
+    ${n.length?`<table><tr><th>날짜</th><th>문제</th><th>소단원</th><th>틀린 이유</th></tr>${n.map(x=>{const l=byLesson(x.key.replace("lesson:","")); const k=key(x); return `<tr><td>${new Date(x.when).toLocaleDateString("ko")}</td><td>${esc(x.q)}</td><td>${l?`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`:""}</td><td><select data-k="${k}"><option value="">—</option>${TAGS.map(t=>`<option ${tags[k]===t?"selected":""}>${t}</option>`).join("")}</select></td></tr>`;}).join("")}</table>`:`<p class="muted">아직 비어 있습니다. <a href="#/study">소단원 퀴즈</a>나 <a href="#/mix">섞어 풀기</a>를 해 보세요.</p>`}`);
+    main.querySelectorAll("select[data-k]").forEach(sel=>sel.onchange=()=>{ tags[sel.dataset.k]=sel.value; store.set("notetags",tags); });
+    $("#exp").onclick=()=>{ const blob=new Blob([JSON.stringify({notes:n,notetags:tags,quiz:store.get("quiz",{}),diag:store.get("diag",[]),srs:store.get("srs",{}),exam:store.get("exam",{}),essay:store.get("essay",{}),daily:store.get("daily",{})},null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="my-math-record.json"; a.click(); };
     $("#clr").onclick=()=>{ if(confirm("오답 노트를 비울까요?")){store.set("notes",[]);notes();} }; }
 
   // ---------- 검색 ----------
@@ -370,11 +438,14 @@
     if(r==="slides") return slides(p[1]);
     if(r==="play") return play(p[1]);
     if(r==="bridge") return bridge(p[1]);
+    if(r==="essay") return essay(p[1]);
+    if(r==="daily") return daily();
+    if(r==="teacher") return teacher();
     if(r==="mix") return mix();
     if(r==="concepts") return concepts(qs);
     if(r==="recall") return recall(p[1]);
     if(r==="exam") return exam(p[1]);
-    if(r==="life") return life();
+    if(r==="life") return life(qs);
     if(r==="people") return people();
     if(r==="notes") return notes();
     if(r==="search") return search(decodeURIComponent((new URLSearchParams(qs||"")).get("q")||""));

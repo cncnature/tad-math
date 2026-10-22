@@ -11,8 +11,13 @@
   const $ = s=>document.querySelector(s);
   let app, auth, db, user=null, pushTimer=null, status="";
   const S = window.SYNC = { enabled:true, user:null,
-    onChange(){ if(!user) return; clearTimeout(pushTimer); pushTimer=setTimeout(push, 1500); }
+    onChange(){ if(!user) return; clearTimeout(pushTimer); pushTimer=setTimeout(push, 1500); },
+    async readClass(code){ if(!user||!code) return null; try{ const snap=await db.ref(`classes/${code.replace(/[.#$\[\]\/]/g,"_")}`).get(); return snap.val()||{}; }catch(e){ console.warn(e); return null; } }
   };
+  // 학급 공유용 요약 (상세 기록은 올리지 않음)
+  function summary(){ const g=k=>{ try{ return JSON.parse(localStorage.getItem("imm:"+k)); }catch(e){ return null; } };
+    const quiz=g("quiz")||{}; const qk=Object.keys(quiz); const diag=(g("diag")||[])[0]; const mix=(g("mix")||[])[0]; const notes=g("notes")||[]; const daily=g("daily")||{};
+    return { id:idOf(user), updated:Date.now(), diagScore:diag?`${diag.score}/${diag.total}`:null, broken:diag?diag.broken:null, quizN:qk.length, quizPct:qk.length?Math.round(100*qk.filter(k=>quiz[k]).length/qk.length):null, mix:mix?`${mix.score}/${mix.n}`:null, notes:notes.length, dailyDays:Object.keys(daily).length }; }
   // 아이디 → Firebase 이메일, 짧은 비밀번호 → 6자 이상으로 보정
   const emailOf = id=>`${id.trim().toLowerCase().replace(/[^a-z0-9._-]/g,"")}@tad-math.user`;
   const pwOf = pw=>pw+"·tad-math·2026";
@@ -28,7 +33,8 @@
     renderBtn();
   }
   function snapshot(){ const o={}; KEYS().forEach(k=>o[k.slice(4)]=localStorage.getItem(k)); return o; }
-  async function push(){ if(!user) return; try{ await db.ref(`users/${user.uid}/data`).set({ ...snapshot(), _updated: Date.now() }); status="저장됨 "+new Date().toLocaleTimeString("ko"); renderBtn(); }catch(e){ status="저장 실패"; renderBtn(); console.warn(e); } }
+  async function push(){ if(!user) return; try{ await db.ref(`users/${user.uid}/data`).set({ ...snapshot(), _updated: Date.now() }); status="저장됨 "+new Date().toLocaleTimeString("ko"); renderBtn();
+      const code=localStorage.getItem("imm:class"); if(code){ const c=JSON.parse(code); if(c) await db.ref(`classes/${String(c).replace(/[.#$\[\]\/]/g,"_")}/${user.uid}`).set(summary()); } }catch(e){ status="저장 실패"; renderBtn(); console.warn(e); } }
   async function pull(){ if(!user) return; try{ const snap=await db.ref(`users/${user.uid}/data`).get(); const d=snap.val();
       if(d){ // 원격 기록을 이 기기에 적용 (원격 우선)
         Object.keys(d).forEach(k=>{ if(k!=="_updated") localStorage.setItem("imm:"+k, d[k]); });
@@ -39,7 +45,9 @@
   function renderBtn(){ let b=$("#syncbtn"); if(!b){ b=document.createElement("button"); b.id="syncbtn"; b.className="icon"; $(".tools").insertBefore(b, $("#theme")); }
     b.innerHTML = user ? `👤 ${idOf(user)}` : "🔐 로그인"; b.title = user ? (status||"동기화 중") : "아이디로 로그인하면 기록이 모든 기기에서 이어집니다";
     b.onclick = user ? menu : dialog; }
-  function menu(){ if(confirm(`${idOf(user)} 로 로그인 중 (${status||"동기화"}).\n로그아웃할까요? (이 기기의 기록은 그대로 남습니다)`)) auth.signOut(); }
+  function menu(){ const cur=(()=>{try{return JSON.parse(localStorage.getItem("imm:class"))||"";}catch(e){return "";}})();
+    const v=prompt(`${idOf(user)} 로 로그인 중 (${status||"동기화"}).\n\n학급 코드를 입력하면 선생님 대시보드에 요약(진단·정답률)이 공유됩니다. 비우면 공유 안 함.\n로그아웃하려면 "로그아웃" 이라고 입력하세요.`, cur);
+    if(v===null) return; if(v.trim()==="로그아웃"){ auth.signOut(); return; } localStorage.setItem("imm:class", JSON.stringify(v.trim())); status="학급 코드 "+(v.trim()||"없음"); renderBtn(); push(); }
   function dialog(){
     const box=document.createElement("div"); box.className="sync-modal"; box.innerHTML=`<div class="sync-card"><h3>🔐 로그인 · 기록 이어하기</h3>
       <p class="muted">아이디와 비밀번호를 정해 입력하세요. 처음이면 자동으로 만들어집니다. 같은 아이디로 폰·PC 어디서든 이어집니다.</p>

@@ -311,4 +311,42 @@
       }
       slider(ctl,"가장 큰 자료의 값",35,100,1,big,v=>{big=v;draw();}); draw();
     }};
+
+  // ---------- 14. 넓이 모형 (CRA: 구체→그림→추상) x(x+k)=N ----------
+  W.areamodel = { title:"넓이 모형으로 이차방정식 풀기 x(x+k) = N", grade:"g31", node:"quadratic-eq",
+    desc:"'연속하는 두 수의 곱' '가로가 세로보다 k 긴 직사각형' 문제는 전부 이 그림입니다. x 를 밀어 넓이가 N 이 되는 순간을 찾으세요 — 그다음에 식을 세우면 식이 그림으로 보입니다.",
+    render(root){
+      const {ctx,w,h}=makeCanvas(root,700,340); const ctl=el("div",{class:"ctrl"}); const out=el("div",{class:"readout"}); root.append(ctl,out);
+      let x=5,k=3,N=40;
+      function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const s=18; const x0=60,y0=300; const A=x*(x+k);
+        ctx.fillStyle=A===N?"rgba(31,157,85,.3)":"rgba(47,111,237,.18)"; ctx.fillRect(x0,y0-x*s,x*s,x*s); ctx.strokeStyle=col.acc; ctx.lineWidth=2; ctx.strokeRect(x0,y0-x*s,x*s,x*s);
+        ctx.fillStyle="rgba(255,138,61,.35)"; ctx.fillRect(x0+x*s,y0-x*s,k*s,x*s); ctx.strokeStyle=col.acc2; ctx.strokeRect(x0+x*s,y0-x*s,k*s,x*s);
+        txt(ctx,`x = ${x}`,x0+x*s/2,y0+18,col.ink,13,"center"); txt(ctx,`k = ${k}`,x0+x*s+k*s/2,y0+18,col.acc2,13,"center"); txt(ctx,`x`,x0-12,y0-x*s/2,col.ink,13,"right");
+        txt(ctx,`x²`,x0+x*s/2,y0-x*s/2,col.acc,16,"center"); txt(ctx,`kx`,x0+x*s+k*s/2,y0-x*s/2,col.acc2,14,"center");
+        txt(ctx,`넓이 x(x+k) = x² + kx = ${A}`,420,60,col.ink,15); txt(ctx,`목표 N = ${N}`,420,88,col.muted,13);
+        txt(ctx,A===N?"✓ 넓이가 N 과 같다 → 이 x 가 해":A<N?"아직 작다 → x 를 키우세요":"너무 크다 → x 를 줄이세요",420,118,A===N?col.ok:col.bad,13);
+        out.innerHTML=`식: x(x+${k}) = ${N} → x² + ${k}x − ${N} = 0 → (x + ${(k+Math.sqrt(k*k+4*N))/2|0})(x − ${((-k+Math.sqrt(k*k+4*N))/2)}) = 0 → <b>x = ${((-k+Math.sqrt(k*k+4*N))/2)}</b> (음수 근은 길이가 아니므로 버림)`;
+      }
+      slider(ctl,"x (세로)",1,12,1,x,v=>{x=v;draw();}); slider(ctl,"k (가로가 더 긴 만큼)",0,6,1,k,v=>{k=v;N=pick();draw();});
+      function pick(){ const r=rnd(3,9); return r*(r+k); } function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+      const b=el("button",{class:"btn sm ghost"},"목표 N 바꾸기"); b.onclick=()=>{N=pick();draw();}; ctl.appendChild(b); draw();
+    }};
+
+  // ---------- 15. 두 주사위 격자 (확률의 '그림' 단계) ----------
+  W.dicegrid = { title:"두 주사위 36칸 격자 — 조건을 고르면 칸이 켜진다", grade:"g22", node:"probability",
+    desc:"확률 문제를 세기 전에 36칸 표로 봅니다. 조건을 바꿔 가며 '합이 7' 이 왜 가장 많은지, '곱이 홀수' 가 왜 1/4 인지 눈으로 확인하세요.",
+    render(root){
+      const {c,ctx,w,h}=makeCanvas(root,700,330); const ctl=el("div",{class:"pill-row"}); const out=el("div",{class:"readout"}); root.append(ctl,out);
+      const conds=[["합 = 7",(a,b)=>a+b===7],["합 ≤ 4",(a,b)=>a+b<=4],["합이 소수",(a,b)=>[2,3,5,7,11].includes(a+b)],["곱이 홀수",(a,b)=>(a*b)%2===1],["두 눈이 같다",(a,b)=>a===b],["차가 2",(a,b)=>Math.abs(a-b)===2],["적어도 하나 6",(a,b)=>a===6||b===6]];
+      let ci=0;
+      function draw(){ const col=C(); ctx.clearRect(0,0,w,h); const f=conds[ci][1]; let n=0; const x0=90,y0=40,cw=44,ch=42;
+        for(let a=1;a<=6;a++){ txt(ctx,`${a}`,x0-16,y0+(a-1)*ch+26,col.muted,13,"right"); txt(ctx,`${a}`,x0+(a-1)*cw+cw/2,y0-10,col.muted,13,"center");
+          for(let b=1;b<=6;b++){ const hit=f(a,b); if(hit)n++; ctx.fillStyle=hit?"rgba(255,138,61,.6)":"rgba(47,111,237,.08)"; ctx.fillRect(x0+(b-1)*cw,y0+(a-1)*ch,cw-3,ch-3); txt(ctx,`(${a},${b})`,x0+(b-1)*cw+cw/2-1,y0+(a-1)*ch+26,hit?col.ink:col.muted,11,"center"); } }
+        txt(ctx,"첫 번째 주사위 ↓ / 두 번째 주사위 →",x0,y0+6*ch+20,col.muted,12);
+        txt(ctx,conds[ci][0],420,80,col.ink,18); txt(ctx,`${n} / 36`,420,120,col.acc2,28); txt(ctx,`= ${(n/36).toFixed(3)}`,420,150,col.muted,14);
+        out.innerHTML=`확률 = (조건을 만족하는 칸 수) ÷ 36 = <b>${n}/36</b>${n%2===0&&n>0?` = ${n/2}/18`:""}${n%6===0&&n>0?` = ${n/6}/6`:""}`;
+      }
+      conds.forEach((cd,i)=>{ const b=el("button",{class:"pill"+(i===0?" on":"")},cd[0]); b.onclick=()=>{ci=i;ctl.querySelectorAll(".pill").forEach(p=>p.classList.remove("on"));b.classList.add("on");draw();}; ctl.appendChild(b); });
+      draw();
+    }};
 })();
