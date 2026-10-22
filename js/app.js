@@ -28,11 +28,25 @@
   // ---------- 유틸 ----------
   const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const md = s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+  // 긴 공식(세미콜론·쉼표로 나열된 식)은 줄을 나눠 표시 — 좁은 화면 대비
+  const texCard = t=>{ t=String(t); let parts=null;
+    if(/;/.test(t)) parts=t.split(/\s*;\s*/);
+    else if(/,\s*\\q?quad/.test(t)) parts=t.split(/,\s*\\q?quad\s*/).map((x,i,a)=>i<a.length-1?x+",":x);
+    else if(t.length>48&&/,\\? /.test(t)){ const sp=t.split(/,\\? (?![^{]*\})/); if(sp.length>=2&&sp.every(x=>x.length<=48)) parts=sp.map((x,i)=>i<sp.length-1?x+",":x); }
+    if(!parts&&t.length>36){ // 괄호 밖의 + − 앞에서 45자 안팎으로 나누기
+      const toks=[]; let d=0,cur=""; for(const ch of t){ if(ch==="{"||ch==="(") d++; if(ch==="}"||ch===")") d--; if(d===0&&(ch==="+"||ch==="-")&&cur.length>12){ toks.push(cur); cur=""; } cur+=ch; } toks.push(cur);
+      if(toks.length>=2){ parts=[]; let line=""; toks.forEach(tk=>{ if(line&&(line+tk).length>32){ parts.push(line); line=tk; } else line+=tk; }); parts.push(line); if(parts.length<2) parts=null; }
+    }
+    if(!parts||parts.length<2) return esc(t); return esc("\\begin{gathered}"+parts.join("\\\\")+"\\end{gathered}"); };
   const tag = g=>`<span class="tag ${GCOL(g)}">${G[g]||({m1:"중1",m21:"중2-1",h1:"고1",h2:"고2",h3:"고3"})[g]||g}</span>`;
   const ico = (code,cls="ico")=>`<img class="${cls}" src="assets/openmoji/${code}.svg" alt="" loading="lazy">`;
   const UNIT_ICON={u1:"1F53A",u2:"1F7E6",u3:"1F5FA",u4:"1F4D0",u5:"1F3B2",u6:"1F522",u7:"2716",u8:"1F9EE",u9:"1F4C8",u10:"1F3D4",u11:"2B55",u12:"1F4CA",m1u1:"1F9E9",m1u2:"1F321",m1u3:"1F524",m1u4:"2696",m1u5:"1F4CD",m1u6:"1F4CF",m1u7:"1F536",m1u8:"1F9CA",m1u9:"1F4CA",m2u1:"267B",m2u2:"1F522",m2u3:"2696",m2u4:"1F500",m2u5:"1F4C8",h1u1:"1F9EE",h1u2:"1F9EC",h1u3:"1F3B2",h1u4:"1F5C2",h1u5:"1F4CD",h1u6:"1F300",h1u7:"1F517",h2u1:"1F4C8",h2u2:"1F3A1",h2u3:"1F9F1",h2u4:"267E",h2u5:"1F3CE",h2u6:"1F30A",h2u7:"1F3B2",h2u8:"1F4CA",h3u1:"267E",h3u2:"1F680",h3u3:"1F30A",h3u4:"1FA90",h3u5:"27A1",h3u6:"1F9CA"};
   const SEC_ICON={study:"1F4D8",roadmap:"1F5FA",formulas:"1F4D0",bridge:"1F517",mix:"1F500",eco:"1F310",diag:"1F9ED",lab:"1F52C",slides:"1F39E",play:"1F3AE",concepts:"1F4D6",recall:"1F9E0",exam:"1F4DD",life:"1F30D",people:"1F3DB",notes:"1F4D2"};
-  function typeset(){ if(window.renderMathInElement) renderMathInElement(main,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false}); }
+  function typeset(){ if(window.renderMathInElement) renderMathInElement(main,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false}); fitFormulas(); setTimeout(fitFormulas,250); }
+  // 좁은 화면에서 긴 수식이 잘리지 않도록 글자 크기를 자동으로 줄인다 (최소 60%), 그래도 넘치면 가로 스크롤
+  function fitFormulas(){ main.querySelectorAll(".formula").forEach(box=>{ const k=box.querySelector(".katex-display")||box.querySelector(".katex"); if(!k) return; box.style.fontSize=""; const cs=getComputedStyle(box); const avail=box.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight); const need=k.scrollWidth||k.getBoundingClientRect().width; if(avail>0&&need>avail){ const r=Math.max(0.68,avail/need*0.96); box.style.fontSize=(parseFloat(cs.fontSize)*r)+"px"; } }); }
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>setTimeout(fitFormulas,50));
+  window.addEventListener("resize",()=>{ clearTimeout(window.__fitT); window.__fitT=setTimeout(fitFormulas,150); });
   function render(html){ main.innerHTML = html; window.scrollTo(0,0); typeset(); document.querySelectorAll("details.more[open]").forEach(d=>d.removeAttribute("open")); }
   const shuffle = a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
   const rnd = (a,b)=>a+Math.floor(Math.random()*(b-a+1));
@@ -148,7 +162,7 @@
     ${l.pitfalls?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${l.points?`<h2 id="pt">🎯 출제 포인트</h2><ul class="pt">${l.points.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${widgets.length?`<h2>만져 보기</h2>${widgets.map(([k,w])=>`<div class="widget" id="w-${k}"><b>${w.title}</b><p class="muted">${w.desc}</p></div>`).join("")}`:""}
-    ${l.formulas.length?`<h2 id="f">이 단원의 공식</h2><div class="grid">${l.formulas.map(f=>byFormula(f)).filter(Boolean).map(f=>`<a class="card link" href="#/formulas/${f.id}"><h3>${f.title} ${f.core?'<span class="tag">외울 것</span>':'<span class="tag">되살릴 것</span>'}</h3><div class="formula">$${f.tex}$</div></a>`).join("")}</div>`:""}
+    ${l.formulas.length?`<h2 id="f">이 단원의 공식</h2><div class="grid">${l.formulas.map(f=>byFormula(f)).filter(Boolean).map(f=>`<a class="card link" href="#/formulas/${f.id}"><h3>${f.title} ${f.core?'<span class="tag">외울 것</span>':'<span class="tag">되살릴 것</span>'}</h3><div class="formula">$${texCard(f.tex)}$</div></a>`).join("")}</div>`:""}
     <h2 id="ex">예제</h2><div class="card"><p><b>문제.</b> ${md(l.example.q)}</p><details class="sol"><summary>풀이 보기</summary><ol class="steps">${l.example.sol.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(l.example.ans)}</p></details></div>
     <h2 id="quiz">확인 퀴즈</h2>${quizHtml(l.quiz,"lesson:"+l.id)}
     ${(()=>{const bs=D.bridge.filter(b=>b.nodes.includes(l.node)); return bs.length?`<h2 id="bridge">🔗 이 개념이 다른 단원과 만나는 문제</h2><div class="grid wide">${bs.map(b=>`<a class="card link ${GCOL(b.grade)}" href="#/bridge/${b.id}">${tag(b.grade)}<h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div></a>`).join("")}</div>`:"";})()}
@@ -184,12 +198,12 @@
     let list=D.formulas.slice(); if(node) list=list.filter(f=>f.node===node); if(grade) list=list.filter(f=>f.grade===grade); if(core==="1") list=list.filter(f=>f.core);
     render(`<div class="crumb"><a href="#/">홈</a> › 공식 사전</div><h1>📐 공식 사전</h1><p class="lead">중1 ~ 고3 공식 ${D.formulas.length}편. 그중 정말 외워야 하는 것은 <b>${D.formulas.filter(f=>f.core).length}편</b>, 나머지는 유도 한 줄이면 그 자리에서 되살아납니다.</p>
     <div class="pill-row"><a class="pill ${!grade&&!core?"on":""}" href="#/formulas">전체 ${D.formulas.length}</a><a class="pill ${core?"on":""}" href="#/formulas?core=1">🔑 정말 외울 것 ${D.formulas.filter(f=>f.core).length}</a></div><div class="pill-row">${GORDER.map(g=>`<a class="pill ${grade===g?"on":""}" href="#/formulas?grade=${g}">${G[g]} ${D.formulas.filter(f=>f.grade===g).length}</a>`).join("")}</div>
-    <div class="grid wide">${list.map(f=>`<a class="card link" href="#/formulas/${f.id}">${tag(f.grade)} ${f.core?'<span class="tag">🔑 외울 것</span>':'<span class="tag">↻ 되살릴 것</span>'}<h3>${f.title}</h3><div class="formula">$${f.tex}$</div></a>`).join("")}</div>`);
+    <div class="grid wide">${list.map(f=>`<a class="card link" href="#/formulas/${f.id}">${tag(f.grade)} ${f.core?'<span class="tag">🔑 외울 것</span>':'<span class="tag">↻ 되살릴 것</span>'}<h3>${f.title}</h3><div class="formula">$${texCard(f.tex)}$</div></a>`).join("")}</div>`);
   }
   function formula(id){
     const f=byFormula(id); if(!f) return notFound(); const r=D.recall.find(x=>x.f===id); const ls=lessonsAll.filter(l=>l.formulas.includes(id));
     render(`<div class="crumb"><a href="#/">홈</a> › <a href="#/formulas">공식 사전</a></div>${tag(f.grade)} ${f.core?'<span class="tag">🔑 정말 외울 것</span>':'<span class="tag">↻ 유도로 되살릴 것</span>'}<h1>${f.title}</h1>
-    <div class="formula" style="font-size:1.6rem">$$${f.tex}$$</div>
+    <div class="formula" style="font-size:1.6rem">$$${texCard(f.tex)}$$</div>
     ${figOfFormula(f)}
     <h2>유도 (되살리기)</h2><ol class="steps">${f.derive.map(s=>`<li>${md(s)}</li>`).join("")}</ol>
     <div class="box ok"><b>한 줄 요령:</b> ${md(f.tip)}</div>
@@ -258,7 +272,7 @@
 
   // ---------- 플레이 ----------
   const GAMES = {
-    "formula-match":{ gen(){ const f=D.formulas[rnd(0,D.formulas.length-1)]; const others=shuffle(D.formulas.filter(x=>x.id!==f.id)).slice(0,3); const opts=shuffle([f,...others]); return {q:`<b>${f.title}</b> 의 식은?`, opts:opts.map(o=>`$${o.tex}$`), a:opts.indexOf(f)}; } },
+    "formula-match":{ gen(){ const f=D.formulas[rnd(0,D.formulas.length-1)]; const others=shuffle(D.formulas.filter(x=>x.id!==f.id)).slice(0,3); const opts=shuffle([f,...others]); return {q:`<b>${f.title}</b> 의 식은?`, opts:opts.map(o=>`$${texCard(o.tex)}$`), a:opts.indexOf(f)}; } },
     "trig-flash":{ gen(){ const T={ "sin 30°":"1/2","sin 45°":"√2/2","sin 60°":"√3/2","cos 30°":"√3/2","cos 45°":"√2/2","cos 60°":"1/2","tan 30°":"√3/3","tan 45°":"1","tan 60°":"√3","sin 90°":"1","cos 0°":"1","sin 0°":"0" }; const keys=Object.keys(T); const k=keys[rnd(0,keys.length-1)]; const vals=[...new Set(Object.values(T))]; const opts=shuffle([T[k],...shuffle(vals.filter(v=>v!==T[k])).slice(0,3)]); return {q:`<b>${k}</b> 의 값은?`,opts,a:opts.indexOf(T[k])}; } },
     "angle-quiz":{ gen(){ const kind=rnd(0,2); if(kind===0){ const c=rnd(20,85)*2; return {q:`호 AB 에 대한 중심각이 <b>${c}°</b> 일 때 원주각은?`, opts:shuffle([c/2,c,c/4,180-c/2]).map(String), a:null, ans:String(c/2)}; } if(kind===1){ const a=rnd(50,130); return {q:`원에 내접하는 사각형 ABCD 에서 ∠A = <b>${a}°</b> 일 때 ∠C 는?`, opts:shuffle([180-a,a,360-a,90]).map(String), a:null, ans:String(180-a)}; } const p=rnd(20,80); return {q:`호 AB 에 대한 원주각이 <b>${p}°</b> 일 때 중심각은?`, opts:shuffle([2*p,p,p/2,180-p]).map(String), a:null, ans:String(2*p)}; } },
     "factor-rush":{ input:true, gen(){ let p=rnd(-6,6),q=rnd(-6,6); if(p===0)p=1; if(q===0)q=-2; const b=p+q,c=p*q; return {q:`$x^2 ${b>=0?"+":"−"} ${Math.abs(b)}x ${c>=0?"+":"−"} ${Math.abs(c)} = (x+p)(x+q)$ 의 p, q 는? (예: <code>3,-2</code> 순서 무관)`, check:v=>{ const m=v.split(/[,\s]+/).map(Number); return m.length===2&&((m[0]===p&&m[1]===q)||(m[0]===q&&m[1]===p)); }, ans:`${p}, ${q}`, hint:`곱이 ${c}, 합이 ${b} 인 두 수`}; } },
@@ -276,7 +290,7 @@
     const meta=D.play.find(g=>g.id===id), gm=GAMES[id]; if(!meta||!gm) return notFound();
     let score=0, streak=0, left=60, timer=null, cur=null;
     function finish(){ clearInterval(timer); const best=store.get("best:"+id,0); if(score>best) store.set("best:"+id,score); render(`<div class="crumb"><a href="#/play">플레이</a> › ${meta.title}</div><h1>⏱ 끝! ${score}점</h1><p class="lead">최고 기록 ${Math.max(best,score)}점 · 최대 연속 정답 ${streak}</p><div class="row"><a class="btn" href="#/play/${id}" onclick="location.reload()">다시</a><a class="btn ghost" href="#/play">다른 게임</a>${meta.node?`<a class="btn ghost" href="#/roadmap/${meta.node}">🗺 개념 보기</a>`:""}</div>`); }
-    function next(){ cur=gm.gen(); render(`<div class="crumb"><a href="#/play">플레이</a> › ${meta.title}</div><div class="row"><span class="score">점수 ${score}</span><span class="muted">남은 시간 <b id="t">${left}</b>초</span></div><div class="progress"><i style="width:${left/60*100}%"></i></div><div class="card game"><div class="big">${cur.q}</div>${gm.input?`<div class="row" style="justify-content:center"><input id="ans" autocomplete="off" autofocus> <button class="btn" id="go">확인</button></div><p class="muted right">Enter 로 제출</p>`:`<div class="quiz" style="border:0"><div class="opts">${cur.opts.map((o,j)=>`<button class="go" data-j="${j}">${o}</button>`).join("")}</div></div>`}<div id="fb" class="muted"></div></div>`);
+    function next(){ cur=gm.gen(); render(`<div class="crumb"><a href="#/play">플레이</a> › ${meta.title}</div><div class="row"><span class="score">점수 ${score}</span><span class="muted">남은 시간 <b id="t">${left}</b>초</span></div><div class="progress"><i style="width:${left/60*100}%"></i></div><div class="card game"><div class="big">${cur.q}</div>${gm.input?`<div class="row" style="justify-content:center"><input id="ans" autocomplete="off" autofocus> <button class="btn" id="go">확인</button></div><p class="muted right">Enter 로 제출</p>`:`<div class="quiz" style="border:0"><div class="opts">${cur.opts.map((o,j)=>`<button class="go" data-j="${j}">${esc(o)}</button>`).join("")}</div></div>`}<div id="fb" class="muted"></div></div>`);
       if(gm.input){ const inp=$("#ans"); inp.focus(); const sub=()=>{ const ok=cur.check(inp.value.trim()); if(ok){score+=10;streak++; $("#fb").innerHTML="✅ 정답!"; setTimeout(next,400);} else { streak=0; $("#fb").innerHTML=`❌ 힌트: ${cur.hint} (답 ${cur.ans})`; } }; $("#go").onclick=sub; inp.addEventListener("keydown",e=>{if(e.key==="Enter")sub();}); }
       else main.querySelectorAll(".go").forEach(b=>b.onclick=()=>{ const ok=cur.a!==null?Number(b.dataset.j)===cur.a:cur.opts[Number(b.dataset.j)]===cur.ans; if(ok){score+=10;streak++;b.classList.add("ok");} else {streak=0;b.classList.add("bad"); $("#fb").innerHTML=`정답: ${cur.a!==null?cur.opts[cur.a]:cur.ans}`; typeset();} setTimeout(next,ok?350:900); }); }
     timer=setInterval(()=>{ left--; const t=$("#t"); if(t)t.textContent=left; if(left<=0)finish(); },1000);
@@ -392,12 +406,12 @@
     if(mode!=="run"){ return render(`<div class="crumb"><a href="#/">홈</a> › 공식 암기법</div><h1>🧠 공식 암기법</h1><p class="lead">외울 것과 되살릴 것을 나누고, 외울 것에는 기억 장치를 붙입니다. 카드를 넘기면 <b>간격 반복</b>으로 내일·3일 뒤·일주일 뒤 다시 묻습니다. (기록은 이 브라우저에만)</p>
       <div class="row"><a class="btn" href="#/recall/run">▶ 오늘의 카드 ${due.length}장 시작</a><button class="btn ghost" id="reset">기록 초기화</button></div>
       <h2>외울 것 vs 되살릴 것</h2><div class="grid wide"><div class="card"><h3>🔑 정말 외울 것 (${D.formulas.filter(f=>f.core).length})</h3><ul>${D.formulas.filter(f=>f.core).map(f=>`<li><a href="#/formulas/${f.id}">${f.title}</a></li>`).join("")}</ul></div><div class="card"><h3>↻ 유도 한 줄로 되살릴 것 (${D.formulas.filter(f=>!f.core).length})</h3><p class="muted">${D.formulas.filter(f=>!f.core).map(f=>`<a href="#/formulas/${f.id}">${f.title}</a>`).join(" · ")}</p></div></div>
-      <h2>기억 장치 모음</h2><div class="grid wide">${D.recall.map(r=>{const f=byFormula(r.f); const st=s[r.f]; return `<div class="card"><h3><a href="#/formulas/${f.id}">${f.title}</a></h3><div class="formula">$${f.tex}$</div><p>🧠 ${md(r.mnemonic)}</p><p class="muted">📜 ${md(r.story)}</p>${st?`<p class="muted" style="font-size:.8rem">다음 복습: ${new Date(st.due).toLocaleDateString("ko")} · 단계 ${st.n}</p>`:""}</div>`;}).join("")}</div>`), $("#reset").onclick=()=>{ if(confirm("암기 기록을 지울까요?")){store.set("srs",{});recall();} }; }
+      <h2>기억 장치 모음</h2><div class="grid wide">${D.recall.map(r=>{const f=byFormula(r.f); const st=s[r.f]; return `<div class="card"><h3><a href="#/formulas/${f.id}">${f.title}</a></h3><div class="formula">$${texCard(f.tex)}$</div><p>🧠 ${md(r.mnemonic)}</p><p class="muted">📜 ${md(r.story)}</p>${st?`<p class="muted" style="font-size:.8rem">다음 복습: ${new Date(st.due).toLocaleDateString("ko")} · 단계 ${st.n}</p>`:""}</div>`;}).join("")}</div>`), $("#reset").onclick=()=>{ if(confirm("암기 기록을 지울까요?")){store.set("srs",{});recall();} }; }
     const queue=shuffle(due); let i=0;
     function card(){ if(i>=queue.length) return render(`<h1>오늘 복습 끝 🎉</h1><p class="lead">${queue.length}장을 넘겼습니다. 내일 다시 오세요.</p><a class="btn" href="#/recall">목록으로</a>`);
       const r=queue[i], f=byFormula(r.f); let flipped=false;
       render(`<div class="crumb"><a href="#/recall">공식 암기법</a> › ${i+1}/${queue.length}</div><div class="progress"><i style="width:${i/queue.length*100}%"></i></div><div class="flash"><div class="face" id="face"><div class="eyebrow">${f.title}</div><p>이 공식을 떠올려 보세요. 되살리는 한 줄: <i>${md(f.tip)}</i></p><button class="btn" id="flip">뒤집기</button></div></div>`);
-      $("#flip").onclick=()=>{ flipped=true; $("#face").innerHTML=`<div class="eyebrow">${f.title}</div><div class="formula" style="font-size:1.5rem">$$${f.tex}$$</div><p>🧠 ${md(r.mnemonic)}</p><div class="row" style="justify-content:center"><button class="btn ghost" data-g="0">😵 몰랐음</button><button class="btn ghost" data-g="1">🤔 애매</button><button class="btn" data-g="2">😎 바로 떠오름</button></div>`; typeset();
+      $("#flip").onclick=()=>{ flipped=true; $("#face").innerHTML=`<div class="eyebrow">${f.title}</div><div class="formula" style="font-size:1.5rem">$$${texCard(f.tex)}$$</div><p>🧠 ${md(r.mnemonic)}</p><div class="row" style="justify-content:center"><button class="btn ghost" data-g="0">😵 몰랐음</button><button class="btn ghost" data-g="1">🤔 애매</button><button class="btn" data-g="2">😎 바로 떠오름</button></div>`; typeset();
         main.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{ const g=Number(b.dataset.g); const st=s[r.f]||{n:0}; const days=g===0?0.5:g===1?Math.max(1,st.n*1.5):[1,3,7,14,30,60][Math.min(5,st.n)]; s[r.f]={n:g===0?0:st.n+1,due:Date.now()+days*864e5}; store.set("srs",s); i++; card(); }); }; }
     card();
   }

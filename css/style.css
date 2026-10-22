@@ -247,3 +247,9 @@ table select{padding:4px 6px;border:1px solid var(--line);border-radius:8px;back
 .lfig svg{width:100%;height:auto;display:block}
 .lfig figcaption{font-size:.82rem;color:var(--muted);margin-top:6px;line-height:1.45}
 @media(max-width:760px){.concept-row{grid-template-columns:1fr}}
+
+/* 긴 수식: 카드 안에서 잘리지 않게 */
+.formula{max-width:100%;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.formula .katex-display{margin:0;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.card.link{overflow:hidden}
+@media(max-width:480px){.formula{font-size:1.05rem;padding:8px 10px}}
