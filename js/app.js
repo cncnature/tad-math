@@ -19,6 +19,9 @@
   const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const md = s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
   const tag = g=>`<span class="tag ${g}">${G[g]||g}</span>`;
+  const ico = (code,cls="ico")=>`<img class="${cls}" src="assets/openmoji/${code}.svg" alt="" loading="lazy">`;
+  const UNIT_ICON={u1:"1F53A",u2:"1F7E6",u3:"1F5FA",u4:"1F4D0",u5:"1F3B2",u6:"1F522",u7:"2716",u8:"1F9EE",u9:"1F4C8",u10:"1F3D4",u11:"2B55",u12:"1F4CA"};
+  const SEC_ICON={study:"1F4D8",roadmap:"1F5FA",formulas:"1F4D0",bridge:"1F517",mix:"1F500",eco:"1F310",diag:"1F9ED",lab:"1F52C",slides:"1F39E",play:"1F3AE",concepts:"1F4D6",recall:"1F9E0",exam:"1F4DD",life:"1F30D",people:"1F3DB",notes:"1F4D2"};
   function typeset(){ if(window.renderMathInElement) renderMathInElement(main,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false}); }
   function render(html){ main.innerHTML = html; window.scrollTo(0,0); typeset(); document.querySelectorAll("details.more[open]").forEach(d=>d.removeAttribute("open")); }
   const shuffle = a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
@@ -53,7 +56,8 @@
     const due = srsDue().length;
     render(`
     <section class="hero">
-      <div class="eyebrow">중2-2 · 중3-1 · 중3-2 전용 · 로그인 없음 · 무료</div>
+      <div class="hero-art">${["1F4D0","2B55","1F4C8","1F3B2","1F9EE","1F53A"].map(c=>ico(c,"ico float")).join("")}</div>
+      <div class="eyebrow">중2-2 · 중3-1 · 중3-2 전용 · 무료 · 오픈소스</div>
       <h1>중등수학, 외우기 전에 먼저 만져 보세요</h1>
       <p class="lead">피타고라스부터 삼각비·원주각·통계까지, 개념마다 손으로 밀고 당기는 판이 붙어 있습니다. 왜 그런지를 본 공식은 잊어도 다시 만들 수 있습니다.</p>
       <div class="row"><a class="btn" href="#/diagnostic">🧭 끊긴 곳부터 진단하기</a><a class="btn ghost" href="#/lab">🔬 그냥 만져 보기</a><a class="btn ghost" href="#/study">📚 학기 고르기</a>${due?`<a class="btn ghost" href="#/recall">🧠 오늘 복습할 공식 ${due}개</a>`:""}</div>
@@ -69,18 +73,27 @@
       <div class="card"><h3>③ 사슬로 보기</h3><p>이 문제가 안 풀리면 이유는 문제 안에 없습니다. 식의 계산 → 곱셈 공식 → 인수분해 → 이차방정식. 끊긴 고리를 찾습니다.</p><a href="#/diagnostic">🧭 18문항으로 끊긴 곳 찾기 →</a></div>
       <div class="card"><h3>④ 길로 보기</h3><p>이차방정식 별 하나 아래에는 중1 식의 계산부터 선수 개념이, 위로는 고1 복소수·도형의 방정식이 이어집니다.</p><a href="#/roadmap">🗺 개념 지도 열기 →</a></div>
     </div>
+    <h2>🔗 개념이 만나는 자리</h2><p class="muted">한 문제에 두세 단원. 풀이 단계마다 어느 개념을 썼는지 보이는 '다리 문제' ${D.bridge.length}편.</p>
+    <div class="grid wide">${D.bridge.slice(0,3).map(b=>`<a class="card link ${b.grade}" href="#/bridge/${b.id}">${tag(b.grade)}<h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div></a>`).join("")}</div>
+    <div class="row" style="margin:10px 0 4px"><a class="btn ghost sm" href="#/bridge">전체 보기 →</a></div>
+    <div class="card evidence"><div class="eyebrow">🔬 학습 과학에 근거한 네 가지 장치</div><div class="grid" style="margin-top:8px">
+      <div><h4>🔀 섞어 풀기</h4><p class="muted">단원을 섞어 '어느 개념인지' 부터 고르게 합니다. 7학년 787명 무작위 실험에서 한 달 뒤 시험 61% vs 38% (Rohrer 외, 2020).</p><a href="#/mix">오늘의 6문제 →</a></div>
+      <div><h4>🧠 간격 반복</h4><p class="muted">공식을 하루·3일·일주일 간격으로 다시 묻습니다. 벼락치기보다 장기 기억에 2배 이상 효과(Dunlosky 외, 2013 '높은 효용').</p><a href="#/recall">암기 카드 →</a></div>
+      <div><h4>📖 이야기로 유도</h4><p class="muted">공식이 왜 그 모양인지 역사와 그림으로 먼저 봅니다. 유도를 본 공식은 잊어도 다시 만들 수 있습니다.</p><a href="#/study/u8/quadratic-eq">근의 공식 이야기 →</a></div>
+      <div><h4>⚠️ 오개념 먼저</h4><p class="muted">소단원마다 '가장 많이 틀리는 지점' 을 먼저 보여 줍니다. 틀린 문제는 자동으로 오답 노트에.</p><a href="#/notes">오답 노트 →</a></div>
+    </div></div>
     <h2>학기별로 바로 가기</h2>
-    <div class="grid">${D.curriculum.units.map(u=>`<a class="card link ${u.grade}" href="#/study/${u.id}"><div>${tag(u.grade)}</div><h3>${u.title}</h3><p class="muted">${u.desc}</p></a>`).join("")}</div>
+    <div class="grid">${D.curriculum.units.map(u=>`<a class="card link unit ${u.grade}" href="#/study/${u.id}">${ico(UNIT_ICON[u.id],"ico big")}<div>${tag(u.grade)}</div><h3>${u.title}</h3><p class="muted">${u.desc}</p></a>`).join("")}</div>
     <h2>더 둘러보기</h2>
     <div class="grid">
-      <a class="card link" href="#/formulas"><h3>📐 공식 사전</h3><p class="muted">${D.formulas.length}편 중 정말 외울 것은 ${nCore}편. 나머지는 유도 한 줄.</p></a>
-      <a class="card link" href="#/recall"><h3>🧠 공식 암기법</h3><p class="muted">기억 장치 + 간격 반복 카드. 내일 다시 묻습니다.</p></a>
-      <a class="card link" href="#/exam"><h3>📝 중간·기말 전 훑기</h3><p class="muted">시험 범위를 한 줄씩 체크. 6개 시험.</p></a>
-      <a class="card link" href="#/slides"><h3>🎞 수업 슬라이드</h3><p class="muted">10분 수업용 ${D.slides.length}편. 교실에서 바로 띄우기.</p></a>
-      <a class="card link" href="#/play"><h3>🎮 플레이</h3><p class="muted">공식 짝 맞추기, 인수분해 러시, 삼각비 플래시…</p></a>
-      <a class="card link" href="#/ecosystem"><h3>🌐 수학의 생태계</h3><p class="muted">개념·공식·인물·쓰임이 한 장으로.</p></a>
-      <a class="card link" href="#/life"><h3>🌍 생활 속 수학</h3><p class="muted">TV 인치, 피자 L, 로또, 경사로 8%.</p></a>
-      <a class="card link" href="#/people"><h3>👤 수학 인물</h3><p class="muted">탈레스부터 튜키까지 ${D.people.length}명.</p></a>
+      <a class="card link" href="#/formulas">${ico(SEC_ICON.formulas)}<h3>공식 사전</h3><p class="muted">${D.formulas.length}편 중 정말 외울 것은 ${nCore}편. 나머지는 유도 한 줄.</p></a>
+      <a class="card link" href="#/recall">${ico(SEC_ICON.recall)}<h3>공식 암기법</h3><p class="muted">기억 장치 + 간격 반복 카드. 내일 다시 묻습니다.</p></a>
+      <a class="card link" href="#/exam">${ico(SEC_ICON.exam)}<h3>중간·기말 전 훑기</h3><p class="muted">시험 범위를 한 줄씩 체크. 6개 시험.</p></a>
+      <a class="card link" href="#/slides">${ico(SEC_ICON.slides)}<h3>수업 슬라이드</h3><p class="muted">10분 수업용 ${D.slides.length}편. 교실에서 바로 띄우기.</p></a>
+      <a class="card link" href="#/play">${ico(SEC_ICON.play)}<h3>플레이</h3><p class="muted">공식 짝 맞추기, 인수분해 러시, 삼각비 플래시…</p></a>
+      <a class="card link" href="#/ecosystem">${ico(SEC_ICON.eco)}<h3>수학의 생태계</h3><p class="muted">개념·공식·인물·쓰임이 한 장으로.</p></a>
+      <a class="card link" href="#/life">${ico(SEC_ICON.life)}<h3>생활 속 수학</h3><p class="muted">TV 인치, 피자 L, 로또, 경사로 8%.</p></a>
+      <a class="card link" href="#/people">${ico(SEC_ICON.people)}<h3>수학 인물</h3><p class="muted">탈레스부터 튜키까지 ${D.people.length}명.</p></a>
     </div>
     <div class="box"><b>보호자·선생님께</b> — 이 사이트는 문제를 많이 푸는 곳이 아니라 왜 그런지를 손으로 만져 이해하는 곳입니다. 진단은 「중2 부족」이 아니라 「인수분해에서 끊김」처럼 개념 하나를 가리키고, 그 소단원으로 바로 이어집니다. 모든 기능이 무료이며 학습 기록은 이 브라우저에만 저장됩니다.</div>`);
     window.WIDGETS.quadratic.render($("#home-widget"));
@@ -91,13 +104,13 @@
     const prog=store.get("quiz",{});
     const done=l=>{ const keys=Object.keys(prog).filter(k=>k.startsWith("lesson:"+l.id+"#")); return keys.length? Math.round(100*keys.filter(k=>prog[k]).length/l.quiz.length):0; };
     render(`<div class="crumb"><a href="#/">홈</a> › 수학 학습</div><h1>🧮 수학 학습</h1><p class="lead">소단원마다 개요 → 핵심 개념 → 왜 그런지 → 공식 → 예제 → 퀴즈 → 이 개념의 자리 순서로 이어집니다.</p>
-    ${Object.keys(G).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.curriculum.units.filter(u=>u.grade===g).map(u=>`<div class="card ${u.grade}"><h3><a href="#/study/${u.id}">${u.title}</a></h3><p class="muted">${u.desc}</p><ol style="padding-left:18px;margin:0">${u.lessons.map(l=>`<li><a href="#/study/${u.id}/${l.id}">${l.title}</a> <span class="muted" style="font-size:.8rem">${done(l)?`퀴즈 ${done(l)}%`:""}</span></li>`).join("")}</ol></div>`).join("")}</div>`).join("")}
+    ${Object.keys(G).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.curriculum.units.filter(u=>u.grade===g).map(u=>`<div class="card ${u.grade}">${ico(UNIT_ICON[u.id],"ico big")}<h3><a href="#/study/${u.id}">${u.title}</a></h3><p class="muted">${u.desc}</p><ol style="padding-left:18px;margin:0">${u.lessons.map(l=>`<li><a href="#/study/${u.id}/${l.id}">${l.title}</a> <span class="muted" style="font-size:.8rem">${done(l)?`퀴즈 ${done(l)}%`:""}</span></li>`).join("")}</ol></div>`).join("")}</div>`).join("")}
     <h2>🌿 줄기로 보기</h2><p class="muted">학년은 꼬리표일 뿐입니다. 개념의 선후관계로 한 줄에 세우면 이렇게 됩니다.</p>
     ${[["geo","도형과 측정"],["alg","변화와 관계"],["num","수와 연산"],["stat","자료와 가능성"]].map(([s,n])=>`<div class="box"><b>${n}</b> — ${D.roadmap.nodes.filter(x=>x.strand===s&&x.unit).map(x=>`<a href="#/study/${x.unit}">${x.label}</a>`).join(" → ")}</div>`).join("")}`);
   }
   function unit(id){
     const u=byUnit(id); if(!u) return notFound();
-    render(`<div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › ${G[u.grade]}</div>${tag(u.grade)}<h1>${u.title}</h1><p class="lead">${u.desc}</p>
+    render(`<div class="lhead ${u.grade}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › ${G[u.grade]}</div><div class="row">${ico(UNIT_ICON[u.id],"ico hero")}<div>${tag(u.grade)}<h1>${u.title}</h1><p class="lead">${u.desc}</p></div></div></div>
     <div class="grid wide">${u.lessons.map((l,i)=>`<a class="card link" href="#/study/${u.id}/${l.id}"><div class="eyebrow">소단원 ${i+1}</div><h3>${l.title}</h3><p class="muted">${l.concept[0].replace(/\*\*/g,"").slice(0,70)}…</p><div>${l.formulas.map(f=>byFormula(f)?`<span class="tag">📐 ${byFormula(f).title}</span>`:"").join("")}</div></a>`).join("")}</div>
     <h2>이 단원과 이어진 것</h2><div class="row">${[...new Set(u.lessons.map(l=>l.node))].map(n=>`<a class="btn ghost sm" href="#/roadmap/${n}">🗺 ${nodeOf(n).label} 의 자리</a>`).join("")}${Object.values(window.WIDGETS).some(w=>u.lessons.some(l=>l.node===w.node))?`<a class="btn ghost sm" href="#/lab">🔬 관련 위젯</a>`:""}<a class="btn ghost sm" href="#/exam">📝 시험 전 훑기</a></div>`);
   }
@@ -107,16 +120,18 @@
     const node=nodeOf(l.node); const pre=preds(l.node).map(nodeOf), post=succs(l.node).map(nodeOf);
     const widgets=Object.entries(window.WIDGETS).filter(([k,w])=>w.node===l.node);
     const lifeItems=D.life.filter(x=>x.node===l.node).slice(0,3); const ppl=D.people.filter(p=>p.link===l.id||p.node===l.node).slice(0,2);
-    render(`<div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)}<h1>${l.title}</h1>
-    <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["pit","오개념"],["pt","출제 포인트"],["f","공식"],["ex","예제"],["quiz","퀴즈"],["place","개념의 자리"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
+    render(`<div class="lhead ${u.grade}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span><h1>${l.title}</h1><p class="lead">${md(l.concept[0]).replace(/<[^>]+>/g,"").slice(0,90)}…</p></div>
+    <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["story","이야기"],["pit","오개념"],["pt","출제 포인트"],["f","공식"],["ex","예제"],["quiz","퀴즈"],["bridge","개념 연결"],["place","개념의 자리"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
     <h2 id="c">핵심 개념</h2><ul>${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>
     <h2 id="why">왜 그런지</h2><div class="box">${md(l.why)}</div>
+    ${l.story?`<h2 id="story">📖 공식이 태어나는 이야기</h2><p class="muted">외우기 전에 읽는 서너 문단. 어디서 왔고 왜 그 모양인지 알면 공식은 저절로 나옵니다.</p><div class="story">${l.story.map((st,i)=>`<div class="st"><div class="st-n">${i+1}</div><div><h4>${md(st.h)}</h4><p>${md(st.t)}</p></div></div>`).join("")}</div>`:""}
     ${l.pitfalls?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${l.points?`<h2 id="pt">🎯 출제 포인트</h2><ul class="pt">${l.points.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${widgets.length?`<h2>만져 보기</h2>${widgets.map(([k,w])=>`<div class="widget" id="w-${k}"><b>${w.title}</b><p class="muted">${w.desc}</p></div>`).join("")}`:""}
     ${l.formulas.length?`<h2 id="f">이 단원의 공식</h2><div class="grid">${l.formulas.map(f=>byFormula(f)).filter(Boolean).map(f=>`<a class="card link" href="#/formulas/${f.id}"><h3>${f.title} ${f.core?'<span class="tag">외울 것</span>':'<span class="tag">되살릴 것</span>'}</h3><div class="formula">$${f.tex}$</div></a>`).join("")}</div>`:""}
     <h2 id="ex">예제</h2><div class="card"><p><b>문제.</b> ${md(l.example.q)}</p><details class="sol"><summary>풀이 보기</summary><ol class="steps">${l.example.sol.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(l.example.ans)}</p></details></div>
     <h2 id="quiz">확인 퀴즈</h2>${quizHtml(l.quiz,"lesson:"+l.id)}
+    ${(()=>{const bs=D.bridge.filter(b=>b.nodes.includes(l.node)); return bs.length?`<h2 id="bridge">🔗 이 개념이 다른 단원과 만나는 문제</h2><div class="grid wide">${bs.map(b=>`<a class="card link ${b.grade}" href="#/bridge/${b.id}">${tag(b.grade)}<h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div></a>`).join("")}</div>`:"";})()}
     <h2 id="place">이 개념의 자리</h2>
     <div class="card"><p><b>${node.label}</b> 별에 닿는 길: ${pre.length?pre.map(n=>`<a href="#/roadmap/${n.id}">${n.label}</a>`).join(" · "):"(시작점)"} → <b>${node.label}</b> → ${post.length?post.map(n=>`<a href="#/roadmap/${n.id}">${n.label}</a>`).join(" · "):"(끝)"}</p><a class="btn sm ghost" href="#/roadmap/${l.node}">🗺 지도에서 보기</a></div>
     ${lifeItems.length||ppl.length?`<h2>이어서 보기</h2><div class="grid">${lifeItems.map(x=>`<a class="card link" href="#/life"><div class="eyebrow">🌍 생활 속 수학</div><h3>${x.title}</h3></a>`).join("")}${ppl.map(p=>`<a class="card link" href="#/people"><div class="eyebrow">👤 수학 인물</div><h3>${p.name}</h3><p class="muted">${p.years}</p></a>`).join("")}</div>`:""}
@@ -241,6 +256,48 @@
     next();
   }
 
+
+  // ---------- 개념 연결·응용 ----------
+  function bridge(id){
+    if(!id) return render(`<div class="crumb"><a href="#/">홈</a> › 개념 연결·응용</div><h1>🔗 개념 연결·응용</h1><p class="lead">한 문제에서 두세 단원이 만납니다. 풀이의 각 단계에 <b>어느 개념을 썼는지</b> 표시해, 풀이가 곧 개념 지도가 되게 했습니다. 시험의 고난도 문항은 대부분 이런 '다리' 문제입니다.</p>
+      <div class="box ok"><b>왜 따로 모았나</b> — 교과서 문제의 약 90% 는 같은 단원 안에서만 묶여 있지만(Rohrer 외, 2020), 실제 시험과 수학적 사고는 단원을 가로지릅니다. 여기서는 '어느 개념을 꺼낼지' 고르는 연습을 합니다.</div>
+      ${Object.keys(G).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${D.bridge.filter(b=>b.grade===g).map(b=>`<a class="card link ${g}" href="#/bridge/${b.id}"><h3>${b.title}</h3><div class="chain">${b.nodes.map(n=>`<span class="chip">${nodeOf(n).label}</span>`).join('<span class="arr">+</span>')}</div><p class="muted">${b.hook}</p></a>`).join("")}</div>`).join("")}`);
+    const b=D.bridge.find(x=>x.id===id); if(!b) return notFound();
+    render(`<div class="lhead ${b.grade}"><div class="crumb"><a href="#/">홈</a> › <a href="#/bridge">개념 연결·응용</a></div>${tag(b.grade)}<h1>${b.title}</h1><p class="lead">${md(b.hook)}</p><div class="chain big">${b.nodes.map(n=>`<a class="chip" href="#/roadmap/${n}">${nodeOf(n).label}</a>`).join('<span class="arr">+</span>')}</div></div>
+    <h2>문제</h2><div class="card"><p style="font-size:1.08rem">${md(b.q)}</p><details class="sol"><summary>먼저 풀어 본 뒤 열기 — 단계별 풀이</summary><ol class="steps bridge-steps">${b.steps.map(st=>`<li><span class="chip sm">${nodeOf(st.node).label}</span> ${md(st.t)}</li>`).join("")}</ol><p><b>답:</b> ${md(b.ans)}</p></details></div>
+    <h2>이렇게 이어집니다</h2><div class="box">${md(b.link)}</div>
+    <h2>같은 구조, 다른 숫자</h2><div class="card"><p>${md(b.variant.q)}</p><details class="sol"><summary>답 확인</summary><p>${md(b.variant.ans)}</p></details></div>
+    <h2>관련 소단원</h2><div class="row">${[...new Set(b.nodes.flatMap(n=>lessonsOfNode(n)))].map(l=>`<a class="btn sm ghost" href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`).join("")}</div>
+    <div class="row" style="margin-top:20px"><a class="btn ghost" href="#/bridge">← 목록</a><a class="btn" href="#/mix">🔀 섞어 풀기로 확인 →</a></div>`);
+  }
+
+  // ---------- 섞어 풀기 (교차 연습 + 인출 연습) ----------
+  function mix(){
+    const pool=[]; lessonsAll.forEach(l=>l.quiz.forEach((q,i)=>pool.push({l,q,i})));
+    // 서로 다른 단원에서 6문항
+    const picked=[]; const usedUnits=new Set(); shuffle(pool).forEach(x=>{ if(picked.length<6 && !usedUnits.has(x.l.unit)){ picked.push(x); usedUnits.add(x.l.unit);} });
+    let i=0, score=0, idOk=0; const log=[];
+    function step(){ if(i>=picked.length) return done();
+      const {l,q}=picked[i]; const units=shuffle([byUnit(l.unit), ...shuffle(D.curriculum.units.filter(u=>u.id!==l.unit)).slice(0,3)]);
+      render(`<div class="crumb"><a href="#/">홈</a> › 섞어 풀기 › ${i+1}/${picked.length}</div><div class="progress"><i style="width:${i/picked.length*100}%"></i></div>
+        <div class="card game"><div class="eyebrow">1단계 · 어느 단원의 문제인가?</div><p style="font-size:1.1rem">${md(q.q)}</p><div class="quiz" style="border:0;padding:0"><div class="opts" id="u-opts">${units.map(u=>`<button data-u="${u.id}">${u.title}</button>`).join("")}</div></div>
+        <div id="stage2" hidden><div class="eyebrow" style="margin-top:14px">2단계 · 풀기</div><div class="quiz" style="border:0;padding:0"><div class="opts" id="a-opts">${q.opts.map((o,j)=>`<button data-j="${j}">${["①","②","③","④"][j]} ${md(o)}</button>`).join("")}</div><div class="exp" id="exp" hidden>${md(q.exp||"")}</div></div></div>
+        <div class="row" style="margin-top:12px"><button class="btn" id="next" hidden>다음 →</button></div></div>`);
+      let unitRight=null;
+      main.querySelectorAll("#u-opts button").forEach(b=>b.onclick=()=>{ if(unitRight!==null)return; unitRight=b.dataset.u===l.unit; if(unitRight)idOk++; b.classList.add(unitRight?"ok":"bad"); main.querySelector(`#u-opts button[data-u="${l.unit}"]`).classList.add("ok"); $("#stage2").hidden=false; typeset(); });
+      let ans=null;
+      main.querySelectorAll("#a-opts button").forEach(b=>b.onclick=()=>{ if(ans!==null)return; ans=Number(b.dataset.j)===q.a; if(ans)score++; b.classList.add(ans?"ok":"bad"); main.querySelector(`#a-opts button[data-j="${q.a}"]`).classList.add("ok"); $("#exp").hidden=false; $("#next").hidden=false; log.push({l,ok:ans,unitRight});
+        if(!ans){ const notes=store.get("notes",[]); notes.unshift({key:"lesson:"+l.id,i:picked[i].i,q:q.q.replace(/\*\*/g,""),when:Date.now()}); store.set("notes",notes.slice(0,200)); } });
+      $("#next").onclick=()=>{ i++; step(); };
+    }
+    function done(){ const h=store.get("mix",[]); h.unshift({when:Date.now(),score,idOk,n:picked.length}); store.set("mix",h.slice(0,30));
+      render(`<div class="crumb"><a href="#/">홈</a> › 섞어 풀기</div><h1>${score} / ${picked.length} 정답 · 단원 알아맞히기 ${idOk} / ${picked.length}</h1>
+      <div class="box ${score===picked.length?"ok":"warn"}">${score===picked.length?"전부 맞혔습니다. 내일 다시 오면 다른 조합이 나옵니다.":"틀린 문제는 오답 노트에 들어갔습니다. '단원 알아맞히기' 가 틀린 문제는 풀이보다 <b>개념 식별</b>이 약한 것이니 그 소단원의 '핵심 개념' 부터 다시 보세요."}</div>
+      <table><tr><th>소단원</th><th>단원 식별</th><th>정답</th></tr>${log.map(x=>`<tr><td><a href="#/study/${x.l.unit}/${x.l.id}">${x.l.title}</a></td><td>${x.unitRight?"✅":"❌"}</td><td>${x.ok?"✅":"❌"}</td></tr>`).join("")}</table>
+      <div class="row" style="margin-top:14px"><a class="btn" href="#/mix" onclick="setTimeout(()=>location.reload(),0)">다른 6문제</a><a class="btn ghost" href="#/notes">📒 오답 노트</a></div>`); }
+    step();
+  }
+
   // ---------- 개념 사전 ----------
   function concepts(q){ const p=new URLSearchParams(q||""); const g=p.get("grade"); const list=D.concepts.filter(c=>!g||c.grade===g).sort((a,b)=>a.term.localeCompare(b.term,"ko"));
     render(`<div class="crumb"><a href="#/">홈</a> › 개념 사전</div><h1>📖 개념 사전</h1><p class="lead">용어 ${D.concepts.length}개. 정의 한 줄과 영어 이름, 그리고 그 개념이 있는 자리.</p><div class="pill-row"><a class="pill ${!g?"on":""}" href="#/concepts">전체</a>${Object.keys(G).map(x=>`<a class="pill ${g===x?"on":""}" href="#/concepts?grade=${x}">${G[x]}</a>`).join("")}</div>
@@ -277,7 +334,7 @@
 
   // ---------- 생활 속 수학 / 인물 ----------
   function life(){ render(`<div class="crumb"><a href="#/">홈</a> › 생활 속 수학</div><h1>🌍 생활 속 수학</h1><p class="lead">교과서 밖에서 같은 공식이 어떻게 쓰이는지. ${D.life.length}편.</p><div class="grid wide">${D.life.map(x=>`<div class="card"><span class="tag">${x.tag}</span> <a class="tag" href="#/roadmap/${x.node}">🗺 ${nodeOf(x.node).label}</a><h3>${x.title}</h3><p>${md(x.body)}</p></div>`).join("")}</div>`); }
-  function people(){ render(`<div class="crumb"><a href="#/">홈</a> › 수학 인물</div><h1>👤 수학 인물</h1><p class="lead">이 범위의 공식 뒤에 있는 사람들. 시대순.</p><div class="grid wide">${D.people.map(p=>{const l=byLesson(p.link); return `<div class="card"><div class="eyebrow">${p.years}</div><h3>${p.name}</h3><p>${md(p.body)}</p>${l?`<a href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`:""} · <a href="#/roadmap/${p.node}">🗺 ${nodeOf(p.node).label}</a></div>`;}).join("")}</div>`); }
+  function people(){ render(`<div class="crumb"><a href="#/">홈</a> › 수학 인물</div><h1>👤 수학 인물</h1><p class="lead">이 범위의 공식 뒤에 있는 사람들. 시대순.</p><div class="grid wide">${D.people.map(p=>{const l=byLesson(p.link); return `<div class="card person"><div class="row">${p.img?`<img class="ico avatar" src="${p.img}" alt="${p.name}" style="object-fit:cover;padding:0">`:ico("1F3DB","ico avatar")}<div><div class="eyebrow">${p.years}</div><h3 style="margin:0">${p.name}</h3></div></div><p>${md(p.body)}</p>${l?`<a href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`:""} · <a href="#/roadmap/${p.node}">🗺 ${nodeOf(p.node).label}</a></div>`;}).join("")}</div>`); }
 
   // ---------- 오답 노트 ----------
   function notes(){ const n=store.get("notes",[]); render(`<div class="crumb"><a href="#/">홈</a> › 오답 노트</div><h1>📒 내 오답 노트</h1><p class="lead">소단원 퀴즈에서 틀린 문제가 자동으로 모입니다. 상단의 🔐 로그인 으로 아이디를 만들면 모든 기기에서 이어지고, 로그인하지 않으면 이 브라우저에만 저장됩니다. 아래에서 내보내기(JSON)·지우기를 할 수 있습니다.</p>
@@ -296,7 +353,7 @@
     <h3>단원 체계의 근거</h3><p>교육부 고시 2022 개정 수학과 교육과정(중학교 2·3학년 영역: 수와 연산, 변화와 관계, 도형과 측정, 자료와 가능성)의 성취기준을 따르며, 2015 개정 교육과정과 공통인 범위(이등변삼각형·사각형·닮음·피타고라스·확률 / 제곱근·인수분해·이차방정식·이차함수 / 삼각비·원·통계)를 다룹니다. 상자그림은 2022 개정에서 중3 통계에 추가된 내용입니다. 학교별 진도·범위는 교과서 차례로 확인하세요.</p>
     <h3>기술</h3><p>정적 HTML/CSS/JS, 수식 렌더링은 KaTeX(MIT), 위젯은 순수 Canvas 2D. 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. 콘텐츠는 <code>data/*.js</code> 파일을 고치면 바로 반영됩니다.</p>
     <h3>저작권</h3><p>본문·문항·위젯 코드는 이 저장소의 저작자가 작성했으며 MIT 라이선스로 공개합니다. 사이트 구조(개념 지도·공식 되살리기·끊긴 고리 진단 등)는 공개된 수학 학습 사이트들의 접근 방식을 참고하되 텍스트·코드·이미지를 복제하지 않았습니다. 인물 정보는 일반적으로 알려진 수학사 사실에 근거합니다.</p>
-    <h3>검증</h3><p>모든 문항의 정답·풀이는 작성 후 재검산했고, 위젯의 기하(원주각 = 중심각의 절반, 무게중심 2:1, 합차 공식의 넓이 보존, 상대도수의 수렴 등)는 수치 판독값으로 확인됩니다. 오류를 발견하면 GitHub 이슈로 알려 주세요.</p><h3>기여</h3><p>오류 제보와 문항·위젯 추가는 GitHub 이슈/PR 로 환영합니다. README 의 "콘텐츠 추가 방법" 을 참고하세요.</p></div>`); }
+    <h3>이미지 출처</h3><p>아이콘·일러스트는 <a href="https://openmoji.org" target="_blank" rel="noopener">OpenMoji</a> (CC BY-SA 4.0) 를 사용했습니다. 원본 파일과 라이선스는 <code>assets/openmoji/</code> 에 있습니다. 수학 인물의 초상은 퍼블릭 도메인 이미지를 <code>scripts/fetch-portraits.md</code> 의 안내대로 추가할 수 있습니다.</p><h3>검증</h3><p>모든 문항의 정답·풀이는 작성 후 재검산했고, 위젯의 기하(원주각 = 중심각의 절반, 무게중심 2:1, 합차 공식의 넓이 보존, 상대도수의 수렴 등)는 수치 판독값으로 확인됩니다. 오류를 발견하면 GitHub 이슈로 알려 주세요.</p><h3>기여</h3><p>오류 제보와 문항·위젯 추가는 GitHub 이슈/PR 로 환영합니다. README 의 "콘텐츠 추가 방법" 을 참고하세요.</p></div>`); }
   function notFound(){ render(`<h1>페이지를 찾을 수 없습니다</h1><a href="#/">홈으로</a>`); }
 
   // ---------- 라우터 ----------
@@ -312,6 +369,8 @@
     if(r==="lab") return lab(p[1]);
     if(r==="slides") return slides(p[1]);
     if(r==="play") return play(p[1]);
+    if(r==="bridge") return bridge(p[1]);
+    if(r==="mix") return mix();
     if(r==="concepts") return concepts(qs);
     if(r==="recall") return recall(p[1]);
     if(r==="exam") return exam(p[1]);
