@@ -391,3 +391,5 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 .why{font:inherit;font-size:.92rem;text-align:left;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);cursor:pointer}
 .why.on{border-color:var(--acc);background:rgba(59,110,245,.1)}.why.ok{border-color:var(--ok);background:rgba(31,157,85,.12)}.why.bad{border-color:var(--bad);background:rgba(214,69,69,.12)}
 .forge-card .formula{font-size:.95rem;margin:6px 0}
+
+.nav a.ext{color:#b46a00}
