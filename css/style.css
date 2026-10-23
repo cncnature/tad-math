@@ -378,3 +378,16 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 .quiz.gen{border-style:dashed}
 @media(max-width:640px){.mtable td.small{display:none}.mtable td.bar{width:34%}}
 .mtable td:first-child{width:30%}
+/* 공식 유도 공방 */
+.lvdots{margin-top:6px;font-size:.85rem}.lvdots span{color:var(--line)}.lvdots span.on{color:var(--acc)}
+.pill.locked{opacity:.45}
+.pieces{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;margin:8px 0}
+.piece{font:inherit;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);cursor:pointer;line-height:1.45}
+.piece:hover:not(:disabled){border-color:var(--acc)}.piece.used{opacity:.35}.piece.trap{border-color:var(--bad);background:rgba(214,69,69,.08);text-decoration:line-through}
+.forge-placed li .small{margin-top:2px}.forge-placed li.next{font-style:italic}
+.blank{display:inline-block;min-width:2.2em;padding:0 6px;border-bottom:2px solid var(--acc);margin:0 2px;text-align:center}.blank.on{background:rgba(59,110,245,.1)}.blank.ok{border-color:var(--ok);background:rgba(31,157,85,.12)}.blank.bad{border-color:var(--bad);background:rgba(214,69,69,.12)}
+.blank-opts{margin:6px 0 2px}
+.why-opts{display:flex;flex-direction:column;gap:6px;margin:6px 0 4px}
+.why{font:inherit;font-size:.92rem;text-align:left;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);cursor:pointer}
+.why.on{border-color:var(--acc);background:rgba(59,110,245,.1)}.why.ok{border-color:var(--ok);background:rgba(31,157,85,.12)}.why.bad{border-color:var(--bad);background:rgba(214,69,69,.12)}
+.forge-card .formula{font-size:.95rem;margin:6px 0}

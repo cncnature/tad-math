@@ -80,6 +80,52 @@
     if(!ok){ const notes=store.get("notes",[]); const text=q.dataset.q; notes.unshift({key:q.dataset.key,i:q.dataset.i,q:text,when:Date.now()}); store.set("notes",notes.slice(0,200)); }
   });
 
+  // ---------- 공식 유도 공방 (조각 잇기 → 빈칸 → 왜 그 걸음 → 되살리기) ----------
+  const forgeOf=f=>(D.derivations||[]).find(d=>d.f===f);
+  const forgeLv=f=>{ const r=store.get("forge",{})[f]; return r?r.lv:0; };
+  const FLV=["","🧩 조각 잇기","▢ 빈칸 메우기","❓ 왜 그 걸음","🔥 되살리기"]; const FLV_DESC=["","뒤섞인 유도 조각을 순서대로. 함정 조각을 걸러내세요.","핵심 걸음의 빈칸을 채웁니다 (완성형 예제).","각 걸음이 왜 필요한지 이유를 고릅니다 (자기설명).","조각 풀 없이 다음 걸음을 매번 골라 처음부터 끝까지 되살립니다."];
+  function forge(fid,qs){
+    const F=(D.derivations||[]).map(d=>({...d,fm:byFormula(d.f)})).filter(d=>d.fm); const pr=new URLSearchParams(qs||"");
+    if(fid==="daily"){ const d=F[Math.floor(Date.now()/864e5)%F.length]; location.hash=`#/forge/${d.f}?lv=${Math.min(4,forgeLv(d.f)+1)}`; return; }
+    if(!fid){ const g=pr.get("g")||((profile()||{}).grade&&F.some(d=>d.fm.grade===profile().grade)?profile().grade:""); const list=F.filter(d=>!g||d.fm.grade===g); const master=F.filter(d=>forgeLv(d.f)>=4).length; const touched=F.filter(d=>forgeLv(d.f)>=1).length;
+      return render(`<div class="crumb"><a href="#/">홈</a> › 공식 유도 공방</div><h1>🔥 공식 유도 공방</h1>
+      <p class="lead">공식을 외우는 대신 <b>유도 과정을 네 단계로 몸에 붙입니다</b>: 조각 잇기(순서) → 빈칸 메우기(완성형 예제) → 왜 그 걸음(자기설명) → 되살리기(인출). 순서 맞추기만으로는 '그럴듯한 순서' 를 찾는 요령에 그치기 쉬워, 매 공식에 <b>함정 조각</b>(그럴듯하지만 틀린 걸음)과 <b>이유 고르기</b>를 넣었습니다. 각 공식의 2단계 이상을 통과하면 소단원 목표율의 '공식' 항목으로 반영됩니다.</p>
+      <div class="stats"><div><b>${F.length}</b>공식</div><div><b>${touched}</b>시작한 공식</div><div><b>${master}</b>되살리기 완료</div><div><a class="btn sm" href="#/forge/daily">📅 오늘의 유도</a></div></div>
+      <div class="pill-row"><a class="pill ${!g?"on":""}" href="#/forge?g=all">전체</a>${GORDER.filter(x=>F.some(d=>d.fm.grade===x)).map(x=>`<a class="pill ${g===x?"on":""}" href="#/forge?g=${x}">${G[x]} ${F.filter(d=>d.fm.grade===x).length}</a>`).join("")}</div>
+      <div class="grid wide">${list.map(d=>{ const lv=forgeLv(d.f); return `<a class="card link forge-card ${GCOL(d.fm.grade)}" href="#/forge/${d.f}?lv=${Math.min(4,lv+1)}">${tag(d.fm.grade)} ${d.fm.core?'<span class="tag">외울 것</span>':''}<h3>${d.fm.title}</h3><div class="formula">$${texCard(d.fm.tex)}$</div><div class="lvdots">${[1,2,3,4].map(i=>`<span class="${i<=lv?"on":""}" title="${FLV[i]}">${i<=lv?"●":"○"}</span>`).join("")} <span class="muted">${lv?FLV[lv]+" 통과":"미시작"} · 조각 ${d.steps.length}+함정 ${d.traps.length}</span></div></a>`; }).join("")}</div>
+      <div class="card evidence" style="margin-top:16px"><div class="eyebrow">🔬 왜 네 단계인가</div><p class="muted">완성형(빈칸) 예제는 완전한 예제보다 전이 효과가 크고(Renkl & Atkinson 2003, 'faded worked examples'), 각 걸음의 이유를 스스로 말하는 자기설명은 이해의 깊이를 가장 크게 높이는 학습 활동 중 하나이며(Chi et al. 1989), 마지막 '되살리기' 는 인출 연습(Roediger & Karpicke 2006)입니다. 함정 조각은 '그럴듯한 오류 식별' — 전문가의 패턴 인식(Chi, Feltovich & Glaser 1981)을 겨냥합니다.</p></div>`); }
+    const d=F.find(x=>x.f===fid); if(!d) return notFound(); const lv=Math.min(4,Math.max(1,+(pr.get("lv")||Math.min(4,forgeLv(fid)+1)))); const fm=d.fm; const steps=d.steps.map((st,i)=>({...st,idx:i})); const ls=lessonsAll.filter(l=>l.formulas.includes(fid));
+    const head=`<div class="lhead ${GCOL(fm.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/forge?g=${fm.grade}">공식 유도 공방</a> › ${fm.title}</div>${tag(fm.grade)} <span class="tag">${FLV[lv]}</span> <span class="tag">통과한 단계 ${forgeLv(fid)}/4</span><h1>${fm.title}</h1><div class="formula" style="font-size:1.3rem">$$${texCard(fm.tex)}$$</div><p class="muted">${FLV_DESC[lv]}</p></div>
+      <div class="pill-row">${[1,2,3,4].map(i=>`<a class="pill ${i===lv?"on":""} ${i>forgeLv(fid)+1?"locked":""}" href="#/forge/${fid}?lv=${i}">${FLV[i]}${i<=forgeLv(fid)?" ✓":""}</a>`).join("")}</div>`;
+    function pass(ok,stars,detail){ const rec=store.get("forge",{}); const prev=rec[fid]||{lv:0}; if(ok) rec[fid]={lv:Math.max(prev.lv,lv),when:Date.now(),stars:Math.max(prev.stars||0,stars||0)}; store.set("forge",rec); logQ("forge:"+fid,lv,ok);
+      return `<div class="box ${ok?"ok":"warn"}"><b>${ok?`🎉 ${FLV[lv]} 통과! ${"★".repeat(stars||1)}`:"아직 통과 못 했어요"}</b> — ${detail}</div><div class="row" style="margin-top:10px">${ok&&lv<4?`<a class="btn" href="#/forge/${fid}?lv=${lv+1}">다음 단계: ${FLV[lv+1]} →</a>`:ok?`<a class="btn" href="#/forge/daily">🔥 다른 공식 되살리기</a>`:`<a class="btn" href="#/forge/${fid}?lv=${lv}" onclick="setTimeout(()=>location.reload(),0)">다시</a>`}<a class="btn ghost" href="#/formulas/${fid}">📐 유도 전체 보기</a>${ls[0]?`<a class="btn ghost" href="#/study/${ls[0].unit}/${ls[0].id}">📘 ${ls[0].title}</a>`:""}<a class="btn ghost" href="#/forge?g=${fm.grade}">목록</a></div>`; }
+    if(lv===1){ // 조각 잇기
+      const pieces=shuffle([...steps.map(st=>({kind:"s",idx:st.idx,t:st.t,why:st.why})),...d.traps.map((t,i)=>({kind:"t",idx:-1-i,t:t.t,why:t.why}))]); let k=0, moves=0, dead=new Set(); const placed=[];
+      const draw=(fb="")=>{ render(`${head}<div class="card"><div class="eyebrow">완성된 유도 (${k}/${steps.length}) · 누른 횟수 ${moves} (최소 ${steps.length})</div><ol class="steps forge-placed">${placed.map(p=>`<li>${md(p.t)}<div class="muted small">— ${md(p.why)}</div></li>`).join("")}${k<steps.length?'<li class="next muted">다음 걸음은?</li>':""}</ol>${fb}</div>
+        ${k<steps.length?`<h3>조각 풀 — 가장 이른 걸음을 누르세요</h3><div class="pieces">${pieces.map((p,i)=>`<button class="piece ${placed.includes(p)?"used":""} ${dead.has(i)?"trap":""}" data-i="${i}" ${placed.includes(p)||dead.has(i)?"disabled":""}>${md(p.t)}</button>`).join("")}</div>`:pass(moves<=steps.length+2,moves===steps.length?3:moves<=steps.length+2?2:1,`${steps.length}조각을 ${moves}번 만에 이었습니다. 함정 ${d.traps.length}개 중 ${[...dead].length}개를 눌렀습니다. 2★ 이상이면 통과.`)}`);
+        main.querySelectorAll(".piece").forEach(b=>b.onclick=()=>{ const p=pieces[+b.dataset.i]; moves++; if(p.kind==="t"){ dead.add(+b.dataset.i); draw(`<div class="box warn">⚠️ <b>함정 조각!</b> ${md(p.t)} — ${md(p.why)}</div>`); return; } if(p.idx===k){ placed.push(p); k++; draw(k<steps.length?`<div class="box ok">✓ ${md(p.why)}</div>`:""); } else draw(`<div class="box warn">이 조각은 <b>${p.idx-k}단계 뒤</b>에 옵니다. 그 전에 무엇이 먼저 필요할까요?</div>`); }); };
+      draw(); return; }
+    if(lv===2){ // 빈칸
+      const bl=steps.filter(st=>st.blank); const choice={};
+      const draw=(graded=false)=>{ render(`${head}<div class="card"><ol class="steps">${steps.map(st=>{ if(!st.blank) return `<li>${md(st.t)}</li>`; const [txt,ans,...alts]=st.blank; const opts=st._opts||(st._opts=shuffle([ans,...alts])); const parts=esc(txt).split("▢"); const c=choice[st.idx]; return `<li class="blank-step">${md(parts[0])}<span class="blank ${graded?(c===ans?"ok":"bad"):c?"on":""}">${c?md(c):"▢"}</span>${md(parts[1]||"")}<div class="row blank-opts">${opts.map(o=>`<button class="btn sm ${c===o?"":"ghost"}" data-s="${st.idx}" data-o="${esc(o)}" ${graded?"disabled":""}>${md(o)}</button>`).join("")}</div>${graded?`<div class="muted small">${c===ans?"✓":"✗ 정답: "+md(ans)+" —"} ${md(st.why)}</div>`:""}</li>`; }).join("")}</ol>
+        ${graded?pass(bl.every(st=>choice[st.idx]===st.blank[1]),bl.every(st=>choice[st.idx]===st.blank[1])?3:1,`빈칸 ${bl.length}개 중 ${bl.filter(st=>choice[st.idx]===st.blank[1]).length}개 정답. 모두 맞혀야 통과.`):`<div class="row"><button class="btn" id="fg-sub" ${bl.every(st=>choice[st.idx])?"":"disabled"}>채점</button><span class="muted">빈칸 ${Object.keys(choice).length}/${bl.length}</span></div>`}</div>`);
+        main.querySelectorAll(".blank-opts button").forEach(b=>b.onclick=()=>{ choice[+b.dataset.s]=b.dataset.o; draw(); }); const sb=$("#fg-sub"); if(sb) sb.onclick=()=>draw(true); };
+      draw(); return; }
+    if(lv===3){ // 왜 그 걸음
+      const choice={};
+      const draw=(graded=false)=>{ const right=steps.filter(st=>choice[st.idx]===st.why).length; render(`${head}<div class="card"><p class="muted">각 걸음 아래에서 <b>그 걸음이 필요한 이유</b>를 고르세요.</p><ol class="steps">${steps.map(st=>{ const opts=st._w||(st._w=shuffle([st.why,...st.alt])); const c=choice[st.idx]; return `<li>${md(st.t)}<div class="why-opts">${opts.map(o=>`<button class="why ${c===o?"on":""} ${graded?(o===st.why?"ok":c===o?"bad":""):""}" data-s="${st.idx}" data-o="${esc(o)}" ${graded?"disabled":""}>${md(o)}</button>`).join("")}</div></li>`; }).join("")}</ol>
+        ${graded?pass(right>=Math.ceil(steps.length*0.8),right===steps.length?3:2,`${steps.length}걸음 중 ${right}개의 이유를 맞혔습니다 (80% 이상 통과).`):`<div class="row"><button class="btn" id="fg-sub" ${Object.keys(choice).length===steps.length?"":"disabled"}>채점</button><span class="muted">${Object.keys(choice).length}/${steps.length}</span></div>`}</div>`);
+        main.querySelectorAll(".why").forEach(b=>b.onclick=()=>{ choice[+b.dataset.s]=b.dataset.o; draw(); }); const sb=$("#fg-sub"); if(sb) sb.onclick=()=>draw(true); };
+      draw(); return; }
+    // lv 4 되살리기
+    let k=0, errs=0; const placed=[]; let cands=null;
+    const mk=()=>{ const rest=steps.filter(st=>st.idx>k); const trap=d.traps.length?[{kind:"t",t:d.traps[Math.floor(Math.random()*d.traps.length)].t,why:d.traps[0].why}]:[]; const others=shuffle(rest).slice(0,trap.length?2:3).map(st=>({kind:"o",t:st.t,idx:st.idx})); return shuffle([{kind:"s",t:steps[k].t,why:steps[k].why},...others,...trap]); };
+    const draw=(fb="")=>{ if(k<steps.length&&!cands) cands=mk(); render(`${head}<div class="card"><div class="eyebrow">되살린 걸음 ${k}/${steps.length} · 실수 ${errs} (1번까지 허용)</div><ol class="steps forge-placed">${placed.map(p=>`<li>${md(p.t)}<div class="muted small">— ${md(p.why)}</div></li>`).join("")}</ol>${fb}
+      ${k<steps.length?`<h3>${k===0?"첫 걸음":"다음 걸음"}은?</h3><div class="pieces">${cands.map((c,i)=>`<button class="piece" data-i="${i}">${md(c.t)}</button>`).join("")}</div>`:pass(errs<=1,errs===0?3:2,`처음부터 끝까지 ${errs===0?"한 번도 틀리지 않고":"실수 "+errs+"번으로"} 되살렸습니다. 이제 이 공식은 잊어도 다시 만들 수 있습니다.`)}</div>`);
+      main.querySelectorAll(".piece").forEach(b=>b.onclick=()=>{ const c=cands[+b.dataset.i]; if(c.kind==="s"){ placed.push(c); k++; cands=null; draw(`<div class="box ok">✓ ${md(c.why)}</div>`); } else { errs++; draw(c.kind==="t"?`<div class="box warn">⚠️ 함정 — ${md(c.why)}</div>`:`<div class="box warn">그 걸음은 더 뒤에 옵니다. 지금 당장 필요한 것은?</div>`); } }); };
+    draw();
+  }
+
   // ---------- 개인 학습 시스템 (프로필 · 목표율 · 컨설팅 · 생성 문제) ----------
   const todayKey=d=>{ d=d||new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
   const profile=()=>store.get("me",null);
@@ -89,14 +135,14 @@
   function mastery(l){
     const prog=store.get("quiz",{}); const L=store.get("qlog",[]); const srs=srsAll(); const visit=store.get("visit",{}); const st=store.get("st",{}); const es=store.get("essay",{});
     const keys=Object.keys(prog).filter(k=>k.startsWith("lesson:"+l.id+"#")); const qc=keys.filter(k=>prog[k]).length; const quizPct=Math.min(100,100*qc/Math.max(1,l.quiz.length));
-    const fs=l.formulas.filter(byFormula); const rc=fs.filter(f=>srs[f]&&srs[f].n>=1).length; const recallPct=fs.length?100*rc/fs.length:null;
+    const fs=l.formulas.filter(byFormula); const rc=fs.filter(f=>(srs[f]&&srs[f].n>=1)||forgeLv(f)>=2).length; const recallPct=fs.length?100*rc/fs.length:null; const fg=fs.filter(forgeOf); const fgDone=fg.filter(f=>forgeLv(f)>=2).length;
     const items=[]; (D.schoolExams||[]).forEach(e=>e.items.forEach((it,i)=>{ if(it.l===l.id) items.push(e.grade+":"+e.term+":"+i); })); const essays=D.essay.filter(e=>e.lesson===l.id);
     const pn=items.length+essays.length; const pc=items.filter(k=>st[k]).length+essays.filter(e=>es[e.id]&&es[e.id].score!=null).length; const practPct=pn?100*pc/pn:null;
     let wq=60, wv=10, wr=15, wp=15; if(recallPct===null){ wq+=wr; wr=0; } if(practPct===null){ wq+=wp; wp=0; }
     const base=(quizPct*wq+(visit[l.id]?100:0)*wv+(recallPct||0)*wr+(practPct||0)*wp)/100;
     const gl=L.filter(x=>x.k==="gen:"+l.id); const gok=gl.filter(x=>x.ok).length; const extra=Math.min(50,5*gok);
     const att=L.filter(x=>lessonOfKey(x.k)===l.id); const acc=att.length?att.filter(x=>x.ok).length/att.length:null;
-    return {pct:Math.round(base+extra),base:Math.round(base),extra,quizPct:Math.round(quizPct),qc,qn:l.quiz.length,recallPct,practPct,visited:!!visit[l.id],gen:gl.length,gok,attempts:att.length,acc};
+    return {pct:Math.round(base+extra),base:Math.round(base),extra,quizPct:Math.round(quizPct),qc,qn:l.quiz.length,recallPct,practPct,visited:!!visit[l.id],gen:gl.length,gok,attempts:att.length,acc,fg:fg.length,fgDone};
   }
   const STATUS=p=>p<=0?["미시작","s0"]:p<40?["시작","s1"]:p<80?["학습 중","s2"]:p<100?["거의 다","s3"]:p===100?["목표 달성","s4"]:["초과 달성","s5"];
   function activeDays(){ const L=store.get("qlog",[]); const daily=store.get("daily",{}); const set=new Set(Object.keys(daily)); L.forEach(x=>set.add(todayKey(new Date(x.t)))); let streak=0; const d=new Date(); for(;;){ const k=todayKey(d); if(set.has(k)){ streak++; d.setDate(d.getDate()-1); } else break; } return {streak,total:set.size}; }
@@ -112,6 +158,7 @@
     const next=ls.find(l=>M[l.id].pct<100);
     if(next) out.push({pri:3,icon:"▶️",title:`다음 할 일: ${next.title}`,body:`${byUnit(next.unit).title} · 목표율 ${M[next.id].pct}% — ${M[next.id].visited?"퀴즈 5문항을 끝내고 공식 카드까지 넘기면 목표 달성":"핵심 개념 → 왜 그런지 → 퀴즈 순으로 20분"}.`,href:`#/study/${next.unit}/${next.id}`,label:"학습"});
     else out.push({pri:3,icon:"🏁",title:`${G[g]} 목표율 100% 달성`,body:"생성 문제로 150% 까지 올리거나, 다음 학기·수능 패턴 도감·서술형으로 확장하세요.",href:"#/patterns",label:"수능 패턴"});
+    const fgLeft=ls.flatMap(l=>l.formulas).filter((f,i,a)=>a.indexOf(f)===i&&forgeOf(f)&&forgeLv(f)<2); if(fgLeft.length) out.push({pri:3,icon:"🔥",title:`유도 공방: 이 학기 공식 ${fgLeft.length}개가 아직 2단계 미만`,body:`${fgLeft.slice(0,3).map(f=>byFormula(f).title).join(", ")} — 외우지 말고 조각 잇기 → 빈칸 → 이유 → 되살리기로. 2단계를 넘기면 목표율의 '공식' 항목이 채워집니다.`,href:`#/forge/${fgLeft[0]}`,label:"유도 공방"});
     const due=srsDue().filter(r=>ls.some(l=>l.formulas.includes(r.f))); if(due.length) out.push({pri:3,icon:"🧠",title:`오늘 복습할 공식 ${due.length}개`,body:"간격 반복: 오늘 넘기면 내일은 두 배로 쌓입니다. 3분이면 됩니다.",href:"#/recall/run",label:"복습"});
     const tags=store.get("notetags",{}); const cnt={}; Object.values(tags).forEach(t=>{ if(t) cnt[t]=(cnt[t]||0)+1; }); const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0]; const tot=Object.values(cnt).reduce((a,b)=>a+b,0);
     if(top&&top[1]>=3) out.push({pri:4,icon:"📒",title:`오답의 ${Math.round(100*top[1]/tot)}% 가 「${top[0]}」`,body:{"계산 실수":"풀이를 한 줄에 하나씩, 답을 쓴 뒤 역산 검산 10초. 생성 문제를 '시간 재지 않고' 풀어 정확도부터 잡으세요.","개념 오류":"틀린 문제 소단원의 '왜 그런지' 와 오개념 항목을 소리 내어 설명해 보세요(자기설명). 공식 카드도 함께.","문제 해석":"조건에 밑줄, 구하는 것을 첫 줄에 쓰기. 섞어 풀기로 '어느 단원 문제인지' 식별 훈련.","풀이 못함":"예제 → 퀴즈 Q1~Q3 → 생성 문제 순으로 난도를 올리세요. 서술형 모범 답안의 '첫 수' 를 따라 쓰기."}[top[0]]||"",href:"#/notes",label:"오답 노트"});
@@ -127,6 +174,7 @@
         else if(l){ items.push({t:`➕ ${l.title} 생성 5문제 (→ 120%)`,h:"#/practice/"+l.id}); }
         else { const s=ls[i%ls.length]; items.push({t:`➕ ${s.title} 생성 5문제 (초과 달성)`,h:"#/practice/"+s.id}); }
         if(i%2===1&&weak.length){ const w=weak[Math.floor(i/2)%weak.length]; if(w.id!==prevId) items.push({t:`⚠️ ${w.title} 생성 5문제`,h:"#/practice/"+w.id}); }
+        if(i%2===0){ const ff=ls.flatMap(x=>x.formulas).find(f=>forgeOf(f)&&forgeLv(f)<4); if(ff) items.push({t:`🔥 유도 공방: ${byFormula(ff).title}`,h:"#/forge/"+ff}); }
         items.push({t:"🧠 공식 카드 3장",h:"#/recall/run"}); }
       plan.push({label:`${d.getMonth()+1}/${d.getDate()} (${DN[wd]})`,items,today:i===0}); }
     return plan; }
@@ -154,11 +202,12 @@
     <div class="week">${plan.map(d=>`<div class="day ${d.today?"today":""}"><div class="eyebrow">${d.label}${d.today?" · 오늘":""}</div>${d.items.map(it=>`<a href="${it.h}">${it.t}</a>`).join("")}</div>`).join("")}</div>
     <h2>📘 ${G[g]} 소단원별 목표율</h2>
     ${units.map(u=>{ const ul=u.lessons.map(l=>byLesson(l.id)); const up=avgX(ul); return `<div class="card unit-prog"><div class="row" style="justify-content:space-between"><h3 style="margin:0">${ico(UNIT_ICON[u.id]||"1F4D8","ico sm")} <a href="#/study/${u.id}">${u.title}</a></h3><b>${up}%</b></div><div class="progress"><i style="width:${Math.min(100,up)}%"></i></div>
-      <table class="mtable">${ul.map(l=>{ const m=M[l.id]; const [sn,sc]=STATUS(m.pct); return `<tr><td><a href="#/study/${u.id}/${l.id}">${l.title}</a></td><td class="bar"><div class="mbar"><i style="width:${Math.min(100,m.pct)}%"></i>${m.pct>100?`<em style="width:${Math.min(100,(m.pct-100)*2)}%"></em>`:""}</div></td><td class="num">${m.pct}%</td><td><span class="st ${sc}">${sn}</span></td><td class="muted small">퀴즈 ${m.qc}/${m.qn}${m.acc!=null?` · 정답률 ${Math.round(m.acc*100)}%`:""}${m.recallPct!=null?` · 공식 ${Math.round(m.recallPct)}%`:""}${m.gok?` · 생성 +${m.extra}%`:""}</td><td><a class="btn sm ghost" href="#/practice/${l.id}">➕ 생성</a></td></tr>`; }).join("")}</table></div>`; }).join("")}
+      <table class="mtable">${ul.map(l=>{ const m=M[l.id]; const [sn,sc]=STATUS(m.pct); return `<tr><td><a href="#/study/${u.id}/${l.id}">${l.title}</a></td><td class="bar"><div class="mbar"><i style="width:${Math.min(100,m.pct)}%"></i>${m.pct>100?`<em style="width:${Math.min(100,(m.pct-100)*2)}%"></em>`:""}</div></td><td class="num">${m.pct}%</td><td><span class="st ${sc}">${sn}</span></td><td class="muted small">퀴즈 ${m.qc}/${m.qn}${m.acc!=null?` · 정답률 ${Math.round(m.acc*100)}%`:""}${m.recallPct!=null?` · 공식 ${Math.round(m.recallPct)}%`:""}${m.fg?` · 유도 ${m.fgDone}/${m.fg}`:""}${m.gok?` · 생성 +${m.extra}%`:""}</td><td><a class="btn sm ghost" href="#/practice/${l.id}">➕ 생성</a></td></tr>`; }).join("")}</table></div>`; }).join("")}
     <h2>📊 기록</h2><div class="grid">
       <div class="card"><h3>🧭 진단</h3><p>${diag?`${new Date(diag.when).toLocaleDateString("ko")} · ${diag.score}/${diag.total} · 끊긴 고리: <b>${diag.broken&&nodeOf(diag.broken)?nodeOf(diag.broken).label:"없음 🎉"}</b>`:"아직 진단 전"}</p><a class="btn sm ghost" href="#/diagnostic">진단</a></div>
       <div class="card"><h3>🏫 학교 시험 문제</h3><p>맞힘 체크 ${stNum}개</p><a class="btn sm ghost" href="#/schooltest">가기</a></div>
       <div class="card"><h3>✍️ 서술형 · 논술</h3><p>자기채점 ${ess}편 · 논술 ${ns}문제</p><a class="btn sm ghost" href="#/essay">가기</a></div>
+      <div class="card"><h3>🔥 공식 유도 공방</h3><p>되살리기 완료 ${Object.values(store.get("forge",{})).filter(r=>r.lv>=4).length}개 · 시작 ${Object.keys(store.get("forge",{})).length}개</p><a class="btn sm ghost" href="#/forge">가기</a></div>
       <div class="card"><h3>🧭 수능 패턴 · 🏅 올림피아드</h3><p>패턴 ${pat}개 체크 · 메달 ${oly}개</p><a class="btn sm ghost" href="#/patterns">가기</a></div>
     </div>
     <div class="row" style="margin-top:16px"><a class="btn ghost" href="#/setup">⚙️ 학기·이름·시험일 바꾸기</a><a class="btn ghost" href="#/intro">📖 사이트 소개 · $x^2-x-6=0$ 이야기</a><a class="btn ghost" href="#/notes">📒 오답 노트 · 기록 내보내기</a></div>`);
@@ -209,6 +258,7 @@
     <div class="grid">
       <a class="card link" href="#/patterns">${ico("1F9ED")}<h3>수능 패턴 도감</h3><p class="muted">10년간 해마다 나온 ${D.suneung.patterns.length}가지 구조 — 신호·첫 수·동형 문제 3단계 풀이, 패턴 알아맞히기.</p></a>
       <a class="card link" href="#/nonsul">${ico("1F393")}<h3>대학별 수리논술 · 의약학 논술</h3><p class="muted">연세·고려·성균관·한양·중앙 등 ${nonsulData().univs.length}개 대학(군)의 10년 출제 경향 + 연도별 주제 순환 동형 문제 ${nonsulData().univs.reduce((a,u)=>a+u.problems.length,0)}개 · 모범 답안 · 채점 루브릭 · 의·약학(과학·의학논술) 탭.</p></a>
+      <a class="card link" href="#/forge">${ico("1F525")}<h3>공식 유도 공방</h3><p class="muted">${(D.derivations||[]).length}개 공식을 조각 잇기 → 빈칸 → 왜 그 걸음 → 되살리기 4단계로. 함정 조각과 이유 고르기로 '순서 외우기' 를 막습니다.</p></a>
       <a class="card link" href="#/olympiad">${ico("1F3C5")}<h3>올림피아드 퀴즈</h3><p class="muted">KMO·KJMO·AMC 에서 되풀이되는 '생각의 기술' ${D.olympiad.items.length}문제 — 비둘기집·홀짝·색칠·보조선. 힌트 3단계, 메달 수집.</p></a>
       <a class="card link" href="#/schooltest">${ico("1F3EB")}<h3>학교 시험 필수 문제</h3><p class="muted">학년·학기별 중간·기말·학력평가에서 꼭 나오는 ${D.schoolExams.reduce((a,e)=>a+e.items.length,0)}문항과 서술형 풀이.</p></a>
       <a class="card link" href="#/daily">${ico("1F3C6")}<h3>하루 10분 코스</h3><p class="muted">암기 3장 → 섞어 풀기 6문제 → 이야기 1편. 연속 일수 도장.</p></a>
@@ -265,7 +315,7 @@
     ${l.pitfalls?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${l.points?`<h2 id="pt">🎯 출제 포인트</h2><ul class="pt">${l.points.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${widgets.length?`<h2>만져 보기</h2>${widgets.map(([k,w])=>`<div class="widget" id="w-${k}"><b>${MF(w.title)}</b><p class="muted">${MF(w.desc)}</p></div>`).join("")}`:""}
-    ${l.formulas.length?`<h2 id="f">이 단원의 공식</h2><div class="grid">${l.formulas.map(f=>byFormula(f)).filter(Boolean).map(f=>`<a class="card link" href="#/formulas/${f.id}"><h3>${f.title} ${f.core?'<span class="tag">외울 것</span>':'<span class="tag">되살릴 것</span>'}</h3><div class="formula">$${texCard(f.tex)}$</div></a>`).join("")}</div>`:""}
+    ${l.formulas.length?`<h2 id="f">이 단원의 공식</h2><div class="grid">${l.formulas.map(f=>byFormula(f)).filter(Boolean).map(f=>`<a class="card link" href="#/formulas/${f.id}"><h3>${f.title} ${f.core?'<span class="tag">외울 것</span>':'<span class="tag">되살릴 것</span>'}</h3><div class="formula">$${texCard(f.tex)}$</div>${forgeOf(f.id)?`<div class="muted small">🔥 유도 공방 ${forgeLv(f.id)}/4</div>`:""}</a>`).join("")}</div>`:""}
     <h2 id="ex">예제</h2><div class="card"><p><b>문제.</b> ${md(l.example.q)}</p><details class="sol"><summary>풀이 보기</summary><ol class="steps">${l.example.sol.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(l.example.ans)}</p></details></div>
     <h2 id="quiz">확인 퀴즈 <span class="muted" style="font-weight:400;font-size:.9rem">맞힌 ${mst.qc}/${mst.qn}</span></h2>${quizHtml(l.quiz,"lesson:"+l.id)}
     <div id="gen-box"></div><div class="row"><button class="btn ghost" id="gen-more">➕ 문제 추가 생성 (3문제 · 맞히면 목표율 +5%)</button><a class="btn ghost" href="#/practice/${l.id}">🎯 생성 문제 5개 모아 풀기</a></div>
@@ -339,6 +389,7 @@
     ${figOfFormula(f)}
     <h2>유도 (되살리기)</h2><ol class="steps">${f.derive.map(s=>`<li>${md(s)}</li>`).join("")}</ol>
     <div class="box ok"><b>한 줄 요령:</b> ${md(f.tip)}</div>
+    ${forgeOf(id)?`<div class="card"><h3>🔥 유도 공방 — 통과 ${forgeLv(id)}/4</h3><p class="muted">조각 잇기 → 빈칸 → 왜 그 걸음 → 되살리기. 2단계를 넘기면 소단원 목표율에 반영됩니다.</p><a class="btn sm" href="#/forge/${id}">시작 →</a></div>`:""}
     ${r?`<h2>기억 장치</h2><div class="card"><p>🧠 ${md(r.mnemonic)}</p><p class="muted">📜 ${md(r.story)}</p><a class="btn sm ghost" href="#/recall">암기 카드로 복습 →</a></div>`:""}
     ${ls.length?`<h2>쓰이는 소단원</h2><div class="row">${ls.map(l=>`<a class="btn sm ghost" href="#/study/${l.unit}/${l.id}">📘 ${l.title}</a>`).join("")}</div>`:""}
     <p style="margin-top:20px"><a href="#/roadmap/${f.node}">🗺 ${nodeOf(f.node).label} 의 자리 보기</a></p>`);
@@ -756,6 +807,7 @@
     if(r==="setup") return setup();
     if(r==="intro") return intro();
     if(r==="practice") return practice(p[1],qs);
+    if(r==="forge") return forge(p[1],qs);
     if(r==="study") return p[2]?lesson(p[1],p[2]):p[1]?unit(p[1]):study();
     if(r==="roadmap") return roadmap(p[1]);
     if(r==="formulas") return p[1]?formula(p[1]):formulas(qs);
