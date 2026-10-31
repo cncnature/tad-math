@@ -230,7 +230,7 @@
     ${(()=>{ const t=tokGet(); const cl=store.get("clinic",{}); const due=Object.entries(cl).filter(([id,c])=>c.done<3&&Date.now()>=c.next).length; const wk=store.get("weekly",[])[0]; const wkDue=!wk||Date.now()-wk.when>6*864e5; return `<div class="grid"><div class="card wallet"><div class="eyebrow">🎟 게임 시간 지갑</div><h3>${t.bal}분 <span class="muted" style="font-size:.85rem;font-weight:400">오늘 +${t.day.earn}분 · 누적 ${t.earned}분</span></h3><p class="muted">공부로 번 시간만큼 <b>🏰 일평제국</b>을 할 수 있습니다.</p><div class="row"><a class="btn sm" href="#/tokens">보내기 · 규칙</a></div></div>
       <div class="card"><div class="eyebrow">🏫 주간 테스트</div><h3>${wk?`${wk.score}/${wk.n} · ${wk.grade}등급`:"미응시"}</h3><p class="muted">${wkDue?"이번 주 테스트가 아직입니다 (10문항 · 15분)":"최근 "+new Date(wk.when).toLocaleDateString("ko")+" 응시"}</p><a class="btn sm ${wkDue?"":"ghost"}" href="#/weekly">${wkDue?"응시":"기록"}</a></div>
       <div class="card"><div class="eyebrow">🩺 오답 클리닉</div><h3>${due}건 풀 수 있음 <span class="muted" style="font-size:.85rem;font-weight:400">등록 ${Object.keys(cl).length}</span></h3><p class="muted">같은 유형 3문제 전부 정답 × 3회(당일·3일·7일)면 졸업</p><a class="btn sm ${due?"":"ghost"}" href="#/clinic">${due?"클리닉 풀기":"목록"}</a></div></div>`; })()}
-    <div class="grid acad"><a class="card link" href="#/schedule" style="border-color:var(--acc)"><h3>📅 일정 · 자동 스케줄</h3><p class="muted">${nx?`${esc(nx.name||EXAM_TYPES[nx.type])} D-${dday} · ${D.studyMethods.phases[todayTasks.phase]||todayTasks.mode}`:"시험 날짜를 넣으면 단계별 계획·컨설팅"} · 오늘 ${tdone}/${todayTasks.tasks.length}</p></a><a class="card link" href="#/survival"><h3>🔥 서바이벌 모의고사</h3><p class="muted">20/30문항 실전 시험지 · 등급컷 · 단원별 오답 리포트</p></a><a class="card link" href="#/types"><h3>🗂 유형 히트맵</h3><p class="muted">유형 코드별 정답/오답/미시도 한눈에</p></a><a class="card link" href="#/track"><h3>🛤 선행·심화 트랙</h3><p class="muted">선수 개념 70% 이상이면 다음 학기 열림 · 강점은 심화로</p></a><a class="card link" href="#/report"><h3>📄 학부모 주간 리포트</h3><p class="muted">학습일·정답률·목표율 변화·계획 (인쇄/PDF)</p></a></div>
+    <div class="grid acad"><a class="card link" href="#/advisor" style="border-color:#8a63d2"><h3>👩‍🏫 전담 AI 선생님</h3><p class="muted">${cohort(g).hakyeon}학년도 수능 D-${cohort(g).dd} · 학기 로드맵 · 꼭 알고 갈 것 · 자동 조사 게시판</p></a><a class="card link" href="#/schedule" style="border-color:var(--acc)"><h3>📅 일정 · 자동 스케줄</h3><p class="muted">${nx?`${esc(nx.name||EXAM_TYPES[nx.type])} D-${dday} · ${D.studyMethods.phases[todayTasks.phase]||todayTasks.mode}`:"시험 날짜를 넣으면 단계별 계획·컨설팅"} · 오늘 ${tdone}/${todayTasks.tasks.length}</p></a><a class="card link" href="#/survival"><h3>🔥 서바이벌 모의고사</h3><p class="muted">20/30문항 실전 시험지 · 등급컷 · 단원별 오답 리포트</p></a><a class="card link" href="#/types"><h3>🗂 유형 히트맵</h3><p class="muted">유형 코드별 정답/오답/미시도 한눈에</p></a><a class="card link" href="#/track"><h3>🛤 선행·심화 트랙</h3><p class="muted">선수 개념 70% 이상이면 다음 학기 열림 · 강점은 심화로</p></a><a class="card link" href="#/report"><h3>📄 학부모 주간 리포트</h3><p class="muted">학습일·정답률·목표율 변화·계획 (인쇄/PDF)</p></a></div>
     <h2>🧑‍🏫 학습 컨설팅 <span class="muted" style="font-weight:400;font-size:.9rem">— 지금 가장 효과가 큰 순서로</span></h2>
     <div class="grid wide">${advice.map(a=>`<div class="card adv p${a.pri}"><h3>${a.icon} ${a.title}</h3><p>${a.body}</p><a class="btn sm" href="${a.href}">${a.label} →</a></div>`).join("")}</div>
     <h2>📅 이번 주 계획 <span class="muted" style="font-weight:400;font-size:.9rem">— 약한 곳 우선 · 하루 20분 · 일요일은 섞어 풀기</span></h2>
@@ -460,6 +460,39 @@
     ["h-wd","h-we"].forEach(id=>$("#"+id).onchange=()=>{ S.hours={wd:+$("#h-wd").value||0,we:+$("#h-we").value||0}; save(); });
     main.querySelectorAll('.check input[data-k]').forEach(c=>c.onchange=()=>{ const d=store.get("schedDone",{}); if(c.checked){ d[c.dataset.k]=Date.now(); earnTok(2,"오늘 계획 완료"); } else delete d[c.dataset.k]; store.set("schedDone",d); });
   }
+
+  // ---------- 전담 AI 선생님 (교육과정 타임라인 · 수능 로드맵 · 자동 조사 게시판 · 종합 컨설팅) ----------
+  const schoolYear=()=>{ const d=new Date(); return d.getMonth()+1>=3?d.getFullYear():d.getFullYear()-1; };
+  const GRADE_YEAR={m11:1,m12:1,m21:2,g22:2,g31:3,g32:3,h11:4,h12:4,h2a:5,h2c:5,h2p:5,h3c:6,h3g:6};
+  function cohort(g){ const gy=GRADE_YEAR[g]||2; const sy=schoolYear(); const csatYear=sy+(6-gy); const hakyeon=csatYear+1; const date=(D.eduTimeline.csat||{})[String(hakyeon)]||`${csatYear}-11-20`; return {gy,sy,csatYear,hakyeon,date,dd:dayDiff(date)}; }
+  function advisor(qs){ const p=profile(); if(!p) return setup(); const ET=D.eduTimeline; const g=p.grade; const co=cohort(g); const M={}; lessonsAll.forEach(l=>M[l.id]=mastery(l)); const order=GORDER; const gi=order.indexOf(g);
+    const avgOf=code=>{ const ls=lessonsAll.filter(l=>l.grade===code); return ls.length?Math.round(ls.reduce((a,l)=>a+M[l.id].pct,0)/ls.length):null; };
+    const semYear=code=>{ const d=GRADE_YEAR[code]-co.gy; return co.sy+d; };
+    const phase=ET.phases.find(ph=>order.indexOf(ph.from)<=gi&&gi<=order.indexOf(ph.to));
+    const cur=ET.semesters[g]; const nextCode=order[gi+1]; const nxt=nextCode?ET.semesters[nextCode]:null;
+    const weakMust=lessonsAll.filter(l=>l.grade===g).sort((a,b)=>M[a.id].pct-M[b.id].pct).slice(0,3);
+    const adv=consult(p,M).slice(0,4); const sch=schedConsult(M).slice(0,2); const wk=store.get("weekly",[])[0]; const sv=store.get("survival",[])[0];
+    const bulletins=(D.advisory||[]).filter(b=>b.grade.includes("all")||b.grade.some(x=>order.indexOf(x)>=gi)).slice(0,8);
+    const lastUpd=(D.advisory||[]).map(b=>b.date).sort().pop()||ET.updated;
+    render(`<div class="crumb"><a href="#/me">내 학습</a> › 전담 AI 선생님</div><div class="me-head"><div><div class="eyebrow">👩‍🏫 전담 AI 선생님 · ${G[g]} · ${co.hakyeon}학년도 수능 대상</div><h1>${p.name?esc(p.name)+" 님의 ":""}진학 로드맵 컨설팅</h1><p class="muted">2022 개정 교육과정과 2028학년도 이후 통합수능 체제를 기준으로, 지금 학기부터 수능(${co.date})까지의 길을 학기별로 잡고 매주 자동 조사한 입시 정보를 반영합니다.</p></div><div class="ring" style="--p:${Math.max(0,Math.min(100,100-co.dd/((6-1)*365)*100))}"><b>D-${co.dd}</b><span>${co.hakyeon}학년도 수능</span></div></div>
+    <h2>🧭 지금 해야 할 것 <span class="muted small">— 선생님의 종합 판단</span></h2>
+    <div class="grid wide">
+      <div class="card adv p1"><h3>📍 현재 단계: ${phase?phase.name:"—"}</h3><p>${phase?phase.goal:""}</p><p class="muted small">KPI: ${phase?phase.kpi:""} · 현재 학기 목표율 평균 <b>${avgOf(g)}%</b>${wk?` · 주간 테스트 ${wk.grade}등급`:""}${sv?` · 서바이벌 ${sv.grade}등급`:""}</p></div>
+      ${cur?`<div class="card adv p2"><h3>📘 ${cur.name} 꼭 알고 갈 것</h3><ul class="bul">${cur.must.map(x=>`<li>${md(x)}</li>`).join("")}</ul><p class="muted small">가장 약한 소단원: ${weakMust.map(l=>`<a href="#/study/${l.unit}/${l.id}">${l.title}</a> ${M[l.id].pct}%`).join(" · ")}</p></div>`:""}
+      ${cur?`<div class="card adv p3"><h3>🏫 내신 출제 경향 · 교사 지도 방향</h3><ul class="bul">${cur.naesin.map(x=>`<li>${md(x)}</li>`).join("")}</ul><p class="muted small"><b>선생님들은:</b> ${cur.teacher.map(md).join(" / ")}</p></div>`:""}
+      ${adv.map(a=>`<div class="card adv p${a.pri}"><h3>${a.icon} ${a.title}</h3><p>${a.body}</p><a class="btn sm" href="${a.href}">${a.label} →</a></div>`).join("")}
+      ${sch.map(a=>`<div class="box ${a.cls}"><b>${a.icon} ${a.title}</b><br>${a.body}</div>`).join("")}
+    </div>
+    <h2>🗓 ${co.hakyeon}학년도 수능까지 학기별 타임라인</h2>
+    <div class="tl">${order.slice(Math.max(0,gi-1)).map((code,k)=>{ const sm=ET.semesters[code]; if(!sm) return ""; const st=code===g?"now":order.indexOf(code)<gi?"done":"todo"; const av=avgOf(code); return `<details class="tl-item ${st}" ${code===g||code===nextCode?"open":""}><summary><span class="tl-dot"></span><b>${sm.name}</b> <span class="muted small">${semYear(code)}년 · ${sm.subject}</span>${av!=null?` <span class="st ${st==="now"?"s2":st==="done"?"s4":"s0"}">${av}%</span>`:""}</summary><div class="tl-body"><p><b>꼭 알고 갈 것</b></p><ul class="bul">${sm.must.map(x=>`<li>${md(x)}</li>`).join("")}</ul><p><b>내신 경향</b></p><ul class="bul">${sm.naesin.map(x=>`<li>${md(x)}</li>`).join("")}</ul><p class="muted small">→ ${esc(sm.next)}</p>${st!=="done"?`<a class="btn sm ghost" href="#/me?g=${code}">${st==="now"?"이 학기 대시보드":"미리 보기(선행)"}</a>`:""}</div></details>`; }).join("")}
+      <div class="tl-item csat"><span class="tl-dot"></span><b>🎯 ${co.hakyeon}학년도 수능 — ${co.date}</b> <span class="muted small">수학 공통: 대수·미적분Ⅰ·확률과 통계</span></div></div>
+    <h2>📌 입시·교육과정 체제 (2022 개정 · 2028학년도 이후)</h2>
+    <div class="grid">${[["📖 교육과정",ET.system.curriculum],["🎯 수능",ET.system.csat],["🏫 내신",ET.system.naesin],["🎓 고교학점제",ET.system.credit]].map(([h,t])=>`<div class="card"><h3>${h}</h3><p>${md(t)}</p></div>`).join("")}</div>
+    <div class="card"><h3>수학 교과 변화(2022 개정)</h3><ul class="bul">${ET.system.mathChanges.map(x=>`<li>${md(x)}</li>`).join("")}</ul><h3>연간 시험 일정</h3><ul class="bul">${ET.system.schedule.map(x=>`<li>${md(x)}</li>`).join("")}</ul></div>
+    <h2>📰 자동 조사 게시판 <span class="muted small">— 마지막 갱신 ${lastUpd} · 매주 월요일 아침 AI 가 입시·교육과정·내신 경향을 검색해 갱신</span></h2>
+    <div class="grid wide">${bulletins.map(b=>`<div class="card"><div class="row" style="justify-content:space-between"><span class="tag">${esc(b.tag)}</span><span class="muted small">${b.date}</span></div><h3>${esc(b.title)}</h3><p>${md(b.body)}</p><p class="muted small">출처: ${b.src.map(([t,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`).join(" · ")}</p>${b.action?`<a class="btn sm ghost" href="${b.action.href}">${esc(b.action.label)} →</a>`:""}</div>`).join("")}</div>
+    <div class="box"><b>이 선생님이 하는 일</b> — ① 매주 월요일 입시·교육과정·내신 경향을 검색해 게시판 갱신 ② 조사 결과로 학기 로드맵(꼭 알고 갈 것·내신 경향)을 수정 ③ 사이트 데이터 오류·약점을 찾으면 코드를 고쳐 배포 ④ 이 화면의 컨설팅은 접속할 때마다 내 기록(목표율·정답률·테스트·클리닉·일정)으로 다시 계산. 사람이 해야 할 것은 학기 선택과 시험 날짜 등록뿐입니다.</div>
+    <div class="row" style="margin-top:12px"><a class="btn" href="#/schedule">📅 일정·스케줄</a><a class="btn ghost" href="#/track">🛤 선행·심화 트랙</a><a class="btn ghost" href="#/report">📄 주간 리포트</a></div>`); }
 
   // ---------- 홈 ----------
   function home(){ return profile()?me():setup(); }
@@ -1068,6 +1101,7 @@
     if(r==="track") return track();
     if(r==="report") return report();
     if(r==="schedule") return schedule(qs);
+    if(r==="advisor") return advisor(qs);
     if(r==="study") return p[2]?lesson(p[1],p[2]):p[1]?unit(p[1]):study();
     if(r==="roadmap") return roadmap(p[1]);
     if(r==="formulas") return p[1]?formula(p[1]):formulas(qs);

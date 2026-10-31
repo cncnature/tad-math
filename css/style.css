@@ -429,3 +429,11 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 .cal-d .pl{margin-top:2px;font-size:.66rem}
 @media(max-width:640px){.cal-d{min-height:48px;font-size:.62rem}.cal-d .pl{display:none}}
 .install-row{margin:6px 0}
+
+/* 전담 선생님 타임라인 */
+.tl{border-left:3px solid var(--line);margin:8px 0 16px 10px;padding-left:16px}
+.tl-item{position:relative;margin:8px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.tl-item summary{cursor:pointer;list-style:none}.tl-item summary::-webkit-details-marker{display:none}
+.tl-dot{position:absolute;left:-26px;top:14px;width:12px;height:12px;border-radius:50%;background:var(--line);border:2px solid var(--bg)}
+.tl-item.now{border-color:var(--acc)}.tl-item.now .tl-dot{background:var(--acc)}.tl-item.done .tl-dot{background:var(--ok)}.tl-item.csat{border-color:var(--bad)}.tl-item.csat .tl-dot{background:var(--bad)}
+.tl-body{margin-top:8px;font-size:.92rem}
