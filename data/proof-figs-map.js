@@ -1,0 +1,6 @@
+// 증명·유도 도형 매핑: 서술형(essay id) · 유도 공방(formula id) → js/proof-figs.js 의 FIG 이름 + 단계 수
+window.DATA = window.DATA || {};
+window.DATA.proofFigs = {
+ essay:{ "e-isosceles":["pfIsosceles",4],"e-circum":["pfCircum",4],"e-parallelogram":["pfParallelogram",4],"e-midseg":["pfMidseg",3],"e-pyth":["pfPyth",4],"e-trig-area":["pfSineArea",3],"e-inscribed":["pfInscribed",3],"e-tangent":["pfTangent",3],"e-cyclic":["pfCyclic",3],"e-angle-sum":["pfAngleSum",4],"e-arith-sum":["pfArithSum",3],"e-deriv-power":["pfSecant",3],"e-dot-cos":["pfDot",3] },
+ formula:{ "triangle-angle-sum":["pfAngleSum",4],"isosceles-properties":["pfIsosceles",4],"pythagoras":["pfPyth",4],"midsegment-theorem":["pfMidseg",3],"centroid-ratio":["pfMidseg",3,{centroid:true}],"trapezoid-area":["pfTrapezoid",3],"difference-of-squares":["pfDiffSquares",4],"trig-identity":["pfTrigId",3],"triangle-area-sine":["pfSineArea",3],"inscribed-angle":["pfInscribed",3],"chord-length":["pfChord",3],"arithmetic-sum":["pfArithSum",3],"derivative-power":["pfSecant",3],"vector-dot":["pfDot",3],"parabola-equation":["pfParabola",3],"ellipse-equation":["pfEllipse",3],"solid-of-revolution":["pfRevolve",3],"space-distance":["pfSpaceDist",2],"distance-two-points":["rightTri",0,{a:"|x₂−x₁|",b:"|y₂−y₁|",c:"AB"}],"cosine-law":["pfSineArea",0],"circumcenter":["pfCircum",4] }
+};

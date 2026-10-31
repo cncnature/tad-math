@@ -21,7 +21,12 @@
 - STUDYGOD 에 `/api/import/tad` (POST JSON) 추가: `qlog` → `studentanswer`(question_id 는 `tad:lesson:idx` 가상 id), `srs` → `reviewcard`(FSRS 초기화), `diag.broken` → `weakprofile`. 역방향 `/api/export/tad` 로 STUDYGOD 의 복습 due·약점 개념을 TAD 가 읽을 수 있는 JSON 생성.
 - 효과: STUDYGOD 의 **시험 분석·학습 가이드·AI 튜터**가 TAD 에서 쌓인 수학 기록을 보고 코칭.
 
-### 2단계 (2~3주) — 로컬 AI 튜터를 TAD 안에 끼워 넣기
+### 2단계 — 로컬 AI 튜터·첨삭 (✓ 2026-10-31 구현)
+- `integrations/studygod_tad.py` 를 STUDYGOD 폴더에 복사하고 app.py 끝에 `from studygod_tad import register_tad; register_tad(app, ollama_generate, OLLAMA_MODEL)` 두 줄. CORS 는 github.io·localhost 만 허용.
+- 엔드포인트: `/api/tad/ping`, `/review`(서술형·논술 첨삭: 루브릭별 ✅⚠️❌ + 다음 한 걸음 + 예상 점수), `/why`(오답 설명: 오개념 유형 분류), `/chat`(소단원 범위 튜터), `/import`·`/export`(기록 교환).
+- TAD 는 로드 시 1.5초 핑 → 성공 시에만 🤖 패널 표시(소단원 AI 튜터, 서술형·논술 AI 첨삭, 틀린 퀴즈 '왜 틀렸을까?'). 주소는 학기 설정 화면에서 변경.
+
+(원래 계획)
 - STUDYGOD `app.py` 에 CORS(`flask-cors`, origin `https://cncnature.github.io`) 를 켜고 `/api/chat`, `/api/generate`, `/api/faded/<id>`, `/api/coaching` 을 그대로 노출.
 - TAD `js/app.js` 에 `window.LOCAL_AI` 탐지: 페이지 로드 시 `http://localhost:5100/api/dashboard` 를 1초 타임아웃으로 ping → 성공하면 소단원 페이지에 **"🤖 AI 튜터에게 묻기"** 패널, 틀린 문제 옆 **"왜 틀렸는지 설명"**, 대시보드 컨설팅에 LLM 코칭 문단 추가. 실패하면 조용히 숨김(공개 사이트는 그대로 동작).
 - 프롬프트는 TAD 데이터(소단원 concept·why·pitfalls·사용자 정답률)를 컨텍스트로 넘겨 **교과 범위 안에서만** 답하게 함. 모델은 현재 `exaone3.5:2.4b` → 수학 설명력은 `qwen3:8b`/`gemma3:12b` 권장(12GB VRAM 기준).
@@ -52,7 +57,7 @@ Firebase 를 쓰는 사용자는 TAD 가 이미 `users/<uid>/data` 에 같은 �
 | 서바이벌 모의고사(시대인재) | 수능 전 범위 100분 실전, 상위권 변별 | ✓ `#/survival`: 학교 시험 116(5지선다) + 개념 퀴즈 + 생성 문제, **20문항 60분 / 30문항 100분**, OMR 답안 칸, 배점 100점 환산, 등급컷 추정, 단원별 오답 리포트, 클리닉 자동 등록 |
 | 데일리 테스트/숙제 검사 | 매일 소량, 미제출 추적 | ✓ 하루 10분 코스 · 주간 계획 · ○ 미완료 시 보호자 알림(이메일/카카오 — Firebase Functions) |
 | 유형서(쎈·블랙라벨 식 유형 분류) | 유형 번호별 반복 | ✓ 수능 패턴 도감 · ✓ 모든 소단원 퀴즈에 **유형 코드**(U8-01-Q3) · ✓ `#/types` 유형 히트맵(첫 시도 결과·누적 정답률·생성 정답률·클리닉 상태) |
-| 첨삭·서술형 클리닉 | 풀이 과정 채점 | ✓ 논술·서술형 루브릭 자기채점 · ○ 2단계 로컬 LLM 첨삭 |
+| 첨삭·서술형 클리닉 | 풀이 과정 채점 | ✓ 논술·서술형 루브릭 자기채점 · ✓ 로컬 LLM 첨삭(STUDYGOD 연동) · ✓ 증명 도형 21종(단계별 강조) |
 | 학부모 리포트 | 주간 출석·점수·코멘트 | ✓ `#/report` 인쇄/PDF — 학습일·푼 문제·정답률·목표율 7일 변화(스냅샷)·주간/서바이벌·클리닉·유도 공방·게임 시간 획득/사용·약점·컨설팅·다음 주 계획 |
 | 선행 로드맵 | 학년 상관없이 개념 선후로 진도 | ✓ `#/track` 선행 트랙(다음 학기 소단원, 선수 소단원 목표율 70% 미만이면 🔒 + 막는 선수 개념 표시) · 심화 트랙(목표 달성·정답률 80%↑ 소단원 → 패턴·올림피아드·서술형·논술 연결) |
 

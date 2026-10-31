@@ -412,3 +412,12 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 .card.locked{opacity:.75;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(0,0,0,.02) 10px,rgba(0,0,0,.02) 20px)}
 .grid.acad .card h3{margin:0 0 4px;font-size:1rem}.grid.acad .card p{margin:0}
 @media print{.topbar,.foot,.noprint,#tok-toast{display:none!important}.main{padding:0}.report .card,.report .day{break-inside:avoid}body{background:#fff}}
+
+/* 증명 도형 */
+.pf-steps li{cursor:pointer;border-left:3px solid transparent;padding-left:8px}.pf-steps li.on{border-left-color:var(--acc);background:rgba(59,110,245,.06)}
+.forge-fig{max-width:420px;margin:10px auto 0}
+#pf-box,#pf-box2{min-width:280px}
+
+/* 로컬 AI */
+.ai-panel,.ai-why{display:none}html.ai-on .ai-panel{display:block;border-color:#8a63d2;background:linear-gradient(135deg,rgba(138,99,210,.08),transparent)}html.ai-on .ai-why{display:inline-block;margin-top:8px}
+.ai-in{width:100%;box-sizing:border-box;margin:8px 0}.ai-out{margin:8px 0;line-height:1.55}
