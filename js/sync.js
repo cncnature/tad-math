@@ -17,7 +17,7 @@
   // 학급 공유용 요약 (상세 기록은 올리지 않음)
   function summary(){ const g=k=>{ try{ return JSON.parse(localStorage.getItem("imm:"+k)); }catch(e){ return null; } };
     const quiz=g("quiz")||{}; const qk=Object.keys(quiz); const diag=(g("diag")||[])[0]; const mix=(g("mix")||[])[0]; const notes=g("notes")||[]; const daily=g("daily")||{};
-    return { id:idOf(user), updated:Date.now(), diagScore:diag?`${diag.score}/${diag.total}`:null, broken:diag?diag.broken:null, quizN:qk.length, quizPct:qk.length?Math.round(100*qk.filter(k=>quiz[k]).length/qk.length):null, mix:mix?`${mix.score}/${mix.n}`:null, notes:notes.length, dailyDays:Object.keys(daily).length }; }
+    return { id:idOf(user), updated:Date.now(), diagScore:diag?`${diag.score}/${diag.total}`:null, broken:diag?diag.broken:null, quizN:qk.length, quizPct:qk.length?Math.round(100*qk.filter(k=>quiz[k]).length/qk.length):null, mix:mix?`${mix.score}/${mix.n}`:null, notes:notes.length, dailyDays:Object.keys(daily).length, mastery:(()=>{ const sn=g("snap")||{}; const ks=Object.keys(sn).sort(); return ks.length?sn[ks[ks.length-1]]:null; })(), weekly:(()=>{ const w=(g("weekly")||[])[0]; return w?`${w.score}/${w.n}·${w.grade}등급`:null; })(), survival:(()=>{ const v=(g("survival")||[])[0]; return v?`${v.score}점·${v.grade}등급`:null; })(), grade:(g("me")||{}).grade||null }; }
   // 아이디 → Firebase 이메일, 짧은 비밀번호 → 6자 이상으로 보정
   const emailOf = id=>`${id.trim().toLowerCase().replace(/[^a-z0-9._-]/g,"")}@tad-math.user`;
   const pwOf = pw=>pw+"·tad-math·2026";
