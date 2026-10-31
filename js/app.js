@@ -74,11 +74,23 @@
     const ok = Number(b.dataset.j)===Number(q.dataset.a);
     b.classList.add(ok?"ok":"bad"); q.querySelector(`.opts button[data-j="${q.dataset.a}"]`).classList.add("ok");
     q.querySelector(".exp").hidden=false;
-    if(!q.dataset.key.startsWith("gen:")){ const prog = store.get("quiz",{}); prog[q.dataset.key+"#"+q.dataset.i]=ok; store.set("quiz",prog); }
+    if(!q.dataset.key.startsWith("gen:")){ const prog = store.get("quiz",{}); const first=!(q.dataset.key+"#"+q.dataset.i in prog); prog[q.dataset.key+"#"+q.dataset.i]=ok; store.set("quiz",prog); if(ok&&first&&q.dataset.key.startsWith("lesson:")){ earnTok(2,"퀴즈 정답"); const l=byLesson(q.dataset.key.slice(7)); if(l){ const m=mastery(l); const dn=store.get("tokDone",{}); if(m.pct>=100&&!dn[l.id]){ dn[l.id]=1; store.set("tokDone",dn); earnTok(10,l.title+" 목표 달성"); } } } }
+    else if(ok) earnTok(1,"생성 문제 정답",{genCap:true});
     logQ(q.dataset.key,q.dataset.i,ok);
     if(q.dataset.key.startsWith("gen:")){ const l=byLesson(q.dataset.key.slice(4)); const m=l?mastery(l):null; const fb=q.querySelector(".exp"); if(m&&fb) fb.insertAdjacentHTML("afterend",`<p class="muted small">${ok?"✅ 목표율 +5% → ":"목표율 "}<b>${m.pct}%</b></p>`); }
     if(!ok){ const notes=store.get("notes",[]); const text=q.dataset.q; notes.unshift({key:q.dataset.key,i:q.dataset.i,q:text,when:Date.now()}); store.set("notes",notes.slice(0,200)); }
   });
+
+  // ---------- 게임 토큰(학습 시간 → 일평제국 플레이 시간) ----------
+  const GAME_URL="https://cncnature.github.io/onepyeong-empire/";
+  const TOK_SECRET="TAD2026-onepyeong";
+  const fnv=str=>{ let h=0x811c9dc5; for(const ch of str){ h^=ch.charCodeAt(0); h=Math.imul(h,0x01000193)>>>0; } return h.toString(36); };
+  const tokGet=()=>{ const t=store.get("tok",{bal:0,earned:0,spent:0,day:{},log:[]}); const d=todayKey(); if(t.day.date!==d) t.day={date:d,earn:0,gen:0}; return t; };
+  function earnTok(min,why,opt={}){ const t=tokGet(); if(opt.genCap){ if(t.day.gen>=15) return 0; t.day.gen+=min; } if(t.day.earn>=120) return 0; min=Math.min(min,120-t.day.earn); if(min<=0) return 0;
+    t.bal+=min; t.earned+=min; t.day.earn+=min; t.log.unshift({m:min,w:why,t:Date.now()}); t.log=t.log.slice(0,100); store.set("tok",t);
+    let el=document.getElementById("tok-toast"); if(!el){ el=document.createElement("div"); el.id="tok-toast"; document.body.appendChild(el); } el.textContent=`🎟 게임 시간 +${min}분 · ${why} (잔액 ${t.bal}분)`; el.classList.add("on"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("on"),2600); return min; }
+  function tokCode(min){ const t=tokGet(); if(min<=0||min>t.bal) return null; const n=Math.random().toString(36).slice(2,10); const ts=Date.now(); const s=fnv(`${min}|${ts}|${n}|${TOK_SECRET}`); t.bal-=min; t.spent+=min; t.log.unshift({m:-min,w:"일평제국으로 전송",t:ts}); store.set("tok",t); return btoa(JSON.stringify({m:min,t:ts,n,s})).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+  const TOK_RULES=[["소단원 퀴즈 첫 정답","+2분"],["생성 문제 정답","+1분 (하루 15분까지)"],["소단원 목표율 100% 달성","+10분"],["유도 공방 단계 통과","+3분 (되살리기 +8분)"],["공식 카드 복습(기억남)","+1분"],["진단 완료","+5분"],["하루 10분 코스 완료","+10분"],["주간 테스트","정답당 +1분, 1등급 +5분"],["오답 클리닉 졸업","+5분"],["올림피아드 정답 · 논술 합격권","+5분"],["하루 상한","120분"]];
 
   // ---------- 공식 유도 공방 (조각 잇기 → 빈칸 → 왜 그 걸음 → 되살리기) ----------
   const forgeOf=f=>(D.derivations||[]).find(d=>d.f===f);
@@ -97,7 +109,7 @@
     const d=F.find(x=>x.f===fid); if(!d) return notFound(); const lv=Math.min(4,Math.max(1,+(pr.get("lv")||Math.min(4,forgeLv(fid)+1)))); const fm=d.fm; const steps=d.steps.map((st,i)=>({...st,idx:i})); const ls=lessonsAll.filter(l=>l.formulas.includes(fid));
     const head=`<div class="lhead ${GCOL(fm.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/forge?g=${fm.grade}">공식 유도 공방</a> › ${fm.title}</div>${tag(fm.grade)} <span class="tag">${FLV[lv]}</span> <span class="tag">통과한 단계 ${forgeLv(fid)}/4</span><h1>${fm.title}</h1><div class="formula" style="font-size:1.3rem">$$${texCard(fm.tex)}$$</div><p class="muted">${FLV_DESC[lv]}</p></div>
       <div class="pill-row">${[1,2,3,4].map(i=>`<a class="pill ${i===lv?"on":""} ${i>forgeLv(fid)+1?"locked":""}" href="#/forge/${fid}?lv=${i}">${FLV[i]}${i<=forgeLv(fid)?" ✓":""}</a>`).join("")}</div>`;
-    function pass(ok,stars,detail){ const rec=store.get("forge",{}); const prev=rec[fid]||{lv:0}; if(ok) rec[fid]={lv:Math.max(prev.lv,lv),when:Date.now(),stars:Math.max(prev.stars||0,stars||0)}; store.set("forge",rec); logQ("forge:"+fid,lv,ok);
+    function pass(ok,stars,detail){ const rec=store.get("forge",{}); const prev=rec[fid]||{lv:0}; if(ok){ if(lv>prev.lv) earnTok(lv===4?8:3,`유도 공방 ${FLV[lv]} 통과`); rec[fid]={lv:Math.max(prev.lv,lv),when:Date.now(),stars:Math.max(prev.stars||0,stars||0)}; } store.set("forge",rec); logQ("forge:"+fid,lv,ok);
       return `<div class="box ${ok?"ok":"warn"}"><b>${ok?`🎉 ${FLV[lv]} 통과! ${"★".repeat(stars||1)}`:"아직 통과 못 했어요"}</b> — ${detail}</div><div class="row" style="margin-top:10px">${ok&&lv<4?`<a class="btn" href="#/forge/${fid}?lv=${lv+1}">다음 단계: ${FLV[lv+1]} →</a>`:ok?`<a class="btn" href="#/forge/daily">🔥 다른 공식 되살리기</a>`:`<a class="btn" href="#/forge/${fid}?lv=${lv}" onclick="setTimeout(()=>location.reload(),0)">다시</a>`}<a class="btn ghost" href="#/formulas/${fid}">📐 유도 전체 보기</a>${ls[0]?`<a class="btn ghost" href="#/study/${ls[0].unit}/${ls[0].id}">📘 ${ls[0].title}</a>`:""}<a class="btn ghost" href="#/forge?g=${fm.grade}">목록</a></div>`; }
     if(lv===1){ // 조각 잇기
       const pieces=shuffle([...steps.map(st=>({kind:"s",idx:st.idx,t:st.t,why:st.why})),...d.traps.map((t,i)=>({kind:"t",idx:-1-i,t:t.t,why:t.why}))]); let k=0, moves=0, dead=new Set(); const placed=[];
@@ -158,6 +170,7 @@
     const next=ls.find(l=>M[l.id].pct<100);
     if(next) out.push({pri:3,icon:"▶️",title:`다음 할 일: ${next.title}`,body:`${byUnit(next.unit).title} · 목표율 ${M[next.id].pct}% — ${M[next.id].visited?"퀴즈 5문항을 끝내고 공식 카드까지 넘기면 목표 달성":"핵심 개념 → 왜 그런지 → 퀴즈 순으로 20분"}.`,href:`#/study/${next.unit}/${next.id}`,label:"학습"});
     else out.push({pri:3,icon:"🏁",title:`${G[g]} 목표율 100% 달성`,body:"생성 문제로 150% 까지 올리거나, 다음 학기·수능 패턴 도감·서술형으로 확장하세요.",href:"#/patterns",label:"수능 패턴"});
+    { const cl=store.get("clinic",{}); const due=Object.entries(cl).filter(([id,c])=>c.done<3&&Date.now()>=c.next&&byLesson(id)); if(due.length) out.push({pri:2,icon:"🩺",title:`오답 클리닉 ${due.length}건 — 오늘 풀 차례`,body:`${due.slice(0,3).map(([id])=>byLesson(id).title).join(", ")}. 틀린 유형은 '다시 맞힐 때까지' 가 아니라 '3번 연속 맞힐 때까지' 가 기준입니다.`,href:"#/clinic/"+due[0][0],label:"클리닉 풀기"}); const wk=store.get("weekly",[])[0]; if(!wk||Date.now()-wk.when>6*864e5) out.push({pri:3,icon:"🏫",title:"이번 주 주간 테스트",body:"10문항 15분. 약한 소단원 우선 출제, 틀린 곳은 클리닉으로 자동 등록됩니다.",href:"#/weekly",label:"응시"}); }
     const fgLeft=ls.flatMap(l=>l.formulas).filter((f,i,a)=>a.indexOf(f)===i&&forgeOf(f)&&forgeLv(f)<2); if(fgLeft.length) out.push({pri:3,icon:"🔥",title:`유도 공방: 이 학기 공식 ${fgLeft.length}개가 아직 2단계 미만`,body:`${fgLeft.slice(0,3).map(f=>byFormula(f).title).join(", ")} — 외우지 말고 조각 잇기 → 빈칸 → 이유 → 되살리기로. 2단계를 넘기면 목표율의 '공식' 항목이 채워집니다.`,href:`#/forge/${fgLeft[0]}`,label:"유도 공방"});
     const due=srsDue().filter(r=>ls.some(l=>l.formulas.includes(r.f))); if(due.length) out.push({pri:3,icon:"🧠",title:`오늘 복습할 공식 ${due.length}개`,body:"간격 반복: 오늘 넘기면 내일은 두 배로 쌓입니다. 3분이면 됩니다.",href:"#/recall/run",label:"복습"});
     const tags=store.get("notetags",{}); const cnt={}; Object.values(tags).forEach(t=>{ if(t) cnt[t]=(cnt[t]||0)+1; }); const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0]; const tot=Object.values(cnt).reduce((a,b)=>a+b,0);
@@ -196,6 +209,9 @@
     render(`<div class="me-head"><div><div class="eyebrow">내 학습 · ${G[g]}${dday!=null?` · 시험 D${dday>=0?"-"+dday:"+"+(-dday)}`:""}</div><h1>${p.name?esc(p.name)+" 님의 ":""}개인 학습 대시보드</h1><p class="muted">목표율 = 퀴즈 60 · 개념 읽기 10 · 공식 카드 15 · 시험/서술형 15. 생성 문제를 맞힐 때마다 +5% (최대 150%).</p></div><div class="ring" style="--p:${Math.min(100,overall)}"><b>${overall}%</b><span>학기 목표율</span></div></div>
     <div class="pill-row">${GORDER.map(x=>`<a class="pill ${x===g?"on":""}" href="#/me?g=${x}">${G[x]}</a>`).join("")}</div>
     <div class="stats me-stats"><div><b>${days.streak}</b>연속 학습일</div><div><b>${days.total}</b>총 학습일</div><div><b>${L.length}</b>푼 문제</div><div><b>${acc7!=null?acc7+"%":"—"}</b>최근 7일 정답률</div><div><b>${gen}</b>생성 문제</div><div><b>${ls.filter(l=>M[l.id].pct>=100).length}/${ls.length}</b>목표 달성 소단원</div></div>
+    ${(()=>{ const t=tokGet(); const cl=store.get("clinic",{}); const due=Object.entries(cl).filter(([id,c])=>c.done<3&&Date.now()>=c.next).length; const wk=store.get("weekly",[])[0]; const wkDue=!wk||Date.now()-wk.when>6*864e5; return `<div class="grid"><div class="card wallet"><div class="eyebrow">🎟 게임 시간 지갑</div><h3>${t.bal}분 <span class="muted" style="font-size:.85rem;font-weight:400">오늘 +${t.day.earn}분 · 누적 ${t.earned}분</span></h3><p class="muted">공부로 번 시간만큼 <b>🏰 일평제국</b>을 할 수 있습니다.</p><div class="row"><a class="btn sm" href="#/tokens">보내기 · 규칙</a></div></div>
+      <div class="card"><div class="eyebrow">🏫 주간 테스트</div><h3>${wk?`${wk.score}/${wk.n} · ${wk.grade}등급`:"미응시"}</h3><p class="muted">${wkDue?"이번 주 테스트가 아직입니다 (10문항 · 15분)":"최근 "+new Date(wk.when).toLocaleDateString("ko")+" 응시"}</p><a class="btn sm ${wkDue?"":"ghost"}" href="#/weekly">${wkDue?"응시":"기록"}</a></div>
+      <div class="card"><div class="eyebrow">🩺 오답 클리닉</div><h3>${due}건 풀 수 있음 <span class="muted" style="font-size:.85rem;font-weight:400">등록 ${Object.keys(cl).length}</span></h3><p class="muted">같은 유형 3문제 전부 정답 × 3회(당일·3일·7일)면 졸업</p><a class="btn sm ${due?"":"ghost"}" href="#/clinic">${due?"클리닉 풀기":"목록"}</a></div></div>`; })()}
     <h2>🧑‍🏫 학습 컨설팅 <span class="muted" style="font-weight:400;font-size:.9rem">— 지금 가장 효과가 큰 순서로</span></h2>
     <div class="grid wide">${advice.map(a=>`<div class="card adv p${a.pri}"><h3>${a.icon} ${a.title}</h3><p>${a.body}</p><a class="btn sm" href="${a.href}">${a.label} →</a></div>`).join("")}</div>
     <h2>📅 이번 주 계획 <span class="muted" style="font-weight:400;font-size:.9rem">— 약한 곳 우선 · 하루 20분 · 일요일은 섞어 풀기</span></h2>
@@ -217,6 +233,67 @@
     ${items.length?quizHtml(items,"gen:"+l.id,Date.now()):'<div class="box warn">이 소단원은 아직 생성기가 없습니다.</div>'}
     <div class="row" style="margin-top:14px"><a class="btn" href="#/practice/${l.id}?n=${n}" onclick="setTimeout(()=>location.reload(),0)">➕ ${n}문제 더</a><a class="btn ghost" href="#/practice/${l.id}?n=10" onclick="setTimeout(()=>location.reload(),0)">10문제</a><a class="btn ghost" href="#/study/${l.unit}/${l.id}">📘 소단원</a><a class="btn ghost" href="#/me">🏠 대시보드</a></div>`); }
 
+  // ---------- 주간 테스트 (학원식 정기 평가) · 오답 클리닉 (3회 통과제) ----------
+  function weeklyBuild(g){ const ls=lessonsAll.filter(l=>l.grade===g); const prog=store.get("quiz",{}); const M={}; ls.forEach(l=>M[l.id]=mastery(l));
+    const order=[...ls].sort((a,b)=>(M[a.id].pct-M[b.id].pct)||Math.random()-.5); const picked=[]; const used=new Set();
+    for(const l of order){ if(picked.length>=10) break; if(used.has(l.unit)&&order.length>10&&Math.random()<.5) continue; used.add(l.unit);
+      const fresh=l.quiz.map((q,i)=>({q,i})).filter(x=>prog["lesson:"+l.id+"#"+x.i]!==true); let item=null;
+      if(fresh.length&&Math.random()<.5){ const x=fresh[rnd(0,fresh.length-1)]; item={l,q:x.q,key:"lesson:"+l.id,i:x.i}; } else { const gq=window.GEN?window.GEN.make(l.id,l.node,1)[0]:null; if(gq) item={l,q:gq,key:"gen:"+l.id,i:"w"+Date.now()+picked.length}; else if(fresh.length){ const x=fresh[0]; item={l,q:x.q,key:"lesson:"+l.id,i:x.i}; } }
+      if(item) picked.push(item); }
+    while(picked.length<10&&ls.length){ const l=ls[rnd(0,ls.length-1)]; const gq=window.GEN?window.GEN.make(l.id,l.node,1)[0]:null; if(gq) picked.push({l,q:gq,key:"gen:"+l.id,i:"w"+Date.now()+picked.length}); else break; }
+    return picked; }
+  const GRADE_OF=p=>p>=90?1:p>=80?2:p>=70?3:p>=60?4:p>=50?5:p>=40?6:p>=30?7:p>=20?8:9;
+  function weekly(qs){ const p=profile(); if(!p) return setup(); const g=p.grade; const hist=store.get("weekly",[]); const pr=new URLSearchParams(qs||"");
+    if(pr.get("start")!=="1"){ const last=hist[0]; return render(`<div class="crumb"><a href="#/me">내 학습</a> › 주간 테스트</div><h1>🏫 주간 테스트 <span class="muted" style="font-size:1rem">${G[g]}</span></h1>
+      <p class="lead">대치동 학원의 '주간 정기 테스트' 방식입니다. 목표율이 낮은 소단원부터 <b>10문항</b>(기존 퀴즈 + 자동 생성 혼합), <b>15분 제한</b>, 제출 후 즉시 채점·추정 등급. 틀린 소단원은 자동으로 <b>오답 클리닉</b>에 들어가 3회 통과(당일·3일·7일)해야 졸업합니다.</p>
+      <div class="stats"><div><b>${hist.length}</b>응시</div><div><b>${last?last.score+"/"+last.n:"—"}</b>최근 점수</div><div><b>${last?last.grade+"등급":"—"}</b>최근 추정 등급</div><div><b>${hist.length?Math.round(hist.slice(0,4).reduce((a,h)=>a+h.score/h.n,0)/Math.min(4,hist.length)*100):"—"}${hist.length?"%":""}</b>최근 4회 평균</div></div>
+      <div class="row"><a class="btn" href="#/weekly?start=1">▶ 테스트 시작 (15분)</a><a class="btn ghost" href="#/clinic">🩺 오답 클리닉</a></div>
+      ${hist.length?`<h2>기록</h2><table><tr><th>날짜</th><th>점수</th><th>추정 등급</th><th>틀린 소단원</th></tr>${hist.slice(0,12).map(h=>`<tr><td>${new Date(h.when).toLocaleDateString("ko")}</td><td>${h.score}/${h.n}</td><td>${h.grade}</td><td>${(h.wrong||[]).map(id=>byLesson(id)?byLesson(id).title:id).join(", ")||"없음"}</td></tr>`).join("")}</table>`:""}
+      <div class="box"><b>추정 등급</b>은 정답률 구간(90%↑ 1등급 … 50%↑ 5등급)으로 환산한 참고값입니다. 실제 등급은 응시 집단에 따라 다릅니다.</div>`); }
+    const items=weeklyBuild(g); if(!items.length) return render(`<p>문항을 만들 수 없습니다.</p>`); let left=900, done=false; const ans={}; const t0=Date.now();
+    render(`<div class="crumb"><a href="#/weekly">주간 테스트</a> › 응시 중</div><div class="row" style="justify-content:space-between;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:2"><b>🏫 ${G[g]} 주간 테스트 · 10문항</b><b id="wk-timer">15:00</b></div>
+      ${items.map((it,k)=>`<div class="quiz wk" data-k="${k}"><span class="qn">${k+1}</span> <span class="tag">${it.l.title}</span><br>${md(it.q.q)}<div class="opts">${it.q.opts.map((o,j)=>`<button data-j="${j}">${["①","②","③","④"][j]} ${md(o)}</button>`).join("")}</div></div>`).join("")}
+      <div class="row"><button class="btn" id="wk-sub">제출 (<span id="wk-n">0</span>/10)</button></div>`);
+    main.querySelectorAll(".quiz.wk .opts button").forEach(b=>b.onclick=()=>{ if(done) return; const q=b.closest(".quiz"); q.querySelectorAll("button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); ans[q.dataset.k]=+b.dataset.j; $("#wk-n").textContent=Object.keys(ans).length; });
+    const timer=setInterval(()=>{ left--; const el=$("#wk-timer"); if(!el){ clearInterval(timer); return; } el.textContent=`${String(Math.floor(left/60)).padStart(2,"0")}:${String(left%60).padStart(2,"0")}`; if(left<=0) submit(); },1000);
+    function submit(){ if(done) return; done=true; clearInterval(timer); let score=0; const wrong=[]; items.forEach((it,k)=>{ const ok=ans[k]===it.q.a; if(ok) score++; else wrong.push(it.l.id); logQ(it.key,it.i,ok); if(it.key.startsWith("lesson:")){ const prog=store.get("quiz",{}); if(!(it.key+"#"+it.i in prog)) prog[it.key+"#"+it.i]=ok; store.set("quiz",prog); } if(!ok){ const notes=store.get("notes",[]); notes.unshift({key:it.key,i:it.i,q:it.q.q.replace(/\*\*/g,""),when:Date.now()}); store.set("notes",notes.slice(0,200)); } });
+      const grade=GRADE_OF(score/items.length*100); const uniq=[...new Set(wrong)]; const cl=store.get("clinic",{}); uniq.forEach(id=>{ if(!cl[id]||cl[id].done>=3) cl[id]={done:0,next:Date.now(),since:Date.now()}; }); store.set("clinic",cl);
+      const h=store.get("weekly",[]); h.unshift({when:Date.now(),score,n:items.length,grade,wrong:uniq,sec:Math.round((Date.now()-t0)/1000)}); store.set("weekly",h.slice(0,52));
+      if(score) earnTok(score,"주간 테스트 정답"); if(grade===1) earnTok(5,"주간 테스트 1등급");
+      render(`<div class="crumb"><a href="#/weekly">주간 테스트</a> › 결과</div><h1>${score} / ${items.length} <span class="st s${grade<=2?4:grade<=4?2:1}">추정 ${grade}등급</span></h1>
+      <div class="box ${grade<=2?"ok":"warn"}">${grade<=2?"안정권입니다. 틀린 문항만 클리닉으로 마무리하세요.":grade<=4?"핵심 유형에 구멍이 있습니다. 클리닉 3회 통과가 이번 주 과제입니다.":"기본 개념부터 다시. 아래 소단원의 '핵심 개념 → 왜 그런지' 를 읽고 클리닉을 시작하세요."} 소요 ${Math.round((Date.now()-t0)/60)}초.</div>
+      <table><tr><th>#</th><th>소단원</th><th>결과</th><th>풀이</th></tr>${items.map((it,k)=>`<tr><td>${k+1}</td><td><a href="#/study/${it.l.unit}/${it.l.id}">${it.l.title}</a></td><td>${ans[k]===it.q.a?"✅":ans[k]==null?"— 미응답":"❌ (정답 "+["①","②","③","④"][it.q.a]+")"}</td><td>${md(it.q.exp||"")}</td></tr>`).join("")}</table>
+      ${uniq.length?`<h2>🩺 오답 클리닉 등록 ${uniq.length}건</h2><div class="row">${uniq.map(id=>`<a class="btn sm" href="#/clinic/${id}">${byLesson(id).title} 클리닉</a>`).join("")}</div>`:""}
+      <div class="row" style="margin-top:14px"><a class="btn ghost" href="#/weekly">기록</a><a class="btn ghost" href="#/me">🏠 대시보드</a></div>`); }
+    $("#wk-sub").onclick=()=>{ if(Object.keys(ans).length<items.length&&!confirm("아직 안 푼 문항이 있습니다. 제출할까요?")) return; submit(); };
+  }
+  function clinic(lid){ const cl=store.get("clinic",{}); const now=Date.now();
+    if(!lid){ const rows=Object.entries(cl).map(([id,c])=>({l:byLesson(id),c})).filter(x=>x.l); return render(`<div class="crumb"><a href="#/me">내 학습</a> › 오답 클리닉</div><h1>🩺 오답 클리닉</h1>
+      <p class="lead">학원 '오답 클리닉' 방식: 틀린 소단원은 같은 유형의 새 문제 3개를 <b>모두 맞혀야 1회 통과</b>, 당일 → 3일 뒤 → 7일 뒤 <b>3회 통과하면 졸업</b>(+5분). 한 번이라도 틀리면 그 회차를 다시 합니다.</p>
+      ${rows.length?`<div class="grid wide">${rows.map(({l,c})=>{ const grad=c.done>=3; const ready=now>=c.next; return `<div class="card ${grad?"done":""}"><h3>${l.title}</h3><p class="muted">${G[l.grade]} · ${byUnit(l.unit).title}</p><p>${["○","●"][0].repeat(0)}${"●".repeat(c.done)}${"○".repeat(Math.max(0,3-c.done))} ${grad?"졸업 🎓":ready?"지금 풀 수 있음":"다음 회차 "+new Date(c.next).toLocaleDateString("ko")}</p>${grad?`<a class="btn sm ghost" href="#/study/${l.unit}/${l.id}">📘 복습</a>`:`<a class="btn sm ${ready?"":"ghost"}" href="#/clinic/${l.id}">${ready?"클리닉 풀기 (3문제)":"미리 연습"}</a>`}</div>`; }).join("")}</div>`:'<div class="box ok">클리닉에 등록된 소단원이 없습니다. 주간 테스트를 보면 틀린 소단원이 자동으로 들어옵니다.</div>'}
+      <div class="row" style="margin-top:12px"><a class="btn" href="#/weekly">🏫 주간 테스트</a></div>`); }
+    const l=byLesson(lid); if(!l) return notFound(); const c=cl[lid]||{done:0,next:now,since:now}; const items=window.GEN?window.GEN.make(l.id,l.node,3):[]; const ans={};
+    render(`<div class="lhead ${GCOL(l.grade)}"><div class="crumb"><a href="#/clinic">오답 클리닉</a> › ${l.title}</div>${tag(l.grade)} <span class="tag">통과 ${c.done}/3</span><h1>🩺 ${l.title} 클리닉</h1><p class="lead muted">3문제를 모두 맞히면 통과. 틀리면 <a href="#/study/${l.unit}/${l.id}">오개념·함정</a>을 읽고 다시.</p></div>
+      ${items.map((q,k)=>`<div class="quiz wk" data-k="${k}"><span class="qn">${k+1}</span> ${md(q.q)}<div class="opts">${q.opts.map((o,j)=>`<button data-j="${j}">${["①","②","③","④"][j]} ${md(o)}</button>`).join("")}</div><div class="exp" hidden>${md(q.exp||"")}</div></div>`).join("")}
+      <div class="row"><button class="btn" id="cl-sub">채점</button></div><div id="cl-res"></div>`);
+    main.querySelectorAll(".quiz.wk .opts button").forEach(b=>b.onclick=()=>{ const q=b.closest(".quiz"); if(q.dataset.done) return; q.querySelectorAll("button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); ans[q.dataset.k]=+b.dataset.j; });
+    $("#cl-sub").onclick=()=>{ let ok=0; items.forEach((q,k)=>{ const el=main.querySelector(`.quiz[data-k="${k}"]`); el.dataset.done=1; const r=ans[k]===q.a; if(r) ok++; el.querySelector(`.opts button[data-j="${q.a}"]`).classList.add("ok"); if(ans[k]!=null&&!r) el.querySelector(`.opts button[data-j="${ans[k]}"]`).classList.add("bad"); el.querySelector(".exp").hidden=false; logQ("gen:"+l.id,"c"+k,r); }); $("#cl-sub").disabled=true;
+      const all=ok===items.length; const ready=now>=c.next; let msg;
+      if(all&&ready){ c.done++; c.next=now+[3,7,14][Math.min(2,c.done)]*864e5; cl[lid]=c; store.set("clinic",cl); if(c.done>=3){ earnTok(5,l.title+" 클리닉 졸업"); msg=`🎓 <b>졸업!</b> 3회 모두 통과했습니다. 이 유형은 이제 당신 것입니다.`; } else msg=`✅ <b>${c.done}회 통과</b> — 다음 회차는 ${new Date(c.next).toLocaleDateString("ko")} 이후에.`; }
+      else if(all) msg=`✅ 3문제 모두 정답 (연습). 정식 회차는 ${new Date(c.next).toLocaleDateString("ko")} 부터 인정됩니다.`;
+      else msg=`❌ ${ok}/3 — 이번 회차는 통과하지 못했습니다. <a href="#/study/${l.unit}/${l.id}#pit">오개념·함정</a>을 읽고 다시 도전하세요.`;
+      $("#cl-res").innerHTML=`<div class="box ${all?"ok":"warn"}">${msg}</div><div class="row"><a class="btn" href="#/clinic/${lid}" onclick="setTimeout(()=>location.reload(),0)">다시 3문제</a><a class="btn ghost" href="#/clinic">클리닉 목록</a></div>`; typeset(); };
+  }
+
+  function tokens(){ const t=tokGet(); const opts=[10,20,30,60].filter(x=>x<=t.bal);
+    render(`<div class="crumb"><a href="#/me">내 학습</a> › 게임 시간 지갑</div><h1>🎟 게임 시간 지갑 <span class="muted" style="font-size:1rem">잔액 ${t.bal}분</span></h1>
+    <p class="lead">공부한 만큼 <b>🏰 일평제국</b> 플레이 시간을 얻습니다. 게임 안에서는 번 시간이 1초씩 줄고, 0 이 되면 "학습하고 오세요" 화면이 뜹니다. 같은 문제를 반복해도 시간은 늘지 않고(첫 정답만), 생성 문제는 하루 15분, 전체 하루 120분이 상한입니다 — STUDYGOD 골드 정책과 같은 '학습과학 기반 차등 지급' 원칙입니다.</p>
+    <div class="stats"><div><b>${t.bal}</b>잔액(분)</div><div><b>${t.day.earn}</b>오늘 획득</div><div><b>${t.earned}</b>누적 획득</div><div><b>${t.spent}</b>게임에 보냄</div></div>
+    <div class="card"><h3>🏰 일평제국으로 보내기</h3><p class="muted">보낼 분량을 고르면 일평제국이 새 탭에서 열리며 시간이 자동으로 충전됩니다. (코드가 필요하면 아래에 표시됩니다 — 게임의 ⏱ 버튼에서 붙여넣기)</p><div class="row">${opts.length?opts.map(m=>`<button class="btn" data-m="${m}">${m}분 보내기</button>`).join(""):'<span class="muted">10분 이상 모이면 보낼 수 있습니다.</span>'}</div><div id="tok-code"></div></div>
+    <h2>획득 규칙</h2><table>${TOK_RULES.map(([a,b])=>`<tr><td>${a}</td><td><b>${b}</b></td></tr>`).join("")}</table>
+    <h2>최근 내역</h2><table>${t.log.slice(0,20).map(x=>`<tr><td>${new Date(x.t).toLocaleString("ko")}</td><td>${x.w}</td><td><b>${x.m>0?"+":""}${x.m}분</b></td></tr>`).join("")||"<tr><td>아직 없음</td></tr>"}</table>`);
+    main.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{ const code=tokCode(+b.dataset.m); if(!code) return; const url=GAME_URL+"#study="+code; const m=b.dataset.m; window.open(url,"_blank"); tokens(); $("#tok-code").innerHTML=`<div class="box ok">🎟 ${m}분 전송 코드가 만들어졌습니다. <a class="btn sm" href="${url}" target="_blank" rel="noopener">🏰 일평제국 열기</a><br><small class="muted">코드: <code style="word-break:break-all">${code}</code></small></div>`; });
+  }
   // ---------- 홈 ----------
   function home(){ return profile()?me():setup(); }
   function intro(){
@@ -422,7 +499,7 @@
       const q=items[i]; render(`<div class="crumb"><a href="#/diagnostic">진단</a> › 문항 ${i+1}/${items.length}</div><div class="progress"><i style="width:${i/items.length*100}%"></i></div><p class="eyebrow">${q.label}</p><div class="quiz" style="border:0;padding:0"><h2 style="margin-top:0">${md(q.q)}</h2><div class="opts">${q.opts.map((o,j)=>`<button data-j="${j}" class="dq">${["①","②","③","④"][j]} ${md(o)}</button>`).join("")}</div></div>`);
       main.querySelectorAll(".dq").forEach(b=>b.addEventListener("click",()=>{ ans.push(Number(b.dataset.j)===q.a); i++; step(); },{once:true})); }
     function result(){ const firstWrong=ans.findIndex(x=>!x); const broken=firstWrong>=0?items[firstWrong].node:null; const score=ans.filter(Boolean).length;
-      const h=store.get("diag",[]); h.unshift({when:Date.now(),level,score,total:items.length,broken}); store.set("diag",h.slice(0,20));
+      const h=store.get("diag",[]); h.unshift({when:Date.now(),level,score,total:items.length,broken}); store.set("diag",h.slice(0,20)); earnTok(5,"진단 완료");
       const wrongNodes=[...new Set(items.filter((q,k)=>!ans[k]).map(q=>q.node))];
       const path=broken?[broken,...[...descendants(broken)].filter(n=>nodeOf(n).unit)]:[];
       render(`<div class="crumb"><a href="#/diagnostic">진단</a> › 결과</div><h1>${score} / ${items.length}</h1>
@@ -559,7 +636,7 @@
     </ol>
     <div class="row"><button class="btn" id="done">오늘 코스 완료 도장 ✔</button>${log[today]?'<span class="muted">오늘은 이미 찍혔습니다.</span>':''}</div>
     <h2>최근 2주</h2><div class="heat">${Array.from({length:14},(_,i)=>{const d=new Date();d.setDate(d.getDate()-13+i);const k=d.toISOString().slice(0,10);return `<span class="${log[k]?"on":""}" title="${k}">${d.getDate()}</span>`;}).join("")}</div>`);
-    $("#done").onclick=()=>{ log[today]=true; store.set("daily",log); daily(); };
+    $("#done").onclick=()=>{ if(!log[today]) earnTok(10,"하루 10분 코스"); log[today]=true; store.set("daily",log); daily(); };
   }
 
   // ---------- 교사 대시보드 ----------
@@ -595,7 +672,7 @@
       const r=queue[i], f=byFormula(r.f); let flipped=false;
       render(`<div class="crumb"><a href="#/recall">공식 암기법</a> › ${i+1}/${queue.length}</div><div class="progress"><i style="width:${i/queue.length*100}%"></i></div><div class="flash"><div class="face" id="face"><div class="eyebrow">${f.title}</div><p>이 공식을 떠올려 보세요. 되살리는 한 줄: <i>${md(f.tip)}</i></p><button class="btn" id="flip">뒤집기</button></div></div>`);
       $("#flip").onclick=()=>{ flipped=true; $("#face").innerHTML=`<div class="eyebrow">${f.title}</div><div class="formula" style="font-size:1.5rem">$$${texCard(f.tex)}$$</div><p>🧠 ${md(r.mnemonic)}</p><div class="row" style="justify-content:center"><button class="btn ghost" data-g="0">😵 몰랐음</button><button class="btn ghost" data-g="1">🤔 애매</button><button class="btn" data-g="2">😎 바로 떠오름</button></div>`; typeset();
-        main.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{ const g=Number(b.dataset.g); const st=s[r.f]||{n:0}; const days=g===0?0.5:g===1?Math.max(1,st.n*1.5):[1,3,7,14,30,60][Math.min(5,st.n)]; s[r.f]={n:g===0?0:st.n+1,due:Date.now()+days*864e5}; store.set("srs",s); i++; card(); }); }; }
+        main.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{ const g=Number(b.dataset.g); const st=s[r.f]||{n:0}; const days=g===0?0.5:g===1?Math.max(1,st.n*1.5):[1,3,7,14,30,60][Math.min(5,st.n)]; s[r.f]={n:g===0?0:st.n+1,due:Date.now()+days*864e5}; store.set("srs",s); if(g>=2) earnTok(1,"공식 카드 복습"); i++; card(); }); }; }
     card();
   }
 
@@ -707,7 +784,7 @@
       </div>
       <div class="row" style="margin-top:14px">${pi<u.problems.length-1?`<a class="btn" href="#/nonsul/${id}?p=${pi+1}">다음 문제 →</a>`:`<a class="btn" href="#/nonsul?t=${u.type}">목록</a>`}<a class="btn ghost" href="#/nonsul/guide">✍️ 답안 쓰기 트레이너</a>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a><a class="btn ghost" href="#/practice/${ls.id}">➕ 기본 유형 생성</a>`:""}${P.node?`<a class="btn ghost" href="#/roadmap/${P.node}">🗺 개념의 자리</a>`:""}</div>`);
       const ob=$("#ns-open"); if(ob) ob.onclick=()=>{ stage=1; draw(); };
-      const sb=$("#ns-score"); if(sb) sb.onclick=()=>{ const boxes=[...main.querySelectorAll(".rubric input")]; const got=boxes.map(b=>b.checked); const score=boxes.reduce((a,b)=>a+(b.checked?+b.dataset.p:0),0); const rr=store.get("ns",{}); rr[key]={score,max,got,when:Date.now()}; store.set("ns",rr); $("#ns-res").textContent=`저장됨 ${score}/${max}`+(score===max?" 🎉 만점!":score>=max*0.7?" 👍 합격권":" — 감점 포인트를 다시 읽어 보세요"); };
+      const sb=$("#ns-score"); if(sb) sb.onclick=()=>{ const boxes=[...main.querySelectorAll(".rubric input")]; const got=boxes.map(b=>b.checked); const score=boxes.reduce((a,b)=>a+(b.checked?+b.dataset.p:0),0); const rr=store.get("ns",{}); if(!rr[key]&&score>=max*0.7) earnTok(5,"논술 합격권"); rr[key]={score,max,got,when:Date.now()}; store.set("ns",rr); $("#ns-res").textContent=`저장됨 ${score}/${max}`+(score===max?" 🎉 만점!":score>=max*0.7?" 👍 합격권":" — 감점 포인트를 다시 읽어 보세요"); };
       typeset(); }
     draw();
   }
@@ -738,7 +815,7 @@
       <div class="row" style="margin-top:14px"><a class="btn" href="#/olympiad/random">🎲 다음 문제</a>${ls?`<a class="btn ghost" href="#/study/${ls.unit}/${ls.id}">📘 ${ls.title}</a><a class="btn ghost" href="#/practice/${ls.id}">➕ 교과 유사 문제</a>`:""}<a class="btn ghost" href="#/roadmap/${x.node}">🗺 개념의 자리</a><a class="btn ghost" href="#/olympiad?b=${x.band}">목록</a></div>`);
       main.querySelectorAll(".oly-hints .hint button").forEach(b=>b.onclick=()=>{ const i=+b.closest(".hint").dataset.i; if(i!==hintsUsed) return; hintsUsed++; draw(); });
       const inp=$("#oly-in"); if(inp){ inp.focus(); const check=()=>{ const v=inp.value.trim().replace(/\s/g,""); if(!v) return; const norm=t=>String(t).replace(/\s/g,"").replace(/°/g,"").toLowerCase(); let ok=false; const nv=Number(v.replace(/[^0-9.\-\/]/g,"")); const na=Number(String(x.ans).replace(/[^0-9.\-]/g,"")); if(norm(v)===norm(x.ans)) ok=true; else if(/^-?\d+\/\d+$/.test(v)&&/^-?\d+\/\d+$/.test(x.ans)){ const f=t=>t.split("/").map(Number); const [a,b]=f(v),[c,d]=f(x.ans); ok=a*d===b*c; } else if(!isNaN(nv)&&!isNaN(na)&&/^-?[\d.]+$/.test(v)) ok=Math.abs(nv-na)<=(x.tol||1e-9);
-        if(ok){ done=true; const sc=SC[hintsUsed]; const rr=store.get("oly",{}); const prev=rr[id]; if(!prev||!prev.ok||prev.score<sc) rr[id]={ok:true,score:sc,when:Date.now()}; store.set("oly",rr); draw(); $("#oly-fb").innerHTML=`<div class="box ok">🎉 정답! <b>${sc}점</b> ${MEDAL(x.level)} — 아래 '아하' 를 꼭 읽어 보세요.</div>`; $("#oly-sol").scrollIntoView({behavior:"smooth",block:"center"}); }
+        if(ok){ done=true; const sc=SC[hintsUsed]; const rr=store.get("oly",{}); const prev=rr[id]; if(!prev||!prev.ok) earnTok(5,"올림피아드 정답"); if(!prev||!prev.ok||prev.score<sc) rr[id]={ok:true,score:sc,when:Date.now()}; store.set("oly",rr); draw(); $("#oly-fb").innerHTML=`<div class="box ok">🎉 정답! <b>${sc}점</b> ${MEDAL(x.level)} — 아래 '아하' 를 꼭 읽어 보세요.</div>`; $("#oly-sol").scrollIntoView({behavior:"smooth",block:"center"}); }
         else { $("#oly-fb").innerHTML=`<div class="box warn">❌ 아직 아니에요. ${hintsUsed<3?"힌트를 하나 열어 볼까요?":"풀이를 보고 싶으면 아래 버튼을."}</div>${hintsUsed>=3?'<button class="btn sm ghost" id="oly-show">풀이 보기 (0점)</button>':""}`; const sb=$("#oly-show"); if(sb) sb.onclick=()=>{ done=true; const rr=store.get("oly",{}); if(!rr[id]||!rr[id].ok) rr[id]={ok:true,score:0,when:Date.now()}; store.set("oly",rr); draw(); }; } };
         $("#oly-go").onclick=check; inp.addEventListener("keydown",e=>{ if(e.key==="Enter") check(); }); }
       typeset(); }
@@ -758,7 +835,7 @@
     <div class="st-list">${cur.items.map((it,i)=>{ const k=cur.grade+":"+cur.term+":"+i; const l=byLesson(it.l); return `<div class="card stq ${done[k]?"done":""}"><div class="st-h"><span class="qn">${i+1}</span>${it.kind?`<span class="tag kind">[${it.kind}]</span>`:""}<span class="tag">${it.pts}점</span><span class="eyebrow">출제 의도 · ${it.intent}</span><label class="st-chk"><input type="checkbox" data-k="${k}" ${done[k]?"checked":""}> 맞힘</label></div><div class="qrow"><p style="font-size:1.05rem">${md(it.q)}</p>${figAny(it,"qfig")}</div>${it.opts?`<div class="choices" data-a="${it.a}">${it.opts.map((o,j)=>`<button class="choice" data-j="${j}"><span class="num">${["①","②","③","④","⑤"][j]}</span> ${md(o)}</button>`).join("")}</div>`:'<p class="muted" style="font-size:.85rem">✍️ 서술형 — 풀이 과정을 쓰고 아래와 비교하세요.</p>'}<details class="sol"><summary>풀이 보기</summary><ol class="steps">${it.steps.map(s=>`<li>${md(s)}</li>`).join("")}</ol><p><b>답:</b> ${md(it.ans)}</p>${l?`<p class="muted">📘 <a href="#/study/${l.unit}/${l.id}">${l.title}</a> 에서 개념 다시 보기 · <a href="#/practice/${l.id}">➕ 유사 문제 생성</a></p>`:""}</details></div>`; }).join("")}</div>
     <div class="row" style="margin-top:14px"><a class="btn" href="#/paper?g=${grade}&t=${cur.term}">🖨 시험지로 보기·인쇄</a><a class="btn ghost" href="#/exam">📝 시험 전 훑기(체크리스트)</a><a class="btn ghost" href="#/mix">🔀 섞어 풀기</a>${["h11","h12","h2a","h2c","h2p","h3c","h3g"].includes(grade)?`<a class="btn" href="#/patterns">🧭 수능 패턴 도감</a>`:""}</div>`);
     main.querySelectorAll(".choices").forEach(box=>box.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{ if(box.dataset.done) return; box.dataset.done=1; const ok=+b.dataset.j===+box.dataset.a; b.classList.add(ok?"ok":"bad"); if(!ok) box.querySelector(`.choice[data-j="${box.dataset.a}"]`).classList.add("ok"); const card=box.closest(".card"); if(ok){ const c=card.querySelector(".st-chk input"); if(c&&!c.checked){ c.checked=true; c.dispatchEvent(new Event("change")); } } else card.querySelector("details.sol").open=true; }));
-    main.querySelectorAll(".st-chk input").forEach(c=>c.onchange=()=>{ const d=store.get("st",{}); if(c.checked) d[c.dataset.k]=Date.now(); else delete d[c.dataset.k]; store.set("st",d); c.closest(".card").classList.toggle("done",c.checked); });
+    main.querySelectorAll(".st-chk input").forEach(c=>c.onchange=()=>{ const d=store.get("st",{}); if(c.checked){ if(!d[c.dataset.k]) earnTok(1,"학교 시험 문제"); d[c.dataset.k]=Date.now(); } else delete d[c.dataset.k]; store.set("st",d); c.closest(".card").classList.toggle("done",c.checked); });
   }
   // ---------- 시험지 모드 (실제 시험지 형식 + 인쇄) ----------
   function paper(qs){
@@ -808,6 +885,9 @@
     if(r==="intro") return intro();
     if(r==="practice") return practice(p[1],qs);
     if(r==="forge") return forge(p[1],qs);
+    if(r==="weekly") return weekly(qs);
+    if(r==="clinic") return clinic(p[1]);
+    if(r==="tokens") return tokens();
     if(r==="study") return p[2]?lesson(p[1],p[2]):p[1]?unit(p[1]):study();
     if(r==="roadmap") return roadmap(p[1]);
     if(r==="formulas") return p[1]?formula(p[1]):formulas(qs);

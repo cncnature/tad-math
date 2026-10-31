@@ -393,3 +393,9 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 .forge-card .formula{font-size:.95rem;margin:6px 0}
 
 .nav a.ext{color:#b46a00}
+
+/* 게임 토큰 · 주간 테스트 · 클리닉 */
+#tok-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;opacity:0;transition:.25s;z-index:50;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#tok-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.card.wallet{border-color:#e0a000;background:linear-gradient(135deg,rgba(255,215,0,.08),transparent)}
+.quiz.wk .opts button.on{border-color:var(--acc);background:rgba(59,110,245,.1)}
