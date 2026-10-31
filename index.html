@@ -6,6 +6,10 @@
 <title>TAD 수학 만지기 · 중1 ~ 고3 개념 연결 학습 사이트</title>
 <meta name="description" content="중1부터 고3까지 수학 개념을 슬라이더와 드래그로 직접 만지며 익힙니다. 개념 지도, 공식 사전, 진단, 매스랩, 슬라이드, 플레이, 공식 암기법, 시험 전 훑기, 생활 속 수학, 수학 인물. 누구나 무료·로그인 없음.">
 <meta name="theme-color" content="#f7f9fc">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📐</text></svg>">
 <!-- KaTeX 0.16.11 (MIT) 동봉: CDN 없이 오프라인에서도 수식 렌더링 -->
 <link rel="stylesheet" href="vendor/katex/katex.min.css">
@@ -38,6 +42,7 @@
         <a href="#/slides">🎞 슬라이드</a>
         <a href="#/play">🎮 플레이</a>
         <a href="#/forge">🔥 공식 유도 공방</a>
+        <a href="#/schedule">📅 일정·스케줄</a>
         <a href="#/weekly">🏫 주간 테스트</a>
         <a href="#/survival">🔥 서바이벌 모의고사</a>
         <a href="#/types">🗂 유형 히트맵</a>
@@ -106,6 +111,7 @@
 <script src="data/olympiad.js"></script>
 <script src="data/derivations.js"></script>
 <script src="data/proof-figs-map.js"></script>
+<script src="data/study-methods.js"></script>
 <script src="data/nonsul.js"></script>
 <script src="data/nonsul-2.js"></script>
 <script src="data/nonsul-3.js"></script>
@@ -117,5 +123,6 @@
 <script src="js/widgets.js"></script>
 <script src="js/app.js"></script>
 <script src="js/sync.js"></script>
+<script>if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();window.__pwaPrompt=e;document.documentElement.classList.add("can-install");});</script>
 </body>
 </html>

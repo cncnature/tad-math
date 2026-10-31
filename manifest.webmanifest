@@ -1,0 +1,22 @@
+{
+  "name": "TAD 수학 만지기",
+  "short_name": "TAD수학",
+  "description": "중1~고3 개인 수학 학습 시스템 — 목표율·컨설팅·주간 테스트·서바이벌·일정 관리",
+  "start_url": "./#/me",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7f9fc",
+  "theme_color": "#2f6fed",
+  "lang": "ko",
+  "icons": [
+    {"src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "assets/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "오늘 할 일", "url": "./#/schedule"},
+    {"name": "주간 테스트", "url": "./#/weekly"},
+    {"name": "오답 클리닉", "url": "./#/clinic"}
+  ]
+}

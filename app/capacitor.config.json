@@ -1,0 +1,14 @@
+{
+  "appId": "com.medihealthtech.tadmath",
+  "appName": "TAD 수학 만지기",
+  "webDir": "www",
+  "server": {
+    "url": "https://cncnature.github.io/tad-math/",
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "backgroundColor": "#f7f9fc",
+    "allowMixedContent": false
+  }
+}

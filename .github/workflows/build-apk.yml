@@ -1,0 +1,62 @@
+name: TAD 수학 만지기 APK 빌드
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ "app/**", ".github/workflows/build-apk.yml" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: 패키지 설치
+        run: npm install --no-audit --no-fund
+      - name: 안드로이드 프로젝트 생성
+        run: npx cap add android
+      - name: 앱 이름·아이콘 반영
+        run: |
+          npx cap sync android
+          for d in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            mkdir -p android/app/src/main/res/mipmap-$d
+            cp ../assets/icons/icon-512.png android/app/src/main/res/mipmap-$d/ic_launcher.png
+            cp ../assets/icons/icon-512.png android/app/src/main/res/mipmap-$d/ic_launcher_round.png
+            cp ../assets/icons/maskable-512.png android/app/src/main/res/mipmap-$d/ic_launcher_foreground.png
+          done
+      - name: APK 빌드
+        working-directory: app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - name: APK 이름 정리
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/tad-math-${{ github.run_number }}.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tad-math-apk
+          path: app/out/*.apk
+          retention-days: 30
+      - name: Release(apk-latest) 갱신
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: TAD 수학 만지기 최신 APK
+          body: "안드로이드 설치 파일. 사이트가 바뀌어도 앱은 그대로 최신 내용을 불러옵니다 (빌드 #${{ github.run_number }})."
+          files: app/out/*.apk
+          prerelease: true

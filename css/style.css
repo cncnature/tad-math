@@ -421,3 +421,11 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 /* 로컬 AI */
 .ai-panel,.ai-why{display:none}html.ai-on .ai-panel{display:block;border-color:#8a63d2;background:linear-gradient(135deg,rgba(138,99,210,.08),transparent)}html.ai-on .ai-why{display:inline-block;margin-top:8px}
 .ai-in{width:100%;box-sizing:border-box;margin:8px 0}.ai-out{margin:8px 0;line-height:1.55}
+
+/* 일정 달력 */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:8px 0 16px}.cal-h{text-align:center;font-size:.78rem;color:var(--muted);padding:4px 0}
+.cal-d{min-height:64px;border:1px solid var(--line);border-radius:8px;padding:4px;background:var(--card);font-size:.72rem}.cal-d.empty{border:0;background:transparent}.cal-d .n{font-weight:700;font-size:.8rem}.cal-d.today{border-color:var(--acc);box-shadow:0 0 0 2px rgba(59,110,245,.15)}
+.cal-d .ev{border-radius:4px;padding:1px 4px;margin-top:2px;color:#fff;background:var(--acc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cal-d .ev.csat{background:var(--bad)}.cal-d .ev.mock{background:#8a63d2}.cal-d .ev.final{background:#b46a00}
+.cal-d .pl{margin-top:2px;font-size:.66rem}
+@media(max-width:640px){.cal-d{min-height:48px;font-size:.62rem}.cal-d .pl{display:none}}
+.install-row{margin:6px 0}
