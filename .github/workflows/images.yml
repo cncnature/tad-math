@@ -1,0 +1,38 @@
+name: Fetch free images (Wikimedia)
+# 차시별 검색어(data/image-queries.json)로 위키백과·위키미디어 공용의 자유 라이선스 이미지를 받아 assets/img 에 저장하고 data/visuals/images.js 를 갱신한다.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "이번 실행에서 처리할 차시 수 (비우면 전부)"
+        required: false
+  schedule:
+    - cron: "40 20 * * 0"   # 매주 월요일 05:40 KST — 새 차시용
+permissions:
+  contents: write
+  actions: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 이미지 수집
+        run: |
+          if [ -n "${{ github.event.inputs.limit }}" ]; then node scripts/fetch-images.js --limit "${{ github.event.inputs.limit }}"; else node scripts/fetch-images.js; fi
+      - name: 검사
+        run: node scripts/check.js
+      - name: 커밋·푸시
+        id: commit
+        run: |
+          git config user.name "tad-auto-update"
+          git config user.email "cncnature@gmail.com"
+          git add -A
+          if git diff --cached --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; else git commit -m "auto: 자유 라이선스 이미지 수집 $(date -u -d '+9 hours' +%Y-%m-%d)"; git push; echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+      - name: 배포 트리거
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main

@@ -41,7 +41,7 @@
       return box(s)+`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title||"개념도")}">${g}</svg>`+end(s); },
     formula(s){ return box(s)+`<div class="vis-formula">$$${s.tex}$$</div>${s.where?`<p class="vis-note">${(s.where||[]).map(w=>md(w)).join(" · ")}</p>`:""}`+end(s); },
     svg(s){ return box(s)+`<div class="vis-svg">${String(s.svg||"").replace(/<script[\s\S]*?<\/script>/gi,"")}</div>`+end(s); },
-    img(s){ return box(s)+`<img src="${esc(s.src)}" alt="${esc(s.alt||s.title||"")}" loading="lazy">${s.credit?`<p class="vis-note">출처: ${md(s.credit)}</p>`:""}`+end(s); }
+    img(s){ return box(s)+`<img src="${esc(s.src)}" alt="${esc(s.alt||s.title||"")}" loading="lazy">${s.credit?`<p class="vis-note">출처: ${s.link?`<a href="${esc(s.link)}" target="_blank" rel="noopener">${md(s.credit)}</a>`:md(s.credit)}</p>`:""}`+end(s); }
   };
   function render(spec){ try{ const f=R[spec.type]; return f?f(spec):""; }catch(e){ return `<p class="muted small">(시각 자료 오류: ${esc(spec.type)})</p>`; } }
   function renderAll(list){ return (list||[]).map(render).join(""); }
