@@ -1,0 +1,53 @@
+{
+  "source": [
+    ["2022 개정 중2 천재(소영순) 1~8과 단원별 언어 형식 (englishtutortv, '중2 영어 천재 소영순 (22개정)')", "https://englishtutortv.com/%EC%A4%912-%EC%B2%9C%EC%9E%AC-%EC%86%8C%EC%98%81%EC%88%9C-1%EA%B3%BC-2%EA%B3%BC-3%EA%B3%BC-4%EA%B3%BC-5%EA%B3%BC-6%EA%B3%BC-7%EA%B3%BC-8%EA%B3%BC-%EC%A0%84%EB%8B%A8%EC%9B%90-%EB%8C%80%ED%99%94/"],
+    ["2022 개정 중2 천재(이상기) 1~8과 단원별 언어 형식 (englishtutortv, '중2 천재 이상기 영어 교과서 (22개정)')", "https://englishtutortv.com/%EC%A4%912-%EC%B2%9C%EC%9E%AC-%EC%9D%B4%EC%83%81%EA%B8%B0-1%EA%B3%BC-2%EA%B3%BC-3%EA%B3%BC-4%EA%B3%BC-5%EA%B3%BC-6%EA%B3%BC-7%EA%B3%BC-8%EA%B3%BC-%EC%A0%84%EB%8B%A8%EC%9B%90-%EB%8C%80%ED%99%94/"]
+  ],
+  "textbooks": {
+    "천재(소영순)": [
+      { "lesson": "Lesson 1 New Year, New Me", "term": 1, "grammar": ["접속사 if", "의문사 + to부정사"] },
+      { "lesson": "Lesson 2 The Journey with My Family", "term": 1, "grammar": ["to부정사 형용사적 용법", "주격 관계대명사"] },
+      { "lesson": "Lesson 3 New Ideas Bring Big Changes", "term": 1, "grammar": ["수동태", "접속사 although"] },
+      { "lesson": "Lesson 4 Open the Doors to the World", "term": 1, "grammar": ["현재완료", "so … that ~"] },
+      { "lesson": "Lesson 5 From Your Interest to Future Jobs", "term": 2, "grammar": ["make/keep + 목적어 + 형용사 (Writing about sports makes me excited.)", "간접의문문 (Can you tell me why you became a sports journalist?)"] },
+      { "lesson": "Lesson 6 Use Smart, Live Safe", "term": 2, "grammar": ["see/hear/feel + 목적어 + -ing (I saw my brother playing basketball.)", "want/tell/ask + 목적어 + to부정사 (My brother wanted me to delete the picture.)"] },
+      { "lesson": "Lesson 7 Natural Wonders", "term": 2, "grammar": ["make/have/let + 목적어 + 동사원형 (National parks let people enjoy the beauty of nature.)", "It … to부정사 가주어 (It is exciting to walk on the glacier.)"] },
+      { "lesson": "Lesson 8 The Magic of Giving", "term": 2, "grammar": ["-thing + 형용사 (The sparrows were wearing something warm.)", "목적격 관계대명사 (These are the socks that I want.)"] }
+    ],
+    "천재(이상기)": [
+      { "lesson": "Lesson 1 Enjoy Your Days", "term": 1, "grammar": ["수여동사(4형식)", "-thing + 형용사"] },
+      { "lesson": "Lesson 2 Living Healthy", "term": 1, "grammar": ["접속사 because", "의문사 + to부정사"] },
+      { "lesson": "Lesson 3 The World of Sports", "term": 1, "grammar": ["현재완료", "to부정사 형용사적 용법"] },
+      { "lesson": "Lesson 4 Animal Wonders", "term": 1, "grammar": ["최상급", "want + 목적어 + to부정사"] },
+      { "lesson": "Lesson 5 Be a Detective!", "term": 2, "grammar": ["주격 관계대명사 (Ms. Jones was a wise old lady who lived next door.)", "지각동사 + 목적어 + -ing (I saw Tom coming out of the kitchen.)"] },
+      { "lesson": "Lesson 6 Discovering Heroes", "term": 2, "grammar": ["수동태 (A leather pilot jacket and goggles were displayed.)", "so ~ that (It was so detailed that the honeybee looked alive.)"] },
+      { "lesson": "Lesson 7 Be a Smart Shopper", "term": 2, "grammar": ["목적격 관계대명사 (He finds a nice T-shirt that he really likes.)", "수량 형용사 (Here are a few shopping secrets that you must know.)"] },
+      { "lesson": "Lesson 8 Explore the Night Sky", "term": 2, "grammar": ["접속사 if (If you connect them, they form the shape of a big spoon.)", "가주어 it (It was difficult to catch the bear.)"] }
+    ]
+  },
+  "units": {
+    "eng-c5":   { "order": 1, "tb": "천재(소영순) L5·L6·L7 / 천재(이상기) L5 (+L4 1학기)", "note": "소영순 판은 5형식 보어를 L5(형용사)→L6(-ing·to부정사)→L7(동사원형) 세 과에 걸쳐 쪼개 배치. 2학기 가장 비중 큰 단원." },
+    "eng-conj": { "order": 2, "tb": "천재(소영순) L5 간접의문문 / 천재(이상기) L6 so~that·L8 if", "note": "소영순 판에서 2학기 신출은 간접의문문뿐(if·although·so~that·의문사+to 는 L1~L4 1학기). 이상기 판은 간접의문문이 8과 전체에 없고 so~that(L6)·if(L8)가 2학기." },
+    "eng-cmp":  { "order": 3, "tb": "천재(소영순) L7 가주어 It / 천재(이상기) L8 가주어 it·L6 수동태(2학기 신출)", "note": "비교급·최상급·as~as·배수는 두 판 모두 2학기 언어 형식에 없음(이상기 L4 최상급만, 1학기). 가주어 It 이 2학기 핵심. 이상기 판은 수동태가 L6 신출이므로 '복습' 레슨이 본 진도가 됨." },
+    "eng-rel":  { "order": 4, "tb": "천재(소영순) L8 목적격 (주격은 L2 1학기) / 천재(이상기) L5 주격·L7 목적격", "note": "이상기 판이면 order 1(L5 첫 문법). 소영순 판은 주격이 1학기라 2학기엔 목적격·생략만 신출." },
+    "eng-read": { "order": 5, "tb": "전 단원 (본문 변형·서술형 공통)" }
+  },
+  "lessons": {
+    "eng-rel-subj":     { "tb": "천재(소영순) L2(1학기 복습) / 천재(이상기) L5", "note": "소영순 판에서는 2학기 복습 성격; 이상기 판에서는 2학기 첫 문법." },
+    "eng-rel-obj":      { "tb": "천재(소영순) L8 / 천재(이상기) L7" },
+    "eng-c5-percept":   { "tb": "천재(소영순) L6(지각동사 -ing)·L7(사역동사 원형) / 천재(이상기) L5(지각동사 -ing)", "note": "두 판 모두 지각동사 예문이 '목적어 + -ing' 형. 사역동사(make/have/let + 원형)는 소영순 L7에만 있음(이상기 판 없음)." },
+    "eng-c5-adj-to":    { "tb": "천재(소영순) L5(make/keep + 형용사)·L6(want/tell/ask + to부정사) / 천재(이상기) L4(want + 목적어 + to부정사, 1학기)", "note": "make/keep + 형용사는 이상기 판에 없음." },
+    "eng-conj-indq":    { "tb": "천재(소영순) L5(간접의문문)·L1(의문사+to, 1학기) / 천재(이상기) L2(의문사+to, 1학기)", "note": "간접의문문은 이상기 판 8과 전체에 없음 → 이상기 판이면 우선순위 낮춤." },
+    "eng-conj-sub":     { "tb": "천재(소영순) L1 if·L3 although·L4 so~that(모두 1학기) / 천재(이상기) L6 so~that·L8 if", "note": "이상기 판은 although 없음(L2 because). that 명사절은 두 판 모두 별도 언어 형식으로 안 잡힘." },
+    "eng-cmp-comp":     { "tb": "천재(소영순) 해당 과 없음 / 천재(이상기) L4 최상급(1학기)", "note": "두 판 모두 2학기 신출 아님. 학평 대비·심화로 표시하거나 순서를 뒤로." },
+    "eng-cmp-it":       { "tb": "천재(소영순) L7 / 천재(이상기) L8", "note": "가주어 It 은 두 판 모두 2학기 핵심. to부정사·동명사 목적어 구분은 두 판 언어 형식에 없음(보조 내용)." },
+    "eng-cmp-review":   { "tb": "천재(소영순) L3 수동태·L4 현재완료(1학기 복습) / 천재(이상기) L6 수동태(2학기 신출)·L3 현재완료(1학기)", "note": "이상기 판이면 수동태 부분을 '복습'이 아닌 L6 본 진도로 승격." },
+    "eng-read-strategy":{ "tb": "전 단원" }
+  },
+  "missing": [
+    { "title": "-thing + 형용사", "grammar": "something/anything/nothing + 형용사 (The sparrows were wearing something warm.)", "note": "천재(소영순) L8 2학기 신출. 사이트에 없음. (이상기 판은 L1 1학기.) eng-rel 또는 eng-cmp-it 에 짧은 레슨/개념 한 줄 추가 권장." },
+    { "title": "수량 형용사", "grammar": "a few / few / a little / little / many / much / some / any (Here are a few shopping secrets that you must know.)", "note": "천재(이상기) L7 2학기 신출. 사이트에 없음. 이상기 판일 때만 필요." },
+    { "title": "지각동사 + 목적어 + -ing (진행 강조)", "grammar": "see/hear/feel + 목적어 + -ing", "note": "eng-c5-percept 에 이미 포함되나, 두 판 교과서 대표 예문이 모두 -ing 형이므로 원형보다 -ing 를 앞세워 설명 순서 조정 권장." }
+  ],
+  "notes": "어느 저자 판인지 모르므로 두 판 모두 표기. 근거는 englishtutortv 의 천재(소영순)·천재(이상기) 22개정 단원 페이지 2건만 실제 열람(둘 다 '22개정' 표기 확인). 천재 T셀파·자습서 목차 등 2차 교차 확인은 검색에서 찾지 못해 미확인. 1·2학기 경계는 L1~L4 = 1학기, L5~L8 = 2학기로 추정(학교 진도에 따라 L4·L5 가 걸칠 수 있음). order 는 소영순 판 L5~L8 첫 등장 순: L5 make/keep+형용사·간접의문문 → L6 지각동사·want+to → L7 사역동사·가주어 It → L8 -thing+형용사·목적격 관계대명사, 따라서 eng-c5(1) → eng-conj(2) → eng-cmp(3) → eng-rel(4) → eng-read(5). 이상기 판이면 L5 주격 관계대명사·지각동사 → L6 수동태·so~that → L7 목적격 관계대명사·수량 형용사 → L8 if·가주어 it, 즉 eng-rel(1) → eng-c5(2) → eng-cmp(3, 수동태 L6) → eng-conj(4, so~that L6·if L8) → eng-read(5). 사이트 eng.js 머리 주석의 '5종 교차 확인' 설명과 eng-c5 exam 문구('5종 모두 5~7과')는 두 천재 판과 모순 없음. 현재 사이트에서 두 판 2학기 언어 형식 중 빠진 것은 '-thing + 형용사'(소영순 L8)와 '수량 형용사'(이상기 L7) 두 개."
+}
