@@ -36,7 +36,7 @@
     const L=["①","②","③","④"];
     const text=[head,exam,"",...blocks.flatMap(b=>[`[${b.subject} · ${b.title}]`,`✅ 꼭: ${b.need}`,b.trap?`⚠️ 함정: ${b.trap}`:null,b.pattern?`🎯 출제·풀이: ${b.pattern}`:null,b.quiz?`❓ ${b.quiz.q} ${b.quiz.opts.map((o,i)=>L[i]+" "+o).join(" ")}`:null,""].filter(x=>x!==null)),`📌 오늘 할 일: ${todo.join(" / ")}`,`🔗 답·풀이: https://cncnature.github.io/tad-math/#/today?d=${date}`].join("\n");
     const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    const html=[`<b>${esc(head)}</b>`,esc(exam),"",...blocks.flatMap(b=>[`<b>[${esc(b.subject)} · ${esc(b.title)}]</b>`,`✅ 꼭: ${esc(b.need)}`,b.trap?`⚠️ 함정: ${esc(b.trap)}`:null,b.pattern?`🎯 출제·풀이: ${esc(b.pattern)}`:null,b.quiz?`❓ ${esc(b.quiz.q)}\n${b.quiz.opts.map((o,i)=>L[i]+" "+esc(o)).join("  ")}`:null,""].filter(x=>x!==null)),`📌 오늘 할 일: ${esc(todo.join(" / "))}`,`🔗 <a href="https://cncnature.github.io/tad-math/#/today?d=${date}">답·풀이 보기</a>`].join("\n");
+    const html=[`<b>${esc(head)}</b>`,esc(exam),"",...blocks.flatMap(b=>[`<b>[${esc(b.subject)} · ${esc(b.title)}]</b>`,`✅ 꼭: ${esc(b.need)}`,b.trap?`⚠️ 함정: ${esc(b.trap)}`:null,b.pattern?`🎯 출제·풀이: ${esc(b.pattern)}`:null,b.quiz?`❓ ${esc(b.quiz.q)}\n${b.quiz.opts.map((o,i)=>L[i]+" "+esc(o)).join("  ")}`:null,""].filter(x=>x!==null)),`📌 오늘 할 일: ${esc(todo.join(" / "))}`,`🔗 답·풀이: https://cncnature.github.io/tad-math/#/today?d=${date}`].join("\n");
     return {head,exam,phase,act:act?act.e:null,dd:act?act.dd:null,blocks,todo,text,html};
   }
   const api={build,SUBJ_ID,phaseOf,PHASE};
