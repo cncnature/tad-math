@@ -40,14 +40,14 @@
    "subject": "역사",
    "sid": "his",
    "grade": "g22",
-   "lessons": 10,
+   "lessons": 12,
    "target": 12
   },
   {
    "subject": "역사",
    "sid": "his",
    "grade": "g31",
-   "lessons": 5,
+   "lessons": 9,
    "target": 8
   },
   {
@@ -131,21 +131,21 @@
    "subject": "사회",
    "sid": "soc",
    "grade": "g22",
-   "lessons": 10,
+   "lessons": 24,
    "target": 12
   },
   {
    "subject": "사회",
    "sid": "soc",
    "grade": "g31",
-   "lessons": 4,
+   "lessons": 2,
    "target": 8
   },
   {
    "subject": "사회",
    "sid": "soc",
    "grade": "g32",
-   "lessons": 4,
+   "lessons": 0,
    "target": 8
   },
   {
@@ -158,6 +158,12 @@
  ],
  "gaps": [
   {
+   "sid": "soc",
+   "subject": "사회",
+   "grade": "g32",
+   "need": 8
+  },
+  {
    "sid": "kor",
    "subject": "국어",
    "grade": "h2",
@@ -167,6 +173,12 @@
    "sid": "sci",
    "subject": "과학",
    "grade": "h1",
+   "need": 6
+  },
+  {
+   "sid": "soc",
+   "subject": "사회",
+   "grade": "g31",
    "need": 6
   },
   {
@@ -236,44 +248,14 @@
    "need": 4
   },
   {
-   "sid": "soc",
-   "subject": "사회",
-   "grade": "g31",
-   "need": 4
-  },
-  {
-   "sid": "soc",
-   "subject": "사회",
-   "grade": "g32",
-   "need": 4
-  },
-  {
-   "sid": "his",
-   "subject": "역사",
-   "grade": "g31",
-   "need": 3
-  },
-  {
    "sid": "his",
    "subject": "역사",
    "grade": "g32",
    "need": 3
-  },
-  {
-   "sid": "his",
-   "subject": "역사",
-   "grade": "g22",
-   "need": 2
   },
   {
    "sid": "sci",
    "subject": "과학",
-   "grade": "g22",
-   "need": 2
-  },
-  {
-   "sid": "soc",
-   "subject": "사회",
    "grade": "g22",
    "need": 2
   }
@@ -283,6 +265,7 @@
   "eng-g3.js",
   "eng-h1.js",
   "eng-h2.js",
+  "his-g22-visang.js",
   "his-g3.js",
   "his-h1.js",
   "kor-g22-chunjae.js",
@@ -293,6 +276,7 @@
   "sci-g3.js",
   "sci-h1.js",
   "sci.js",
+  "soc-g22-visang.js",
   "soc-g3.js",
   "soc-h1.js"
  ],
@@ -300,10 +284,29 @@
  "thin": [],
  "noStd": [],
  "dupTitles": [],
- "noVisual": [],
+ "noVisual": [
+  "his-g22-visang-ww-order",
+  "his-g22-visang-ww-peace",
+  "his-g22-visang-ww-asia",
+  "his-g22-visang-coldwar",
+  "his-g22-visang-democracy",
+  "his-g22-visang-global",
+  "soc-g22-visang-central-travel",
+  "soc-g22-visang-central-gangwon",
+  "soc-g22-visang-central-chungcheong",
+  "soc-g22-visang-south-travel",
+  "soc-g22-visang-south-industry",
+  "soc-g22-visang-south-jeju",
+  "soc-g22-visang-north-nature",
+  "soc-g22-visang-north-border",
+  "soc-g22-visang-north-peace",
+  "soc-g22-visang-sustain-resource",
+  "soc-g22-visang-sustain-env",
+  "soc-g22-visang-sustain-local"
+ ],
  "overrides": {
   "lessons": 0,
-  "units": 20,
-  "hide": 0
+  "units": 25,
+  "hide": 2
  }
 }

@@ -15,7 +15,7 @@
   function mathLessons(D,grade){ const out=[]; const push=u=>{ if(u.grade===grade) (u.lessons||[]).forEach(l=>out.push({u,l})); }; (D.curriculum.units||[]).forEach(push); (D.curriculumExtra||[]).flat().forEach(push); return out; }
   // 단원에 grade 가 있으면 학생 학년과 같은 단원만, 없으면 과목 기본 grade 로 본다. 해당 학년 단원이 하나도 없으면 전체에서 고른다.
   const gk=g=>/^h1/.test(g||"")?"h1":/^h2/.test(g||"")?"h2":/^h3/.test(g||"")?"h3":(g||"");
-  function subjLessons(D,sid,grade){ const s=D.subjects&&D.subjects[sid]; if(!s) return []; const all=[]; s.units.forEach(u=>u.lessons.forEach(l=>all.push({s,u,l,g:u.grade||s.grade}))); if(!grade) return all; const exact=all.filter(x=>gk(x.g)===gk(grade)); if(exact.length) return exact; const band=all.filter(x=>gk(x.g).slice(0,2)===gk(grade).slice(0,2)); return band.length?band:all; }
+  function subjLessons(D,sid,grade){ const s=D.subjects&&D.subjects[sid]; if(!s) return []; const all=[]; s.units.forEach(u=>u.lessons.forEach(l=>all.push({s,u,l,g:u.grade||s.grade}))); if(!grade) return all; const exact=all.filter(x=>gk(x.g)===gk(grade)); if(exact.length){ const term=(D.dailyConfig&&D.dailyConfig.term)||s.term; const cur=term?exact.filter(x=>!x.u.term||x.u.term===term):exact; return cur.length?cur:exact; } const band=all.filter(x=>gk(x.g).slice(0,2)===gk(grade).slice(0,2)); return band.length?band:all; }
 
   function build(opt){
     const D=opt.D, date=opt.date, grade=opt.grade||"g22", di=dayIndex(date); const wd=new Date(date+"T00:00:00").getDay();

@@ -2026,5 +2026,276 @@
   "alt": "안내문 포스터와 도표",
   "want": 1,
   "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-central-travel",
+  "wiki": [
+   "ko:설악산",
+   "en:Seoraksan",
+   "ko:단양군"
+  ],
+  "commons": [
+   "Seoraksan National Park autumn",
+   "Danyang Dodamsambong"
+  ],
+  "alt": "중부 지역의 산지·관광 경관(설악산)",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-central-gangwon",
+  "wiki": [
+   "ko:대관령",
+   "en:Daegwallyeong",
+   "ko:태백시"
+  ],
+  "commons": [
+   "Daegwallyeong wind farm ranch",
+   "Taebaek coal mine museum"
+  ],
+  "alt": "강원 고랭지·풍력 발전과 폐광 지역",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-central-chungcheong",
+  "wiki": [
+   "ko:세종특별자치시",
+   "en:Sejong_City",
+   "ko:오송역"
+  ],
+  "commons": [
+   "Sejong City government complex aerial",
+   "Osong Station KTX"
+  ],
+  "alt": "세종시 정부청사와 고속철도",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-south-travel",
+  "wiki": [
+   "ko:순천만",
+   "en:Suncheon_Bay",
+   "ko:경주시"
+  ],
+  "commons": [
+   "Suncheon Bay reed field",
+   "Gyeongju Bulguksa temple"
+  ],
+  "alt": "남부 지역의 자연·문화 관광지(순천만·경주)",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-south-industry",
+  "wiki": [
+   "ko:울산광역시",
+   "en:Pohang_Steel_Works",
+   "ko:여수국가산업단지"
+  ],
+  "commons": [
+   "Ulsan Hyundai shipyard aerial",
+   "POSCO Pohang steel works",
+   "Yeosu industrial complex night"
+  ],
+  "alt": "남동 임해 공업 지역(울산 조선소·포항 제철)",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-south-jeju",
+  "wiki": [
+   "ko:성산일출봉",
+   "en:Seongsan_Ilchulbong",
+   "ko:제주특별자치도"
+  ],
+  "commons": [
+   "Seongsan Ilchulbong Jeju",
+   "Jeju Olle trail coast"
+  ],
+  "alt": "제주도의 화산 지형과 해안 경관",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-north-nature",
+  "wiki": [
+   "ko:백두산",
+   "en:Paektu_Mountain",
+   "en:Pyongyang"
+  ],
+  "commons": [
+   "Paektu Mountain Heaven Lake",
+   "Pyongyang skyline Taedong river"
+  ],
+  "alt": "북한의 자연환경(백두산 천지)과 평양",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-north-border",
+  "wiki": [
+   "ko:한반도_비무장_지대",
+   "en:Korean_Demilitarized_Zone",
+   "en:Panmunjom"
+  ],
+  "commons": [
+   "Korean DMZ Panmunjom JSA",
+   "DMZ fence Korea border"
+  ],
+  "alt": "비무장 지대(DMZ)와 판문점",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-north-peace",
+  "wiki": [
+   "ko:도라산역",
+   "en:Dorasan_Station",
+   "ko:임진각"
+  ],
+  "commons": [
+   "Dorasan Station platform",
+   "Imjingak peace park"
+  ],
+  "alt": "도라산역·임진각 — 통일을 향한 공간",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-sustain-resource",
+  "wiki": [
+   "ko:태양광_발전",
+   "en:Solar_power_in_South_Korea",
+   "ko:풍력_발전"
+  ],
+  "commons": [
+   "Solar farm South Korea",
+   "Jeju wind turbines coast"
+  ],
+  "alt": "재생 에너지(태양광·풍력) 발전 시설",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-sustain-env",
+  "wiki": [
+   "ko:갯벌",
+   "en:Getbol",
+   "en:Plastic_pollution"
+  ],
+  "commons": [
+   "Korean tidal flat getbol Incheon",
+   "Plastic pollution beach"
+  ],
+  "alt": "갯벌과 해양 플라스틱 오염",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g22-visang-sustain-local",
+  "wiki": [
+   "ko:쿠리치바",
+   "en:Curitiba",
+   "en:Bus_rapid_transit"
+  ],
+  "commons": [
+   "Curitiba bus rapid transit station",
+   "Copenhagen bicycle lane"
+  ],
+  "alt": "쿠리치바 BRT·코펜하겐 자전거 도로",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g22-visang-ww-order",
+  "wiki": [
+   "en:Treaty_of_Versailles",
+   "ko:제1차_세계_대전",
+   "en:Western_Front_(World_War_I)"
+  ],
+  "commons": [
+   "World War I trench soldiers 1916",
+   "Signing Treaty of Versailles 1919 Hall of Mirrors"
+  ],
+  "alt": "제1차 세계 대전 참호와 베르사유 조약 조인",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g22-visang-ww-peace",
+  "wiki": [
+   "en:Nuremberg_trials",
+   "ko:뉘른베르크_재판",
+   "en:Universal_Declaration_of_Human_Rights"
+  ],
+  "commons": [
+   "Nuremberg trials defendants dock 1945",
+   "Eleanor Roosevelt Universal Declaration of Human Rights"
+  ],
+  "alt": "뉘른베르크 재판과 세계 인권 선언",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g22-visang-ww-asia",
+  "wiki": [
+   "en:Mahatma_Gandhi",
+   "ko:5·4_운동",
+   "en:May_Fourth_Movement"
+  ],
+  "commons": [
+   "Gandhi Salt March 1930",
+   "May Fourth Movement Beijing students 1919"
+  ],
+  "alt": "간디의 소금 행진과 5·4 운동",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g22-visang-coldwar",
+  "wiki": [
+   "en:Berlin_Wall",
+   "ko:베를린_장벽",
+   "en:Cuban_Missile_Crisis"
+  ],
+  "commons": [
+   "Berlin Wall fall November 1989 Brandenburg",
+   "Berlin Wall Checkpoint Charlie 1961"
+  ],
+  "alt": "베를린 장벽과 그 붕괴(1989)",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g22-visang-democracy",
+  "wiki": [
+   "en:Martin_Luther_King_Jr.",
+   "en:Nelson_Mandela",
+   "en:March_on_Washington_for_Jobs_and_Freedom"
+  ],
+  "commons": [
+   "March on Washington 1963 Lincoln Memorial crowd",
+   "Nelson Mandela voting 1994"
+  ],
+  "alt": "워싱턴 행진(1963)과 만델라",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g22-visang-global",
+  "wiki": [
+   "en:European_Union",
+   "en:Container_ship",
+   "en:World_Trade_Organization"
+  ],
+  "commons": [
+   "Container ship port Busan",
+   "European Parliament Strasbourg building"
+  ],
+  "alt": "컨테이너선과 유럽 의회 — 세계화와 지역 통합",
+  "want": 2,
+  "kind": "photo"
  }
 ]
