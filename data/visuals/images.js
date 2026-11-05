@@ -2097,5 +2097,329 @@ window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAd
    "credit": "Louis Tauzin · Public domain · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Vichy-Louis_Tauzin.jpg"
   }
+ ],
+ "soc-g22-visang-central-travel": [
+  {
+   "type": "img",
+   "title": "중부 지역의 산지·관광 경관(설악산)",
+   "src": "assets/img/soc-g22-visang-central-travel-1.jpg",
+   "alt": "중부 지역의 산지·관광 경관(설악산)",
+   "credit": "Juliana Ng from Singapore · CC BY 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Korea_Seoraksan.jpg"
+  },
+  {
+   "type": "img",
+   "title": "중부 지역의 산지·관광 경관(설악산)",
+   "src": "assets/img/soc-g22-visang-central-travel-2.jpg",
+   "alt": "중부 지역의 산지·관광 경관(설악산)",
+   "credit": "Taewangkorea · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Dinosaur_Ridge_of_Seoraksan.jpg"
+  }
+ ],
+ "soc-g22-visang-central-gangwon": [
+  {
+   "type": "img",
+   "title": "강원 고랭지·풍력 발전과 폐광 지역",
+   "src": "assets/img/soc-g22-visang-central-gangwon-1.jpg",
+   "alt": "강원 고랭지·풍력 발전과 폐광 지역",
+   "credit": "Dittwjfsdgkvkdjg · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Daegwallyeong3.jpg"
+  },
+  {
+   "type": "img",
+   "title": "강원 고랭지·풍력 발전과 폐광 지역",
+   "src": "assets/img/soc-g22-visang-central-gangwon-2.jpg",
+   "alt": "강원 고랭지·풍력 발전과 폐광 지역",
+   "credit": "Taehoon Kang from SAN FRANCISCO, USA · CC BY 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Daegwallyeong_sheep_farm2.jpg"
+  }
+ ],
+ "soc-g22-visang-central-chungcheong": [
+  {
+   "type": "img",
+   "title": "세종시 정부청사와 고속철도",
+   "src": "assets/img/soc-g22-visang-central-chungcheong-1.jpg",
+   "alt": "세종시 정부청사와 고속철도",
+   "credit": "Minseong Kim · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Hannuridaero_and_Bangchukcheon.jpg"
+  },
+  {
+   "type": "img",
+   "title": "세종시 정부청사와 고속철도",
+   "src": "assets/img/soc-g22-visang-central-chungcheong-2.jpg",
+   "alt": "세종시 정부청사와 고속철도",
+   "credit": "Minseong Kim · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Sejong_Area_1.jpg"
+  }
+ ],
+ "soc-g22-visang-south-travel": [
+  {
+   "type": "img",
+   "title": "남부 지역의 자연·문화 관광지(순천만·경주)",
+   "src": "assets/img/soc-g22-visang-south-travel-1.jpg",
+   "alt": "남부 지역의 자연·문화 관광지(순천만·경주)",
+   "credit": "Jjw · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:20181231_Suncheon_Bay_002.jpg"
+  },
+  {
+   "type": "img",
+   "title": "남부 지역의 자연·문화 관광지(순천만·경주)",
+   "src": "assets/img/soc-g22-visang-south-travel-2.jpg",
+   "alt": "남부 지역의 자연·문화 관광지(순천만·경주)",
+   "credit": "Kyoww (montage) · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Gyeongju_montage.png"
+  }
+ ],
+ "soc-g22-visang-south-industry": [
+  {
+   "type": "img",
+   "title": "남동 임해 공업 지역(울산 조선소·포항 제철)",
+   "src": "assets/img/soc-g22-visang-south-industry-1.jpg",
+   "alt": "남동 임해 공업 지역(울산 조선소·포항 제철)",
+   "credit": "Choi2451 · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Taehwa_River_from_Hotel_Riverside_Ulsan.jpg"
+  },
+  {
+   "type": "img",
+   "title": "남동 임해 공업 지역(울산 조선소·포항 제철)",
+   "src": "assets/img/soc-g22-visang-south-industry-2.jpg",
+   "alt": "남동 임해 공업 지역(울산 조선소·포항 제철)",
+   "credit": "Cho's · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:POSCO_(POhang_Steel_Corp.)_Entrance_-_panoramio.jpg"
+  }
+ ],
+ "soc-g22-visang-south-jeju": [
+  {
+   "type": "img",
+   "title": "제주도의 화산 지형과 해안 경관",
+   "src": "assets/img/soc-g22-visang-south-jeju-1.jpg",
+   "alt": "제주도의 화산 지형과 해안 경관",
+   "credit": "Korea Heritage Service · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:%EC%84%B1%EC%82%B0%EC%9D%BC%EC%B6%9C%EB%B4%89_%EC%B2%9C%EC%97%B0%EB%B3%B4%ED%98%B8%EA%B5%AC%EC%97%AD_2019%EB%85%84_%EC%B4%AC%EC%98%81(%EC%B6%9C%EC%B2%98_%EB%AC%B8%ED%99%94%EC%9E%AC%EC%B2%AD_%EB%8C%80%EB%B3%80%EC%9D%B8%EC%8B%A4).jpg"
+  },
+  {
+   "type": "img",
+   "title": "제주도의 화산 지형과 해안 경관",
+   "src": "assets/img/soc-g22-visang-south-jeju-2.jpg",
+   "alt": "제주도의 화산 지형과 해안 경관",
+   "credit": "Korea.net / Korean Culture and Information Service · CC BY-SA 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Seongsan_Ilchulbong_from_the_air.jpg"
+  }
+ ],
+ "soc-g22-visang-north-nature": [
+  {
+   "type": "img",
+   "title": "북한의 자연환경(백두산 천지)과 평양",
+   "src": "assets/img/soc-g22-visang-north-nature-1.jpg",
+   "alt": "북한의 자연환경(백두산 천지)과 평양",
+   "credit": "Bdpmax · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Baitou_Mountain_Tianchi.jpg"
+  },
+  {
+   "type": "img",
+   "title": "북한의 자연환경(백두산 천지)과 평양",
+   "src": "assets/img/soc-g22-visang-north-nature-2.jpg",
+   "alt": "북한의 자연환경(백두산 천지)과 평양",
+   "credit": "Laika ac from USA · CC BY-SA 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Laika_ac_Mt._Paekdu_(7998657081).jpg"
+  }
+ ],
+ "soc-g22-visang-north-border": [
+  {
+   "type": "img",
+   "title": "비무장 지대(DMZ)와 판문점",
+   "src": "assets/img/soc-g22-visang-north-border-1.jpg",
+   "alt": "비무장 지대(DMZ)와 판문점",
+   "credit": "korea.net · CC BY-SA 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:President_Moon_Jaein_Gangwondo_20190426_08.jpg"
+  },
+  {
+   "type": "img",
+   "title": "비무장 지대(DMZ)와 판문점",
+   "src": "assets/img/soc-g22-visang-north-border-2.jpg",
+   "alt": "비무장 지대(DMZ)와 판문점",
+   "credit": "Driedprawns at en.wikipedia · CC BY 2.5 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:070401_Panmunjeom3.jpg"
+  }
+ ],
+ "soc-g22-visang-north-peace": [
+  {
+   "type": "img",
+   "title": "도라산역·임진각 — 통일을 향한 공간",
+   "src": "assets/img/soc-g22-visang-north-peace-1.jpg",
+   "alt": "도라산역·임진각 — 통일을 향한 공간",
+   "credit": "Mimmodipalma · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Dorasan_stationdue.jpg"
+  },
+  {
+   "type": "img",
+   "title": "도라산역·임진각 — 통일을 향한 공간",
+   "src": "assets/img/soc-g22-visang-north-peace-2.jpg",
+   "alt": "도라산역·임진각 — 통일을 향한 공간",
+   "credit": "Sanmosa · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Dorasan_Station_20190630.jpg"
+  }
+ ],
+ "soc-g22-visang-sustain-resource": [
+  {
+   "type": "img",
+   "title": "재생 에너지(태양광·풍력) 발전 시설",
+   "src": "assets/img/soc-g22-visang-sustain-resource-1.jpg",
+   "alt": "재생 에너지(태양광·풍력) 발전 시설",
+   "credit": "USAF · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Nellis_AFB_Solar_panels.jpg"
+  },
+  {
+   "type": "img",
+   "title": "재생 에너지(태양광·풍력) 발전 시설",
+   "src": "assets/img/soc-g22-visang-sustain-resource-2.jpg",
+   "alt": "재생 에너지(태양광·풍력) 발전 시설",
+   "credit": "SolarGIS © 2014 GeoModel Solar · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:SolarGIS-Solar-map-South-Korea-en.png"
+  }
+ ],
+ "soc-g22-visang-sustain-env": [
+  {
+   "type": "img",
+   "title": "갯벌과 해양 플라스틱 오염",
+   "src": "assets/img/soc-g22-visang-sustain-env-1.jpg",
+   "alt": "갯벌과 해양 플라스틱 오염",
+   "credit": "--Pinpin 13:22, 15 August 2006 (UTC) · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:France_-_Passage_du_Gois_-_p%C3%AAche_%C3%A0_pied.jpg"
+  },
+  {
+   "type": "img",
+   "title": "갯벌과 해양 플라스틱 오염",
+   "src": "assets/img/soc-g22-visang-sustain-env-2.jpg",
+   "alt": "갯벌과 해양 플라스틱 오염",
+   "credit": "Seungh · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:%EA%B3%A0%EC%B0%BD%EA%B0%AF%EB%B2%8C.jpg"
+  }
+ ],
+ "soc-g22-visang-sustain-local": [
+  {
+   "type": "img",
+   "title": "쿠리치바 BRT·코펜하겐 자전거 도로",
+   "src": "assets/img/soc-g22-visang-sustain-local-1.jpg",
+   "alt": "쿠리치바 BRT·코펜하겐 자전거 도로",
+   "credit": "Zé Andrade · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Centro_C%C3%ADvico_Curitiba_Pr.jpg"
+  },
+  {
+   "type": "img",
+   "title": "쿠리치바 BRT·코펜하겐 자전거 도로",
+   "src": "assets/img/soc-g22-visang-sustain-local-2.jpg",
+   "alt": "쿠리치바 BRT·코펜하겐 자전거 도로",
+   "credit": "Vitor Hirota · CC BY-SA 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Tangu%C3%A1_Curitiba.jpg"
+  }
+ ],
+ "his-g22-visang-ww-order": [
+  {
+   "type": "img",
+   "title": "제1차 세계 대전 참호와 베르사유 조약 조인",
+   "src": "assets/img/his-g22-visang-ww-order-1.jpg",
+   "alt": "제1차 세계 대전 참호와 베르사유 조약 조인",
+   "credit": "David Lloyd George, Woodrow Wilson and Georges Clemenceau · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Treaty_of_Versailles,_English_version.jpg"
+  },
+  {
+   "type": "img",
+   "title": "제1차 세계 대전 참호와 베르사유 조약 조인",
+   "src": "assets/img/his-g22-visang-ww-order-2.jpg",
+   "alt": "제1차 세계 대전 참호와 베르사유 조약 조인",
+   "credit": "User:Hohum · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:WWImontage.jpg"
+  }
+ ],
+ "his-g22-visang-ww-peace": [
+  {
+   "type": "img",
+   "title": "뉘른베르크 재판과 세계 인권 선언",
+   "src": "assets/img/his-g22-visang-ww-peace-1.jpg",
+   "alt": "뉘른베르크 재판과 세계 인권 선언",
+   "credit": "Published in accordance with the direction of the International Military Tribuna · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Emblem_of_the_International_Military_Tribunal,_Nuremberg.png"
+  },
+  {
+   "type": "img",
+   "title": "뉘른베르크 재판과 세계 인권 선언",
+   "src": "assets/img/his-g22-visang-ww-peace-2.jpg",
+   "alt": "뉘른베르크 재판과 세계 인권 선언",
+   "credit": "RsVe, corrected by Barliner. · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Parteiadler_Nationalsozialistische_Deutsche_Arbeiterpartei_(1933%E2%80%931945).svg"
+  }
+ ],
+ "his-g22-visang-ww-asia": [
+  {
+   "type": "img",
+   "title": "간디의 소금 행진과 5·4 운동",
+   "src": "assets/img/his-g22-visang-ww-asia-1.jpg",
+   "alt": "간디의 소금 행진과 5·4 운동",
+   "credit": "Elliott &amp; Fry · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Mahatma-Gandhi,_studio,_1931.jpg"
+  },
+  {
+   "type": "img",
+   "title": "간디의 소금 행진과 5·4 운동",
+   "src": "assets/img/his-g22-visang-ww-asia-2.jpg",
+   "alt": "간디의 소금 행진과 5·4 운동",
+   "credit": "Unknown authorUnknown author · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Beijing_students_protesting_the_Treaty_of_Versailles_(May_4,_1919).jpg"
+  }
+ ],
+ "his-g22-visang-coldwar": [
+  {
+   "type": "img",
+   "title": "베를린 장벽과 그 붕괴(1989)",
+   "src": "assets/img/his-g22-visang-coldwar-1.jpg",
+   "alt": "베를린 장벽과 그 붕괴(1989)",
+   "credit": "Noir · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Berlinermauer.jpg"
+  },
+  {
+   "type": "img",
+   "title": "베를린 장벽과 그 붕괴(1989)",
+   "src": "assets/img/his-g22-visang-coldwar-2.jpg",
+   "alt": "베를린 장벽과 그 붕괴(1989)",
+   "credit": "USAF · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:PGM-19A_Jupiter_missile-02.jpg"
+  }
+ ],
+ "his-g22-visang-democracy": [
+  {
+   "type": "img",
+   "title": "워싱턴 행진(1963)과 만델라",
+   "src": "assets/img/his-g22-visang-democracy-1.jpg",
+   "alt": "워싱턴 행진(1963)과 만델라",
+   "credit": "Yoichi Okamoto · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Martin_Luther_King,_Jr._and_Lyndon_Johnson_(cropped).jpg"
+  },
+  {
+   "type": "img",
+   "title": "워싱턴 행진(1963)과 만델라",
+   "src": "assets/img/his-g22-visang-democracy-2.jpg",
+   "alt": "워싱턴 행진(1963)과 만델라",
+   "credit": "Kingkongphoto &amp; www.celebrity-photos.com from Laurel · CC BY-SA 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Nelson_Mandela_1994.jpg"
+  }
+ ],
+ "his-g22-visang-global": [
+  {
+   "type": "img",
+   "title": "컨테이너선과 유럽 의회 — 세계화와 지역 통합",
+   "src": "assets/img/his-g22-visang-global-1.jpg",
+   "alt": "컨테이너선과 유럽 의회 — 세계화와 지역 통합",
+   "credit": "User:Verdy p, User:-xfi-, User:Paddu, User:Nightstallion, User:Funakoshi, User:J · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Flag_of_Europe.svg"
+  },
+  {
+   "type": "img",
+   "title": "컨테이너선과 유럽 의회 — 세계화와 지역 통합",
+   "src": "assets/img/his-g22-visang-global-2.jpg",
+   "alt": "컨테이너선과 유럽 의회 — 세계화와 지역 통합",
+   "credit": "kees torn · CC BY-SA 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:MAERSK_MC_KINNEY_M%C3%96LLER_%26_MARSEILLE_MAERSK_(48694054418).jpg"
+  }
  ]
 });
