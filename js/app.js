@@ -430,7 +430,7 @@
           else if(phase==="after"){ mt.push({t:"📒 시험 오답을 계산/개념/해석/시간 으로 분류",m:30,h:"#/notes"}); if(due.length) mt.push({t:`🩺 클리닉: ${byLesson(due[0][0]).title}`,m:15,h:"#/clinic/"+due[0][0]}); }
           else { const pat=(D.suneung.patterns||[])[(i*7)%D.suneung.patterns.length]; mt.push({t:`🧭 수능 패턴: ${pat.name}`,m:20,h:"#/patterns/"+pat.id}); if(wd===6) mt.push({t:"🔥 서바이벌 30문항 100분",m:100,h:"#/survival"}); else if(weak) mt.push({t:`➕ ${weak.title} 생성 5문제 + 오답 분류`,m:20,h:"#/practice/"+weak.id}); if(due.length) mt.push({t:`🩺 클리닉: ${byLesson(due[0][0]).title}`,m:15,h:"#/clinic/"+due[0][0]}); }
           let used=0; mt.forEach(x=>{ if(used+x.m<=mins+10){ tasks.push({s:"수학",...x}); used+=x.m; } }); }
-        else { const sm=SM.subjects[sub]; if(!sm) return; const list=sm[phase]||sm.csat||sm.concept; let used=0; list.forEach((x,k)=>{ if(used+x.m<=mins+10){ tasks.push({s:sub,t:`${sm.icon} ${x.t}`,m:x.m,why:x.why}); used+=x.m; } }); } });
+        else { const sm=SM.subjects[sub]; if(!sm) return; const list=sm[phase]||sm.csat||sm.concept; let used=0; const sid=(window.BRIEF&&window.BRIEF.SUBJ_ID||{})[sub]; const sl=[]; if(sid&&D.subjects&&D.subjects[sid]) D.subjects[sid].units.forEach(u=>u.lessons.forEach(l=>sl.push(l))); const sL=sl.length?sl[(i+Math.floor(Date.now()/864e5))%sl.length]:null; list.forEach((x,k)=>{ if(used+x.m<=mins+10){ tasks.push({s:sub,t:`${sm.icon} ${x.t}`,m:x.m,why:x.why,h:k===0&&sL?`#/sub/${sid}/${sL.id}`:undefined}); used+=x.m; } }); if(sL&&phase!=="after") tasks.push({s:sub,t:`${sm.icon} 차시: ${sL.title} (핵심→함정→퀴즈 3)`,m:10,h:`#/sub/${sid}/${sL.id}`}); } });
       out.push({date,wd,label:`${+date.slice(5,7)}/${+date.slice(8,10)} (${["일","월","화","수","목","금","토"][wd]})`,mode,phase,exam:act?act.e:null,dd:act?act.dd:null,tasks,budget}); }
     return out; }
   function schedConsult(M){ const S=schedGet(); const out=[]; const ups=S.exams.map(e=>({e,dd:dayDiff(e.date)})).filter(x=>x.dd>=-3).sort((a,b)=>a.dd-b.dd);
@@ -632,7 +632,7 @@
     const widgets=Object.entries(window.WIDGETS).filter(([k,w])=>w.node===l.node);
     const lifeItems=D.life.filter(x=>x.node===l.node).slice(0,3); const ppl=D.people.filter(p=>p.link===l.id||p.node===l.node).slice(0,2);
     { const v=store.get("visit",{}); v[l.id]={n:(v[l.id]?v[l.id].n:0)+1,last:Date.now()}; store.set("visit",v); } const mst=mastery(l); const [stn,stc]=STATUS(mst.pct);
-    render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span> <span class="st ${stc}">목표율 ${mst.pct}% · ${stn}</span><h1>${l.title}</h1><p class="lead">${teaser(l.concept[0],90)}</p></div>
+    render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span> <span class="st ${stc}">목표율 ${mst.pct}% · ${stn}</span><h1>${l.title}</h1><p class="lead">${teaser(l.concept[0],90)}</p>${(D.standards&&D.standards.lessons[l.id])?`<p class="muted small" title="2022 개정 수학과 교육과정(교육부 고시 제2022-33호 별책 8)">성취기준 ${D.standards.lessons[l.id].map(c=>`<code>[${c}]</code> ${esc(D.standards.codes[c]||"")}`).join(" · ")}</p>`:""}</div>
     <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["story","이야기"],["pit","오개념"],["pt","출제 포인트"],["f","공식"],["ex","예제"],["quiz","퀴즈"],["bridge","개념 연결"],["place","개념의 자리"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
     <h2 id="c">핵심 개념</h2><div class="concept-row"><ul>${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>${figOf(l.id)}</div>
     <h2 id="why">왜 그런지</h2><div class="box">${md(l.why)}</div>
@@ -1120,7 +1120,7 @@
     :`<p class="muted">퀴즈에서 답을 고르기 전에 <b>😎 확실 · 🤔 반반 · 🎲 찍음</b> 중 하나를 누르면 여기에 '착각'과 '운'이 나뉘어 쌓입니다. <a href="#/study">소단원 퀴즈</a>에서 시작하세요.</p>`}</div>
     ${n.length?`<div class="grid"><div class="card"><h3>틀린 이유 분포</h3>${TAGS.map(t=>`<div class="row" style="justify-content:space-between"><span>${t}</span><b>${cnt[t]||0}</b></div><div class="progress"><i style="width:${n.length?(cnt[t]||0)/n.length*100:0}%"></i></div>`).join("")}<p class="muted" style="font-size:.85rem">미분류 ${n.length-Object.values(cnt).reduce((a,b)=>a+b,0)}</p></div><div class="card"><h3>단원별</h3>${Object.entries(byUnitC).sort((a,b)=>b[1]-a[1]).map(([u,c])=>`<div class="row" style="justify-content:space-between"><span>${u}</span><b>${c}</b></div>`).join("")}</div><div class="card"><h3>처방</h3><p class="muted">계산 실수 → 검산 습관(답을 식에 대입)<br>개념 오류 → 그 소단원 '오개념' 다시 읽기<br>문제 해석 → 문제를 그림·표로 옮기기<br>풀이 못함 → '왜 그런지'와 예제부터</p></div></div>`:""}
     <div class="row" style="margin:12px 0"><button class="btn ghost" id="exp">내보내기</button><button class="btn ghost" id="clr">모두 지우기</button></div>
-    ${n.length?`<table><tr><th>날짜</th><th>문제</th><th>소단원</th><th>틀린 이유</th></tr>${n.map(x=>{const l=byLesson(x.key.replace("lesson:","")); const k=key(x); return `<tr><td>${new Date(x.when).toLocaleDateString("ko")}</td><td>${esc(x.q)}</td><td>${l?`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`:""}</td><td><select data-k="${k}"><option value="">—</option>${TAGS.map(t=>`<option ${tags[k]===t?"selected":""}>${t}</option>`).join("")}</select></td></tr>`;}).join("")}</table>`:`<p class="muted">아직 비어 있습니다. <a href="#/study">소단원 퀴즈</a>나 <a href="#/mix">섞어 풀기</a>를 해 보세요.</p>`}`);
+    ${n.length?`<table><tr><th>날짜</th><th>문제</th><th>소단원</th><th>틀린 이유</th></tr>${n.map(x=>{const l=byLesson(x.key.replace("lesson:","")); const sh=x.key.startsWith("sub:")?subLesson(x.key.slice(4)):null; const k=key(x); return `<tr><td>${new Date(x.when).toLocaleDateString("ko")}</td><td>${esc(x.q)}</td><td>${l?`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`:sh?`<a href="#/sub/${sh.s.id}/${sh.l.id}">${sh.s.name} · ${sh.l.title}</a>`:""}</td><td><select data-k="${k}"><option value="">—</option>${TAGS.map(t=>`<option ${tags[k]===t?"selected":""}>${t}</option>`).join("")}</select></td></tr>`;}).join("")}</table>`:`<p class="muted">아직 비어 있습니다. <a href="#/study">소단원 퀴즈</a>나 <a href="#/mix">섞어 풀기</a>를 해 보세요.</p>`}`);
     main.querySelectorAll("select[data-k]").forEach(sel=>sel.onchange=()=>{ tags[sel.dataset.k]=sel.value; store.set("notetags",tags); });
     $("#exp").onclick=()=>{ const blob=new Blob([JSON.stringify({notes:n,notetags:tags,quiz:store.get("quiz",{}),diag:store.get("diag",[]),srs:store.get("srs",{}),exam:store.get("exam",{}),essay:store.get("essay",{}),daily:store.get("daily",{})},null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="my-math-record.json"; a.click(); };
     $("#clr").onclick=()=>{ if(confirm("오답 노트를 비울까요?")){store.set("notes",[]);notes();} }; }
@@ -1181,6 +1181,44 @@
     main.querySelectorAll(".rv-if").forEach(b=>b.onclick=()=>{ $("#rv-if").value=b.textContent; }); main.querySelectorAll(".rv-then").forEach(b=>b.onclick=()=>{ $("#rv-then").value=b.textContent; });
     $("#rv-save").onclick=()=>{ R[k]={good:$("#rv-good").value.trim(),stuck:$("#rv-stuck").value.trim(),ifc:$("#rv-if").value.trim(),then:$("#rv-then").value.trim(),when:Date.now()}; store.set("review",R); $("#rv-msg").textContent="저장됨 ✓ "+new Date().toLocaleString("ko"); $("#rv-pre").textContent=shareText(); if(R[k].ifc&&R[k].then) earnTok(2,"주간 돌아보기"); };
     $("#rv-share").onclick=()=>shareNow($("#rv-share")); }
+
+  // ---------- 전 과목 (국어·영어·과학·사회·역사) — 2022 개정 성취기준 기반, 수학과 같은 구조 ----------
+  const SUBJ=()=>Object.values(D.subjects||{});
+  const subLesson=id=>{ for(const s of SUBJ()) for(const u of s.units) for(const l of u.lessons) if(l.id===id) return {s,u,l}; return null; };
+  const subScore=l=>{ const prog=store.get("quiz",{}); let c=0,n=l.quiz.length; l.quiz.forEach((q,i)=>{ if(prog["sub:"+l.id+"#"+i]) c++; }); return {c,n}; };
+  function subjects(){ const p=profile(); if(!p) return setup(); const S=SUBJ();
+    render(`<div class="crumb"><a href="#/">홈</a> › 전 과목</div><h1>📚 전 과목 — 내신·학평 핵심</h1>
+    <p class="lead">수학과 같은 목표로 만든 <b>국어·영어·과학·사회·역사(세계사·한국사)</b>. 2022 개정 교육과정 <b>성취기준</b> 단위로 핵심 개념 → 오개념·함정 → 출제 포인트 → 풀이 패턴 → 확인 퀴즈 3(확신도 체크 포함). 교과서(출판사)마다 단원 순서가 달라 성취기준 코드로 묶었으니 학교 진도와 맞춰 고르세요. 현재 범위: 중2 2학기.</p>
+    ${S.map(s=>`<h2>${s.icon} ${s.name} <span class="muted" style="font-weight:400;font-size:.9rem">${s.units.length}단원 · ${s.units.reduce((a,u)=>a+u.lessons.length,0)}차시</span></h2>
+      ${s.units.map(u=>`<div class="card"><h3>${u.title}${u.track?` <span class="tag">${u.track==="world"?"세계사(역사①)":"한국사(역사②)"}</span>`:""} <span class="muted small">${(u.std||[]).map(c=>"["+c+"]").join(" ")}</span></h3><p class="muted small">🏫 ${esc(u.exam||"")}</p><div class="grid wide">${u.lessons.map(l=>{ const r=subScore(l); return `<a class="card link" href="#/sub/${s.id}/${l.id}"><h3 style="font-size:1rem">${l.title}</h3><p class="muted small">${teaser(l.memo||l.concept[0],70)}</p><span class="tag">퀴즈 ${r.c}/${r.n}</span></a>`; }).join("")}</div></div>`).join("")}
+      <p class="muted small">근거: ${(s.src||[]).map(([t,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(t)}</a>`).join(" · ")}</p>`).join("")}
+    <div class="box warn"><b>주의.</b> 성취기준 코드와 단원 배치는 공개 자료(교육부 고시·교과서 목차·2차 정리 자료)를 바탕으로 했고, 일부는 원문 대조가 안 된 추정입니다(각 과목 파일 머리말에 표시). 학교 시험 범위는 반드시 교과서 차례와 선생님 공지로 확인하세요.</div>`); }
+  function sub(sid,lid){ const p=profile(); if(!p) return setup(); const s=(D.subjects||{})[sid]; if(!s) return notFound(); if(!lid){ location.hash="#/subjects"; return; }
+    const hit=subLesson(lid); if(!hit||hit.s.id!==sid) return notFound(); const {u,l}=hit; const idx=u.lessons.findIndex(x=>x.id===lid); const prev=u.lessons[idx-1], next=u.lessons[idx+1]; const r=subScore(l);
+    render(`<div class="lhead ${GCOL(s.grade)}"><div class="crumb"><a href="#/subjects">전 과목</a> › ${s.icon} ${s.name} › ${u.title}</div>${tag(s.grade)} <span class="tag">${idx+1}/${u.lessons.length}</span> <span class="tag">퀴즈 ${r.c}/${r.n}</span><h1>${l.title}</h1><p class="muted small">성취기준 ${(l.std||[]).map(c=>`<code>[${c}]</code>`).join(" ")} · 🏫 ${esc(u.exam||"")}</p></div>
+    <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["pit","오개념"],["pt","출제 포인트"],["pat","풀이 패턴"],["quiz","퀴즈"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
+    <h2 id="c">핵심 개념</h2><ul class="bul">${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>
+    ${l.memo?`<div class="box ok"><b>꼭 외울 한 줄:</b> ${md(l.memo)}</div>`:""}
+    ${l.why?`<h2 id="why">왜 그런지</h2><p>${md(l.why)}</p>`:""}
+    ${l.pitfalls&&l.pitfalls.length?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
+    ${l.points&&l.points.length?`<h2 id="pt">🎯 출제 포인트</h2><ul class="bul">${l.points.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
+    ${l.pattern&&l.pattern.length?`<h2 id="pat">🧭 문제 풀이 패턴</h2><ol class="steps">${l.pattern.map(c=>`<li>${md(c)}</li>`).join("")}</ol>`:""}
+    <h2 id="quiz">확인 퀴즈 <span class="muted" style="font-weight:400;font-size:.9rem">답 고르기 전에 확신도를 먼저</span></h2>${quizHtml(l.quiz,"sub:"+l.id)}
+    <div class="row" style="margin-top:14px">${prev?`<a class="btn ghost" href="#/sub/${s.id}/${prev.id}">← ${prev.title}</a>`:""}${next?`<a class="btn ghost" href="#/sub/${s.id}/${next.id}">${next.title} →</a>`:`<a class="btn ghost" href="#/subjects">목록으로</a>`}<a class="btn ghost" href="#/today">📬 오늘의 5줄</a></div>
+    <p class="muted small" style="margin-top:12px">근거: ${(s.src||[]).slice(0,3).map(([t,u2])=>`<a href="${u2}" target="_blank" rel="noopener">${esc(t)}</a>`).join(" · ")}</p>`);
+    main.querySelectorAll(".pill[data-to]").forEach(b=>b.onclick=()=>{ const el=document.getElementById(b.dataset.to); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); }); }
+  // ---------- 오늘의 5줄 (텔레그램과 같은 내용 + 답·풀이 링크) ----------
+  function today(qs){ const p=profile(); if(!p) return setup(); const pr=new URLSearchParams(qs||""); const date=pr.get("d")||todayKey(); const cfg=D.dailyConfig||{};
+    const mine=schedGet().exams.map(e=>({name:e.name||EXAM_TYPES[e.type],date:e.date,type:e.type,subjects:e.subjects||[]})); const exams=mine.length?mine:(cfg.exams||[]);
+    const b=window.BRIEF.build({D,date,grade:p.grade,name:p.name||"",exams});
+    const L=["①","②","③","④"];
+    render(`<div class="crumb"><a href="#/me">내 학습</a> › 오늘의 5줄</div><h1>📬 ${esc(b.head.replace("📘 ",""))}</h1><p class="lead">${esc(b.exam)} ${mine.length?"":'<span class="muted small">(시험 일정은 <a href="#/schedule">일정·스케줄</a>에 등록하면 내 일정으로 바뀝니다)</span>'}</p>
+    ${b.blocks.map(x=>{ const hit=x.href.startsWith("#/sub/")?subLesson(x.href.split("/").pop()):null; const ml=!hit?byLesson(x.href.split("/").pop()):null; const q=hit?hit.l.quiz[0]:(ml?ml.quiz[0]:null);
+      return `<div class="card"><h3>${esc(x.subject)} · <a href="${x.href}">${esc(x.title)}</a> ${(x.std||[]).map(c=>`<code class="tcode">${c}</code>`).join(" ")}</h3>
+      <p>✅ <b>꼭:</b> ${md(x.need)}</p>${x.trap?`<p>⚠️ <b>함정:</b> ${md(x.trap)}</p>`:""}${x.pattern?`<p>🎯 <b>출제·풀이:</b> ${md(x.pattern)}</p>`:""}
+      ${q?quizHtml([q],(hit?"sub:":"lesson:")+(hit?hit.l.id:ml.id)):""}<a class="btn ghost sm" href="${x.href}">차시 전체 보기 →</a></div>`; }).join("")}
+    <div class="card"><h3>📌 오늘 할 일</h3><ul class="bul">${b.todo.map(t=>`<li>${esc(t)}</li>`).join("")}</ul><p class="muted small">단계는 시험 D-day 로 자동 결정(개념 21일 전 → 유형 8~21일 → 실전 7일 이내 → 복기). <a href="#/schedule">일정·스케줄</a>의 하루 계획과 같은 규칙입니다.</p></div>
+    <div class="card"><h3>📨 텔레그램으로 매일 아침 받기</h3><p class="muted small">같은 내용이 매일 07:00 에 텔레그램으로 옵니다. 설정은 저장소 <code>docs/DAILY-BRIEF.md</code> (봇 토큰·채팅 ID 를 GitHub Secrets 에 넣으면 끝). 시험 일정은 <code>data/daily-config.js</code>.</p><details><summary>오늘 메시지 원문</summary><pre class="muted small" style="white-space:pre-wrap">${esc(b.text)}</pre></details></div>`); }
   // ---------- 검색 ----------
   function search(q){ q=(q||"").trim().toLowerCase(); if(!q) return render(`<h1>검색</h1>`);
     const L=lessonsAll.filter(l=>(l.title+l.concept.join(" ")).toLowerCase().includes(q)); const F=D.formulas.filter(f=>(f.title+f.tex).toLowerCase().includes(q)); const Cc=D.concepts.filter(c=>(c.term+c.def+c.en).toLowerCase().includes(q)); const Lf=D.life.filter(x=>(x.title+x.body).toLowerCase().includes(q)); const P=D.people.filter(p=>(p.name+p.body).toLowerCase().includes(q));
@@ -1226,6 +1264,9 @@
     if(r==="essay") return essay(p[1]);
     if(r==="spot") return spot(p[1]);
     if(r==="review") return review();
+    if(r==="subjects") return subjects();
+    if(r==="sub") return sub(p[1],p[2]);
+    if(r==="today") return today(qs);
     if(r==="daily") return daily();
     if(r==="teacher") return teacher();
     if(r==="mix") return mix(qs);

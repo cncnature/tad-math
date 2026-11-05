@@ -1,0 +1,25 @@
+name: Daily brief (Telegram)
+on:
+  schedule:
+    - cron: "0 22 * * *"   # 매일 07:00 KST (UTC 22:00 전날)
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "YYYY-MM-DD (비우면 오늘)"
+        required: false
+permissions:
+  contents: read
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build and send
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then node scripts/send-telegram.js --date "${{ github.event.inputs.date }}"; else node scripts/send-telegram.js; fi
