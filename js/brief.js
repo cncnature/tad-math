@@ -13,7 +13,8 @@
   const WD=["일","월","화","수","목","금","토"];
 
   function mathLessons(D,grade){ const out=[]; const push=u=>{ if(u.grade===grade) (u.lessons||[]).forEach(l=>out.push({u,l})); }; (D.curriculum.units||[]).forEach(push); (D.curriculumExtra||[]).flat().forEach(push); return out; }
-  function subjLessons(D,sid){ const s=D.subjects&&D.subjects[sid]; if(!s) return []; const out=[]; s.units.forEach(u=>u.lessons.forEach(l=>out.push({s,u,l}))); return out; }
+  // 단원에 grade 가 있으면 학생 학년과 같은 단원만, 없으면 과목 기본 grade 로 본다. 해당 학년 단원이 하나도 없으면 전체에서 고른다.
+  function subjLessons(D,sid,grade){ const s=D.subjects&&D.subjects[sid]; if(!s) return []; const all=[]; s.units.forEach(u=>u.lessons.forEach(l=>all.push({s,u,l}))); if(!grade) return all; const mine=all.filter(x=>(x.u.grade||s.grade)===grade); return mine.length?mine:all; }
 
   function build(opt){
     const D=opt.D, date=opt.date, grade=opt.grade||"g22", di=dayIndex(date); const wd=new Date(date+"T00:00:00").getDay();
@@ -29,7 +30,7 @@
     // 수학: 학년 소단원을 날짜로 순환 (약점 정보는 브라우저에서만 있으므로 여기선 순환)
     const ml=mathLessons(D,grade); if(ml.length&&(examSubjects.includes("수학")||(opt.daily||[]).includes("수학"))){ const {u,l}=ml[di%ml.length]; const pat=(D.suneung&&D.suneung.patterns||[])[di%Math.max(1,(D.suneung&&D.suneung.patterns||[]).length)];
       blocks.push({subject:"수학",title:l.title,href:`#/study/${u.id}/${l.id}`,need:cut(l.concept[0],110),trap:cut((l.pitfalls||[])[0]||"",110),pattern:cut((l.points||[])[0]||(pat?pat.name+": "+(pat.first||pat.desc||""):""),110),quiz:l.quiz&&l.quiz[0]?{q:cut(l.quiz[0].q,120),opts:l.quiz[0].opts.map(o=>cut(o,28))}:null,std:(D.standards&&D.standards.lessons[l.id])||[]}); }
-    pick.forEach(sn=>{ const sl=subjLessons(D,SUBJ_ID[sn]); if(!sl.length) return; const {s,u,l}=sl[di%sl.length];
+    pick.forEach(sn=>{ const sl=subjLessons(D,SUBJ_ID[sn],grade); if(!sl.length) return; const {s,u,l}=sl[di%sl.length];
       blocks.push({subject:s.name,title:l.title,href:`#/sub/${s.id}/${l.id}`,need:cut(l.memo||l.concept[0],110),trap:cut((l.pitfalls||[])[0]||"",110),pattern:cut((l.pattern||[])[0]||(l.points||[])[0]||"",110),quiz:l.quiz&&l.quiz[0]?{q:cut(l.quiz[0].q,120),opts:l.quiz[0].opts.map(o=>cut(o,28))}:null,std:l.std||[]}); });
     // 오늘 할 일: 과목별 공부법(단계별) 첫 과제
     const SM=D.studyMethods; const todo=[]; ["수학",...pick].forEach(sn=>{ if(sn==="수학"){ const b=blocks[0]; if(b) todo.push(`수학 ${b.title} ${phase==="final"?"주간 테스트 10문항 15분":phase==="pattern"?"학교 시험 필수 문제 4개 + 생성 5문제":"개념→왜→퀴즈 30분"}`); return; } const sm=SM&&SM.subjects[sn==="역사"?"한국사":sn]; const list=sm&&(sm[phase]||sm.csat||sm.concept); if(list&&list[0]) todo.push(`${sn} ${strip(list[0].t)} ${list[0].m}분`); });
