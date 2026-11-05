@@ -485,7 +485,7 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 .lchip{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-decoration:none}
 .lchip b{font-size:.74rem;color:var(--muted)}.lchip.s4 b,.lchip.s5 b{color:var(--ok)}.lchip.s4,.lchip.s5{border-color:var(--ok)}.lchip.s2,.lchip.s3{border-color:var(--acc)}.lchip:hover{border-color:var(--acc);text-decoration:none}
 .sumcard{background:linear-gradient(180deg,rgba(47,111,237,.05),transparent)}.sum{margin:0;padding-left:22px}.sum li{margin:6px 0;line-height:1.55}
-.kw{display:flex;flex-wrap:wrap;gap:6px}.kw .chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.84rem;font-weight:600}
+.kwlist{display:flex;flex-wrap:wrap;gap:6px}.kwlist .chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.84rem;font-weight:600}
 .tiers th{font-size:.8rem;color:var(--muted);text-align:left;padding:4px 6px}.tiers td:nth-child(3),.tiers td:nth-child(4),.tiers td:nth-child(5){white-space:nowrap;font-size:.84rem;text-align:center}
 .card.data{background:var(--bg);margin:10px 0 0}.card.data .fig-table{font-size:.88rem}.why3{margin:-4px 0 14px}
 .essay{margin:12px 0}.essay textarea{width:100%;box-sizing:border-box;margin:8px 0;font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
@@ -496,3 +496,61 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 .quiz .qn em{font-style:normal;font-size:.72rem;background:var(--acc);color:#fff;border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:middle}
 .me-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 @media (max-width:640px){.stiles{grid-template-columns:1fr 1fr}.stile h3{font-size:1rem}}
+
+/* ===== v3.1 만점 노트 디자인 시스템 — 종이·펜·형광펜 (합격생 필기 규칙: 파랑 = 개념어·예시, 빨강 = 핵심·헷갈림, 형광 = 복습 때 못 떠올린 것) ===== */
+:root{
+  --paper:#fffdf7;--paper-line:#e9e2cf;--pen-blue:#1d4ed8;--pen-red:#d6334b;--hl:#fff1a6;--hl2:#d9f5e1;--hl3:#ffd9e6;--star:#f5a524;
+  --font-display:"Gowun Batang","Pretendard Variable",Pretendard,serif;
+  --grad-ink:linear-gradient(90deg,var(--acc),#7c3aed);
+}
+:root[data-theme="dark"]{--paper:#1b2130;--paper-line:#2e3647;--pen-blue:#8ab4ff;--pen-red:#ff8a9a;--hl:rgba(255,230,120,.28);--hl2:rgba(120,230,160,.25);--hl3:rgba(255,160,190,.25);--star:#fbbf24}
+h1,h2,.brand,.paper h1,.note-h{font-family:var(--font-display);letter-spacing:-.01em}
+h1{font-weight:700}
+h2{position:relative;padding-bottom:6px;border-bottom:0}
+h2::after{content:"";position:absolute;left:0;bottom:0;width:56px;height:3px;border-radius:3px;background:var(--grad-ink)}
+.topbar{backdrop-filter:saturate(1.4) blur(10px);background:color-mix(in srgb,var(--card) 86%,transparent)}
+.brand em{background:var(--grad-ink);-webkit-background-clip:text;background-clip:text;color:transparent}
+.me-head{padding:18px 20px;border-radius:18px;background:radial-gradient(1200px 300px at 10% -40%,rgba(47,111,237,.16),transparent 60%),radial-gradient(800px 260px at 95% 0%,rgba(124,58,237,.14),transparent 60%),var(--card);border:1px solid var(--line)}
+.stile{position:relative;overflow:hidden}.stile::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 10%,transparent),transparent 55%);pointer-events:none}
+/* 펜·형광펜·별표 */
+mark.hl{background:linear-gradient(104deg,transparent 2%,var(--hl) 3%,var(--hl) 96%,transparent 98%);padding:0 .18em;border-radius:3px;color:inherit;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+mark.hl.g{background:linear-gradient(104deg,transparent 2%,var(--hl2) 3%,var(--hl2) 96%,transparent 98%)}mark.hl.p{background:linear-gradient(104deg,transparent 2%,var(--hl3) 3%,var(--hl3) 96%,transparent 98%)}
+.kw{color:var(--pen-red);font-weight:800;border-bottom:2px solid color-mix(in srgb,var(--pen-red) 45%,transparent);cursor:pointer}
+.note b,.note strong{color:var(--pen-blue)}
+.stars{color:var(--star);letter-spacing:-.05em;font-size:.9em;white-space:nowrap}
+.stars.dim{color:var(--line)}
+/* 노트 종이 */
+.note{background:var(--paper);border:1px solid var(--paper-line);border-radius:14px;padding:18px 20px 18px 54px;position:relative;line-height:1.8;background-image:repeating-linear-gradient(transparent 0,transparent calc(1.8em - 1px),var(--paper-line) calc(1.8em - 1px),var(--paper-line) 1.8em);background-attachment:local;background-origin:content-box}
+.note::before{content:"";position:absolute;left:42px;top:0;bottom:0;width:2px;background:color-mix(in srgb,var(--pen-red) 35%,transparent)}
+.note-h{font-size:1.25rem;font-weight:700;margin:0 0 .4em;color:var(--pen-blue)}
+.note ol.sum{margin:0;padding-left:8px;list-style:none;counter-reset:n}
+.note ol.sum li{position:relative;padding-left:0;margin:0;line-height:1.8}
+.note ol.sum li::before{counter-increment:n;content:counter(n);position:absolute;left:-40px;top:.15em;width:22px;height:22px;border-radius:50%;background:var(--pen-blue);color:#fff;font-size:.72rem;font-weight:800;display:grid;place-items:center;font-family:Pretendard,sans-serif}
+.note .stars{position:absolute;right:0;top:0}
+.note li.s3{background:linear-gradient(90deg,color-mix(in srgb,var(--hl) 55%,transparent),transparent 70%)}
+.note-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.memo-mode .kw{color:transparent;background:var(--pen-red);border-radius:3px;border-bottom:0;text-shadow:none}
+.memo-mode .kw.show{color:var(--pen-red);background:transparent;border-bottom:2px solid color-mix(in srgb,var(--pen-red) 45%,transparent)}
+.memo-mode mark.hl{background:transparent}
+.final{border:2px solid var(--pen-red);border-radius:12px;padding:14px 16px;background:var(--paper);position:relative}
+.final::before{content:"FINAL 한 장";position:absolute;top:-11px;left:14px;background:var(--pen-red);color:#fff;font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:.08em}
+.final ul{margin:6px 0 0;padding-left:18px}.final li{margin:4px 0}
+.final .kwrow{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.final .kwrow span{background:var(--hl);padding:2px 9px;border-radius:999px;font-weight:700;font-size:.86rem;color:#2b2b2b}
+.lesson-concept{background:var(--paper);border:1px solid var(--paper-line);border-radius:14px;padding:12px 16px}
+.lesson-concept li{margin:6px 0}.lesson-concept b{color:var(--pen-blue)}
+.box.ok.memo{border-left:4px solid var(--pen-red);background:color-mix(in srgb,var(--hl) 45%,var(--card))}
+/* 백지 복습지·요약 노트 인쇄 (paper 틀 재사용) */
+.paper .note{border:0;background:#fff;padding-left:44px;background-image:repeating-linear-gradient(transparent 0,transparent calc(1.8em - 1px),#ddd calc(1.8em - 1px),#ddd 1.8em)}
+.paper .note::before{background:#e88}.paper .kw{color:#c00;border-bottom-color:#e99}.paper .note b{color:#1b4fd0}.paper mark.hl{background:#fff1a6}
+.paper .final{background:#fff;border-color:#c00}.paper .final::before{background:#c00}.paper .final .kwrow span{background:#fff1a6}
+.blank-lines{height:1.9em;border-bottom:1px solid #bbb}
+.paper .blank-row{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:end;margin:0 0 .6em}
+.paper .omr{border:1px solid #333;padding:8px;font-size:.85rem;margin-top:12px;break-inside:avoid}
+.paper .omr table{border-collapse:collapse;width:100%}.paper .omr td,.paper .omr th{border:1px solid #999;padding:3px 6px;text-align:center}
+.paper .essay-box{border:1px solid #999;min-height:90px;margin:6px 0 10px}
+.paper .pq-data{border:1px solid #999;padding:6px 8px;margin:4px 0;font-size:.86rem;background:#fafafa}
+.paper .pq-data table{border-collapse:collapse;margin:4px 0}.paper .pq-data td,.paper .pq-data th{border:1px solid #999;padding:2px 6px}
+.paper .pts{float:right;font-size:.8rem;color:#444}
+.paper-break{break-before:page}
+.paper .ans-key{display:grid;grid-template-columns:repeat(5,1fr);gap:4px 10px;font-size:.85rem;margin:6px 0 10px}
+@media print{.paper .pq-data{background:#fff}.paper .note{page-break-inside:auto}}

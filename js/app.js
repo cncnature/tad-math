@@ -31,7 +31,7 @@
   // ---------- 유틸 ----------
   const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const MF = t=>(window.MF||(x=>x))(esc(t));
-  const md = s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+  const md = s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/==(.+?)==/g,'<mark class="hl">$1</mark>').replace(/!!(.+?)!!/g,'<span class="kw">$1</span>');
   // 긴 공식(세미콜론·쉼표로 나열된 식)은 줄을 나눠 표시 — 좁은 화면 대비
   const texCard = t=>{ t=String(t); let parts=null;
     if(/;/.test(t)) parts=t.split(/\s*;\s*/);
