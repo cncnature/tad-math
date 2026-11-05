@@ -1198,18 +1198,26 @@ window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAd
   {
    "type": "img",
    "title": "한반도 지형도(동고서저)와 태백산맥",
-   "src": "assets/img/soc-climate-1.jpg",
+   "src": "assets/img/soc-climate-2.jpg",
    "alt": "한반도 지형도(동고서저)와 태백산맥",
-   "credit": "Kokiri, uploaded to Commons by User:Electionworld; modified by User:Valentim · CC BY-SA 3.0 · Wikimedia Commons",
-   "link": "https://commons.wikimedia.org/wiki/File:Korea_south_map_-_Valentim.png"
+   "credit": "Changhwan Han · CC BY 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Seoraksan_1.jpg"
   },
   {
    "type": "img",
    "title": "한반도 지형도(동고서저)와 태백산맥",
    "src": "assets/img/soc-climate-2.jpg",
    "alt": "한반도 지형도(동고서저)와 태백산맥",
-   "credit": "Changhwan Han · CC BY 2.0 · Wikimedia Commons",
-   "link": "https://commons.wikimedia.org/wiki/File:Seoraksan_1.jpg"
+   "credit": "Juliana Ng from Singapore · CC BY 2.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Korea_Seoraksan.jpg"
+  },
+  {
+   "type": "img",
+   "title": "한반도 지형도(동고서저)와 태백산맥",
+   "src": "assets/img/soc-climate-3.jpg",
+   "alt": "한반도 지형도(동고서저)와 태백산맥",
+   "credit": "Taewangkorea · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Dinosaur_Ridge_of_Seoraksan.jpg"
   }
  ],
  "soc-region": [
@@ -1246,8 +1254,8 @@ window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAd
    "title": "대법원과 법정 내부",
    "src": "assets/img/soc-g3-law-1.jpg",
    "alt": "대법원과 법정 내부",
-   "credit": "Adrian Grycuk · CC BY-SA 3.0 pl · Wikimedia Commons",
-   "link": "https://commons.wikimedia.org/wiki/File:European_Court_of_Human_Rights,_courtroom,_2014_(cropped).JPG"
+   "credit": "Seoul Institute · CC BY 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Supreme_Court_of_Korea_(2020).jpg"
   }
  ],
  "soc-g3-trend": [
@@ -1528,10 +1536,10 @@ window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAd
   {
    "type": "img",
    "title": "피타고라스 수와 테오도루스의 나선",
-   "src": "assets/img/pythagoras-apply-1.gif",
+   "src": "assets/img/pythagoras-apply-1.jpg",
    "alt": "피타고라스 수와 테오도루스의 나선",
-   "credit": "AmericanXplorer13 (talk) · CC BY-SA 3.0 · Wikimedia Commons",
-   "link": "https://commons.wikimedia.org/wiki/File:Pythagorean_theorem_-_Ani.gif"
+   "credit": "Unknown authorUnknown author · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Pythagoras_in_the_Roman_Forum,_Colosseum.jpg"
   }
  ],
  "isosceles": [
@@ -1742,8 +1750,8 @@ window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAd
    "title": "평행선과 동위각·엇각",
    "src": "assets/img/angles-1.jpg",
    "alt": "평행선과 동위각·엇각",
-   "credit": "Edward Doubleday, scan by Project Gutenberg · Public domain · Wikimedia Commons",
-   "link": "https://commons.wikimedia.org/wiki/File:Insects_Plate_3_(Discoveries_in_Australia).jpg"
+   "credit": "CactiStaccingCrane · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Angle.svg"
   }
  ],
  "construction-congruence": [
@@ -1992,8 +2000,8 @@ window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAd
    "title": "토론 대회에서 발언하는 학생들",
    "src": "assets/img/kor-write-debate-1.jpg",
    "alt": "토론 대회에서 발언하는 학생들",
-   "credit": "Dhanu · Public domain · Wikimedia Commons",
-   "link": "https://commons.wikimedia.org/wiki/File:Mughal43.jpg"
+   "credit": "Unknown authorUnknown author · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Petrus_alphonsi_dialogues.jpg"
   }
  ],
  "kor-g3-lit-classic": [

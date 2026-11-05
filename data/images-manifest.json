@@ -1196,19 +1196,27 @@
  ],
  "soc-climate": [
   {
-   "file": "Korea south map - Valentim.png",
-   "src": "assets/img/soc-climate-1.jpg",
-   "page": "https://commons.wikimedia.org/wiki/File:Korea_south_map_-_Valentim.png",
-   "lic": "CC BY-SA 3.0",
-   "artist": "Kokiri, uploaded to Commons by User:Electionworld; modified by User:Valentim",
-   "alt": "한반도 지형도(동고서저)와 태백산맥"
-  },
-  {
    "file": "Seoraksan 1.jpg",
    "src": "assets/img/soc-climate-2.jpg",
    "page": "https://commons.wikimedia.org/wiki/File:Seoraksan_1.jpg",
    "lic": "CC BY 2.0",
    "artist": "Changhwan Han",
+   "alt": "한반도 지형도(동고서저)와 태백산맥"
+  },
+  {
+   "file": "Korea Seoraksan.jpg",
+   "src": "assets/img/soc-climate-2.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Korea_Seoraksan.jpg",
+   "lic": "CC BY 2.0",
+   "artist": "Juliana Ng from Singapore",
+   "alt": "한반도 지형도(동고서저)와 태백산맥"
+  },
+  {
+   "file": "Dinosaur Ridge of Seoraksan.jpg",
+   "src": "assets/img/soc-climate-3.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Dinosaur_Ridge_of_Seoraksan.jpg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Taewangkorea",
    "alt": "한반도 지형도(동고서저)와 태백산맥"
   }
  ],
@@ -1242,11 +1250,11 @@
  ],
  "soc-g3-law": [
   {
-   "file": "European Court of Human Rights, courtroom, 2014 (cropped).JPG",
+   "file": "Supreme Court of Korea (2020).jpg",
    "src": "assets/img/soc-g3-law-1.jpg",
-   "page": "https://commons.wikimedia.org/wiki/File:European_Court_of_Human_Rights,_courtroom,_2014_(cropped).JPG",
-   "lic": "CC BY-SA 3.0 pl",
-   "artist": "Adrian Grycuk",
+   "page": "https://commons.wikimedia.org/wiki/File:Supreme_Court_of_Korea_(2020).jpg",
+   "lic": "CC BY 4.0",
+   "artist": "Seoul Institute",
    "alt": "대법원과 법정 내부"
   }
  ],
@@ -1526,11 +1534,11 @@
  ],
  "pythagoras-apply": [
   {
-   "file": "Pythagorean theorem - Ani.gif",
-   "src": "assets/img/pythagoras-apply-1.gif",
-   "page": "https://commons.wikimedia.org/wiki/File:Pythagorean_theorem_-_Ani.gif",
-   "lic": "CC BY-SA 3.0",
-   "artist": "AmericanXplorer13 (talk)",
+   "file": "Pythagoras in the Roman Forum, Colosseum.jpg",
+   "src": "assets/img/pythagoras-apply-1.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Pythagoras_in_the_Roman_Forum,_Colosseum.jpg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author",
    "alt": "피타고라스 수와 테오도루스의 나선"
   }
  ],
@@ -1738,11 +1746,11 @@
  ],
  "angles": [
   {
-   "file": "Insects Plate 3 (Discoveries in Australia).jpg",
+   "file": "Angle.svg",
    "src": "assets/img/angles-1.jpg",
-   "page": "https://commons.wikimedia.org/wiki/File:Insects_Plate_3_(Discoveries_in_Australia).jpg",
-   "lic": "Public domain",
-   "artist": "Edward Doubleday, scan by Project Gutenberg",
+   "page": "https://commons.wikimedia.org/wiki/File:Angle.svg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "CactiStaccingCrane",
    "alt": "평행선과 동위각·엇각"
   }
  ],
@@ -1988,11 +1996,11 @@
  ],
  "kor-write-debate": [
   {
-   "file": "Mughal43.jpg",
+   "file": "Petrus alphonsi dialogues.jpg",
    "src": "assets/img/kor-write-debate-1.jpg",
-   "page": "https://commons.wikimedia.org/wiki/File:Mughal43.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Petrus_alphonsi_dialogues.jpg",
    "lic": "Public domain",
-   "artist": "Dhanu",
+   "artist": "Unknown authorUnknown author",
    "alt": "토론 대회에서 발언하는 학생들"
   }
  ],
