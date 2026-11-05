@@ -22,6 +22,10 @@ jobs:
       - name: 이미지 수집
         run: |
           if [ -n "${{ github.event.inputs.limit }}" ]; then node scripts/fetch-images.js --limit "${{ github.event.inputs.limit }}"; else node scripts/fetch-images.js; fi
+      - name: 이미지 최적화 (640px JPEG)
+        run: |
+          pip install -q pillow
+          python3 scripts/optimize-images.py
       - name: 검사
         run: node scripts/check.js
       - name: 커밋·푸시
