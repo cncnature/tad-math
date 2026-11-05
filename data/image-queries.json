@@ -2297,5 +2297,33 @@
   "alt": "컨테이너선과 유럽 의회 — 세계화와 지역 통합",
   "want": 2,
   "kind": "photo"
+ },
+ {
+  "id": "sci-g22-galaxy-nebula",
+  "wiki": [
+   "en:Orion_Nebula",
+   "en:Pleiades",
+   "en:Globular_cluster"
+  ],
+  "commons": [
+   "Orion Nebula Hubble",
+   "Pleiades star cluster",
+   "Globular cluster Messier 13"
+  ],
+  "alt": "오리온 대성운과 플레이아데스 성단, 구상 성단",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-g22-series-parallel",
+  "wiki": [
+   "en:Series_and_parallel_circuits"
+  ],
+  "commons": [
+   "Series and parallel circuits diagram"
+  ],
+  "alt": "직렬 회로와 병렬 회로 구성",
+  "want": 1,
+  "kind": "diagram"
  }
 ]
