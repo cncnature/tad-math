@@ -6,7 +6,7 @@
 const vm=require("vm"),fs=require("fs"),path=require("path"); const root=path.join(__dirname,"..");
 const w={DATA:{},WIDGETS:{}}; const ctx=vm.createContext({window:w,document:{createElement:()=>({}),documentElement:{}},getComputedStyle:()=>({getPropertyValue:()=>""})});
 const subFiles=fs.readdirSync(path.join(root,"data/subjects")).filter(f=>f.endsWith(".js")).map(f=>"subjects/"+f.replace(/\.js$/,""));
-const visFiles=fs.readdirSync(path.join(root,"data/visuals")).filter(f=>f.endsWith(".js")).map(f=>"visuals/"+f.replace(/\.js$/,""));
+const visFiles=[...["visuals","problems","unit-notes"].flatMap(d=>fs.existsSync(path.join(root,"data",d))?fs.readdirSync(path.join(root,"data",d)).filter(f=>f.endsWith(".js")).map(f=>d+"/"+f.replace(/\.js$/,"")):[])];
 for(const f of ["curriculum","curriculum-m1","curriculum-m21","curriculum-h1","curriculum-h23","standards","daily-config","overrides",...visFiles,...subFiles]) vm.runInContext(fs.readFileSync(path.join(root,"data",f+".js"),"utf8"),ctx);
 const D=w.DATA; require(path.join(root,"js/merge.js")).apply(D); const out_noVisMath=[]; D.curriculum.units.forEach(u=>u.lessons.forEach(l=>{ if(!(l.visuals&&l.visuals.length)) out_noVisMath.push(l.id); }));
 const TARGET={ // 학년별 과목별 목표 차시 (채워질수록 올린다)
@@ -21,6 +21,8 @@ Object.entries(titles).forEach(([t,ids])=>{ if(ids.length>1) out.dupTitles.push(
 subFiles.forEach(f=>{ const head=fs.readFileSync(path.join(root,"data",f+".js"),"utf8").split("\n").slice(0,12).join("\n"); if(/추정/.test(head)) out.assumptions.push(f.replace("subjects/","")+".js"); });
 ((D.dailyConfig||{}).exams||[]).forEach(e=>{ if(e.date<today) out.pastExams.push(e); });
 out.gaps.sort((a,b)=>b.need-a.need);
+// v3: 3단계 문제(lv2/lv3) 없는 과목 차시 · 단원 노트 없는 단원
+out.noProblems=[]; out.noNotes=[]; Object.values(D.subjects||{}).forEach(s=>s.units.forEach(u=>{ if(!(u.notes&&u.notes.summary)) out.noNotes.push(s.id+":"+u.id); u.lessons.forEach(l=>{ const P=l.problems||[]; if(!(P.some(q=>q.lv===2)&&P.some(q=>q.lv===3))) out.noProblems.push(l.id); }); })); D.curriculum.units.forEach(u=>{ if(!(u.notes&&u.notes.summary)) out.noNotes.push("math:"+u.id); });
 fs.writeFileSync(path.join(root,"data/audit.json"),JSON.stringify(out,null,1));
 const md=[`# 콘텐츠 자가 진단 (${today})`,"",`주간 자동 조사는 이 문서의 **부족분(gaps)** 상위부터 채우고, **추정** 파일은 공개 자료로 다시 확인해 \`data/overrides.js\` 로 정정한다. (\`node scripts/audit.js\` 가 생성)`,"",
  "## 학년 × 과목 차시 (현재 / 목표)","","| 과목 | "+[...new Set(out.coverage.map(c=>c.grade))].join(" | ")+" |","|---|"+[...new Set(out.coverage.map(c=>c.grade))].map(()=>"---").join("|")+"|",
@@ -29,6 +31,8 @@ const md=[`# 콘텐츠 자가 진단 (${today})`,"",`주간 자동 조사는 이
  "## 재검증 필요 (파일 머리말에 '추정')","",...(out.assumptions.length?out.assumptions.map(f=>`- [ ] data/subjects/${f}`):["- 없음"]),"",
  "## 지난 시험 일정 (data/daily-config.js 에서 지울 것)","",...(out.pastExams.length?out.pastExams.map(e=>`- [ ] ${e.name} ${e.date}`):["- 없음"]),"",
  "## 시각 자료(표·도식·그래프) 없는 차시","",`- 과목 차시 ${out.noVisual.length}개 · 수학 소단원 ${out_noVisMath.length}개 (매주 10개 이상 채운다: docs/VISUAL-SCHEMA.md)`,"",
+ "## 3단계 문제(② 실력·③ 1등급) 없는 과목 차시","",`- ${out.noProblems.length}개 (docs/AGENT-BRIEF-PROBLEMS.md · 매주 과목당 5차시 이상): ${out.noProblems.slice(0,12).join(", ")}${out.noProblems.length>12?" …":""}`,"",
+ "## 단원 노트 없는 단원","",...(out.noNotes.length?out.noNotes.map(x=>"- [ ] "+x):["- 없음"]),"",
  "## 빈 필드 차시","",...(out.thin.length?out.thin.map(x=>`- ${x.id}: ${x.miss.join(", ")}`):["- 없음"]),"",
  "## 성취기준 코드 없는 차시","",...(out.noStd.length?out.noStd.map(x=>"- "+x):["- 없음"]),"",
  "## 제목 중복","",...(out.dupTitles.length?out.dupTitles.map(x=>`- ${x.title}: ${x.ids.join(", ")}`):["- 없음"]),"",
