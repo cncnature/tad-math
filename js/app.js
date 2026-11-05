@@ -7,6 +7,7 @@
   const BAND = { m11:"중학교", m12:"중학교", m21:"중학교", g22:"중학교", g31:"중학교", g32:"중학교", h11:"고등학교", h12:"고등학교", h2a:"고등학교", h2c:"고등학교", h2p:"고등학교", h3c:"고등학교", h3g:"고등학교" };
   D.curriculum.grades = G;
   D.curriculum.units = [...D.curriculum.units, ...(D.curriculumExtra||[])].sort((a,b)=>gradeRank(a.grade)-gradeRank(b.grade));
+  (D.subjectsExtra||[]).forEach(x=>{ const sj=D.subjects&&D.subjects[x.sid]; if(sj) sj.units.push(...x.units.map(u=>({...u,grade:u.grade||x.grade}))); });
   // 시험 문항 그림·보기(data/exam-figs.js): 학교 시험 필수 문제 + 수능 패턴 도감
   (D.schoolExams||[]).forEach(e=>e.items.forEach((it,i)=>{ const x=(D.schoolExamExtra||{})[e.grade+":"+e.term+":"+i]; if(!x) return; Object.assign(it,x); if(it.opts&&it.opts.length===5){ const k=(i*2+e.grade.length+(e.term==="mid"?0:e.term==="final"?3:1))%5; it.opts=it.opts.map((_,j)=>it.opts[(j+k)%5]); it.a=(it.a-k+5)%5; } }));
   (D.suneung?D.suneung.patterns:[]).forEach(x=>{ const f=(D.patternFigs||{})[x.id]; if(f) Object.assign(x,f); });
