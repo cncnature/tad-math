@@ -1,0 +1,12 @@
+{
+ "note": "scripts/watch.js 가 매일 여는 공개 페이지. 새 글 제목에 keywords 가 들어 있으면 '변경 감지' 로 기록하고 docs/BACKLOG.md 에 넣는다. 실패해도 작업은 계속된다.",
+ "sources": [
+  {"id":"kice-suneung","name":"한국교육과정평가원 수능 공지","url":"https://www.suneung.re.kr/boardCnts/list.do?boardID=1500234&m=0403&s=suneung","keywords":["수능","모의평가","시행","기본계획","예시문항"],"affects":["data/edu-timeline.js","data/daily-config.js","data/advisory.js"]},
+  {"id":"moe-press","name":"교육부 보도자료","url":"https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe","keywords":["교육과정","대입","수능","고교학점제","내신","교과서"],"affects":["data/edu-timeline.js","data/advisory.js","data/subjects/*"]},
+  {"id":"adiga","name":"대교협 대입정보포털","url":"https://www.adiga.kr/","keywords":["전형","시행계획","기본사항","모집요강"],"affects":["data/admissions.js"]},
+  {"id":"kcue","name":"한국대학교육협의회 보도자료","url":"https://www.kcue.or.kr/","keywords":["대입","전형","시행계획","기본사항"],"affects":["data/admissions.js"]},
+  {"id":"sen-exam","name":"서울특별시교육청","url":"https://www.sen.go.kr/","keywords":["학력평가","전국연합"],"affects":["data/edu-timeline.js","data/daily-config.js"]},
+  {"id":"ncic","name":"국가교육과정정보센터","url":"https://ncic.re.kr/","keywords":["고시","개정","교육과정"],"affects":["data/subjects/*","data/standards.js"]},
+  {"id":"npm-standards","name":"성취기준 원문 데이터셋(npm)","url":"https://registry.npmjs.org/korean-secondary-learning-map-mcp","type":"npm","affects":["data/standards-all.js"]}
+ ]
+}

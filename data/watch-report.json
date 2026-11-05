@@ -1,0 +1,48 @@
+{
+ "date": "2026-11-05",
+ "sources": [
+  {
+   "id": "kice-suneung",
+   "name": "한국교육과정평가원 수능 공지",
+   "ok": false,
+   "error": "fetch failed"
+  },
+  {
+   "id": "moe-press",
+   "name": "교육부 보도자료",
+   "ok": false,
+   "error": "fetch failed"
+  },
+  {
+   "id": "adiga",
+   "name": "대교협 대입정보포털",
+   "ok": false,
+   "error": "fetch failed"
+  },
+  {
+   "id": "kcue",
+   "name": "한국대학교육협의회 보도자료",
+   "ok": false,
+   "error": "fetch failed"
+  },
+  {
+   "id": "sen-exam",
+   "name": "서울특별시교육청",
+   "ok": false,
+   "error": "fetch failed"
+  },
+  {
+   "id": "ncic",
+   "name": "국가교육과정정보센터",
+   "ok": false,
+   "error": "fetch failed"
+  },
+  {
+   "id": "npm-standards",
+   "name": "성취기준 원문 데이터셋(npm)",
+   "ok": true,
+   "version": "0.3.0"
+  }
+ ],
+ "changes": []
+}

@@ -93,6 +93,7 @@ node scripts/check.js
 모든 id 참조(소단원↔노드↔공식↔시험↔슬라이드)가 연결되는지 확인합니다.
 
 ## 자동 업그레이드 구조
+- **매일 06:20 자동 업데이트**(`.github/workflows/auto-update.yml`, 사람 개입 없음): ① `scripts/watch.js` 가 평가원·교육부·대교협·교육청·NCIC 공지와 성취기준 데이터셋을 감시해 새 글을 `docs/WATCH.md`·`docs/BACKLOG.md` 에 기록 → ② `scripts/sync-standards.js` 가 사이트가 쓰는 성취기준 308개의 문장을 고시 원문 공개 데이터셋과 대조·갱신(`data/standards-all.js`, 사라진 코드는 경고) → ③ `scripts/auto-update.js` 가 지난 시험 삭제·학년 자동 전환(3/1·9/1) 등 규칙 수정 → ④ `ANTHROPIC_API_KEY` 를 Secrets 에 넣으면 `scripts/llm-revise.js` 가 감지된 공지 본문을 읽고 일정·입시·차시 정정을 덧씌우기 패치로 적용(검증 통과분만) → ⑤ 검사 통과 시 커밋·배포·텔레그램 알림. 키가 없으면 ④는 건너뛰고 매주 월요일 Claude 예약 작업이 같은 백로그를 처리한다.
 - **매주 월요일**: 예약 작업이 `scripts/weekly-advisor.md` 절차대로 조사 → `node scripts/audit.js`(부족분·추정·지난 일정 진단, `docs/AUDIT.md`) → `docs/BACKLOG.md` 의 기한 항목과 부족분 순으로 콘텐츠 추가 → 검사·커밋·배포.
 - **정정은 덧씌우기**: `data/overrides.js` 에 차시·단원 단위로 고칠 필드만 적으면 사이트·검사·브리핑이 로드 때 적용(`js/merge.js`). 변경 기록은 사이트 소개 화면에 표시.
 - **배포 보호**: `node scripts/check.js`·브리핑 생성·진단이 실패하면 GitHub Pages 배포가 중단되어 잘못된 자동 수정이 사이트에 올라가지 않음.

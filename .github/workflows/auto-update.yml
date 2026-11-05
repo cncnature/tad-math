@@ -1,0 +1,56 @@
+name: Auto update (self-correcting data)
+# 매일 06:20 KST: 공개 자료 감시 → 성취기준 원문 동기화 → 규칙 기반 자동 수정 → (API 키 있으면) LLM 정정 → 검사 → 커밋·배포 → 알림
+on:
+  schedule:
+    - cron: "20 21 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      LLM_MODEL: ${{ vars.LLM_MODEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 공개 자료 감시
+        run: node scripts/watch.js || true
+      - name: 성취기준 원문 동기화
+        run: node scripts/sync-standards.js || true
+      - name: 규칙 기반 자동 수정
+        run: node scripts/auto-update.js
+      - name: LLM 정정 (ANTHROPIC_API_KEY 있을 때만)
+        run: node scripts/llm-revise.js || true
+      - name: 진단
+        run: node scripts/audit.js --json > /dev/null
+      - name: 검사 (실패하면 커밋하지 않음)
+        run: |
+          node scripts/check.js
+          node scripts/send-telegram.js --dry > /dev/null
+      - name: 커밋·푸시
+        id: commit
+        run: |
+          git config user.name "tad-auto-update"
+          git config user.email "cncnature@gmail.com"
+          git add -A
+          if git diff --cached --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; echo "변경 없음"; else
+            git commit -m "auto: 자동 업데이트 $(date -u -d '+9 hours' +%Y-%m-%d) — $(node -e 'const r=require("./data/auto-report.json");const w=require("./data/watch-report.json");console.log([...r.changes,...w.changes.map(c=>"감지: "+c.title)].slice(0,4).join("; ")||"동기화·감시 상태 갱신")')"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+      - name: 배포 트리거 (GITHUB_TOKEN 커밋은 자동 배포가 안 돌므로 직접 실행)
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main
+      - name: 알림 (변경이 있을 때만)
+        if: steps.commit.outputs.changed == 'true' && env.TELEGRAM_BOT_TOKEN != ''
+        run: |
+          MSG=$(node -e 'const r=require("./data/auto-report.json");const w=require("./data/watch-report.json");const l=(()=>{try{return require("./data/llm-report.json")}catch(e){return null}})();const lines=["🛠 TAD 공부방 자동 업데이트 "+r.date,...r.changes.map(x=>"· "+x),...w.changes.slice(0,5).map(c=>"· 감지: "+c.source+" — "+c.title),...(l&&l.applied.length?["· LLM 정정: "+l.applied.join(", ")]:[]),"자세히: https://github.com/cncnature/tad-math/blob/main/docs/WATCH.md"];console.log(lines.join("\n"))')
+          node -e 'const https=require("https");const body=JSON.stringify({chat_id:process.env.TELEGRAM_CHAT_ID,text:process.argv[1],disable_web_page_preview:true});const req=https.request({hostname:"api.telegram.org",path:"/bot"+process.env.TELEGRAM_BOT_TOKEN+"/sendMessage",method:"POST",headers:{"Content-Type":"application/json","Content-Length":Buffer.byteLength(body)}},r=>r.resume());req.write(body);req.end();' "$MSG"
