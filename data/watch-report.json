@@ -4,38 +4,44 @@
   {
    "id": "kice-suneung",
    "name": "한국교육과정평가원 수능 공지",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true,
+   "found": 9,
+   "fresh": 9
   },
   {
    "id": "moe-press",
    "name": "교육부 보도자료",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true,
+   "found": 11,
+   "fresh": 11
   },
   {
    "id": "adiga",
    "name": "대교협 대입정보포털",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true,
+   "found": 0,
+   "fresh": 0
   },
   {
    "id": "kcue",
    "name": "한국대학교육협의회 보도자료",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true,
+   "found": 1,
+   "fresh": 1
   },
   {
    "id": "sen-exam",
    "name": "서울특별시교육청",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true,
+   "found": 0,
+   "fresh": 0
   },
   {
    "id": "ncic",
    "name": "국가교육과정정보센터",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true,
+   "found": 26,
+   "fresh": 26
   },
   {
    "id": "npm-standards",
