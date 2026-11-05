@@ -1,5 +1,5 @@
 // node scripts/send-kakao.js [--dry] [--date YYYY-MM-DD]
-// 오늘의 5줄을 카카오톡 '나에게 보내기'(나와의 채팅)로 보낸다. 텍스트 템플릿은 200자 제한이라 과목 블록마다 한 통씩 나눠 보낸다.
+// 오늘의 5줄을 카카오톡 '나에게 보내기'(나와의 채팅)로 보낸다. 기본은 리스트 템플릿 한 통(카드 3개 + 전체 보기 버튼), KAKAO_FORMAT=text 면 200자 텍스트 4통.
 // 환경변수: KAKAO_REST_KEY, KAKAO_REFRESH_TOKEN (필수) · KAKAO_CLIENT_SECRET (앱에서 켰을 때만) · REPO_PAT + GITHUB_REPOSITORY (리프레시 토큰이 갱신되면 Secrets 에 되쓰기, 선택)
 // 설정 절차: docs/KAKAO-SETUP.md
 const vm=require("vm"),fs=require("fs"),path=require("path"),https=require("https"),{execSync}=require("child_process");
@@ -26,6 +26,17 @@ function post(host,p,body,headers){ return new Promise((res,rej)=>{ const data=t
   if(tk.status!==200||!tk.json.access_token){ console.error("토큰 갱신 실패",tk.json); process.exit(1); }
   if(tk.json.refresh_token&&process.env.REPO_PAT&&process.env.GITHUB_REPOSITORY){ try{ execSync(`gh secret set KAKAO_REFRESH_TOKEN --repo ${process.env.GITHUB_REPOSITORY} --body "${tk.json.refresh_token}"`,{env:{...process.env,GH_TOKEN:process.env.REPO_PAT},stdio:"inherit"}); console.log("리프레시 토큰 갱신·저장"); }catch(e){ console.error("리프레시 토큰 저장 실패(수동 갱신 필요)"); } }
   else if(tk.json.refresh_token) console.log("⚠️ 새 리프레시 토큰이 발급됐지만 REPO_PAT 이 없어 저장하지 못함 — Secrets 의 KAKAO_REFRESH_TOKEN 을 수동으로 바꿔야 2달 뒤에도 동작합니다.");
-  let ok=0; for(const m of msgs){ const r=await post("kapi.kakao.com","/v2/api/talk/memo/default/send",{template_object:JSON.stringify({object_type:"text",text:m,link:{web_url:url,mobile_web_url:url},button_title:"답·풀이 보기"})},{Authorization:"Bearer "+tk.json.access_token}); if(r.status===200&&r.json.result_code===0) ok++; else console.error("전송 실패",r.json); }
+  const auth={Authorization:"Bearer "+tk.json.access_token};
+  // 기본: 리스트 템플릿 한 통(머리말 + 과목 카드 2 + 오늘 할 일, 버튼 '답·풀이 전체 보기'). 각 카드는 4줄까지만 보이므로 짧게 줄이고 전체는 링크로.
+  if((process.env.KAKAO_FORMAT||"list")==="list"){
+    const site="https://cncnature.github.io/tad-math/"; const lk=h=>({web_url:site+h,mobile_web_url:site+h});
+    const card=x=>({title:cut(`${x.subject} · ${x.title}`,40),description:cut(`✅ ${cut(x.need,58)}\n⚠️ ${cut(x.trap,58)}${x.quiz?"\n❓ "+cut(x.quiz.q,50):""}`,200),link:lk(x.href)});
+    const contents=[...b.blocks.slice(0,2).map(card),{title:"📌 오늘 할 일",description:cut(b.todo.map(t=>"· "+t).join("\n"),200),link:lk(`#/today?d=${date}`)}];
+    const tpl={object_type:"list",header_title:cut(`${b.head.replace("📘 ","")} · ${b.exam}`,200),header_link:lk(`#/today?d=${date}`),contents,buttons:[{title:"답·풀이 전체 보기",link:lk(`#/today?d=${date}`)}]};
+    const r=await post("kapi.kakao.com","/v2/api/talk/memo/default/send",{template_object:JSON.stringify(tpl)},auth);
+    if(r.status===200&&r.json.result_code===0){ console.log("카카오 전송 1/1 (리스트 템플릿)"); process.exit(0); }
+    console.error("리스트 템플릿 실패 → 텍스트 분할로 재시도",r.json);
+  }
+  let ok=0; for(const m of msgs){ const r=await post("kapi.kakao.com","/v2/api/talk/memo/default/send",{template_object:JSON.stringify({object_type:"text",text:m,link:{web_url:url,mobile_web_url:url},button_title:"답·풀이 보기"})},auth); if(r.status===200&&r.json.result_code===0) ok++; else console.error("전송 실패",r.json); }
   console.log(`카카오 전송 ${ok}/${msgs.length}`); process.exit(ok===msgs.length?0:1);
 })();
