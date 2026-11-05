@@ -31,13 +31,17 @@ function post(host,p,body,headers){ return new Promise((res,rej)=>{ const data=t
   if((process.env.KAKAO_FORMAT||"list")==="list"){
     const site="https://cncnature.github.io/tad-math/"; const lk=h=>({web_url:site+h,mobile_web_url:site+h});
     const card=x=>({title:cut(`${x.subject} · ${x.title}`,40),description:cut(`✅ ${cut(x.need,58)}\n⚠️ ${cut(x.trap,58)}${x.quiz?"\n❓ "+cut(x.quiz.q,50):""}`,200),link:lk(x.href)});
-    // 카드는 최대 3장: 과목이 3개 이상이면 과목 카드 3장 + 오늘 할 일은 머리말에, 2개 이하면 과목 카드 + 오늘 할 일 카드
-    const many=b.blocks.length>=3; const contents=many?b.blocks.slice(0,3).map(card):[...b.blocks.map(card),{title:"📌 오늘 할 일",description:cut(b.todo.map(t=>"· "+t).join("\n"),200),link:lk(`#/today?d=${date}`)}];
-    const header=many?cut(`${b.head.replace("📘 ","")} · ${b.exam}\n📌 ${b.todo.map(t=>t.replace(/\s*\d+분$/,"")).join(" / ")}`,200):cut(`${b.head.replace("📘 ","")} · ${b.exam}`,200);
-    const tpl={object_type:"list",header_title:header,header_link:lk(`#/today?d=${date}`),contents,buttons:[{title:"답·풀이 전체 보기",link:lk(`#/today?d=${date}`)}]};
-    const r=await post("kapi.kakao.com","/v2/api/talk/memo/default/send",{template_object:JSON.stringify(tpl)},auth);
-    if(r.status===200&&r.json.result_code===0){ console.log("카카오 전송 1/1 (리스트 템플릿)"); process.exit(0); }
-    console.error("리스트 템플릿 실패 → 텍스트 분할로 재시도",r.json);
+    // 카드는 한 통에 최대 3장 → 과목 3개씩 묶어 여러 통(6과목 = 2통). 마지막 통 머리말에 오늘 할 일. 과목이 2개 이하면 오늘 할 일을 카드로.
+    const todoCard={title:"📌 오늘 할 일",description:cut(b.todo.map(t=>"· "+t).join("\n"),200),link:lk(`#/today?d=${date}`)};
+    const groups=[]; for(let i=0;i<b.blocks.length;i+=3) groups.push(b.blocks.slice(i,i+3)); if(!groups.length) groups.push([]);
+    const base=`${b.head.replace("📘 ","")} · ${b.exam}`; let sentN=0;
+    for(let gi=0;gi<groups.length;gi++){ const g=groups[gi]; const last=gi===groups.length-1; const contents=g.map(card); if(last&&contents.length<3) contents.push(todoCard); if(contents.length<2) contents.push(todoCard);
+      const header=cut(groups.length>1?`${base} (${gi+1}/${groups.length})`+(last&&contents.length>=3&&!contents.includes(todoCard)?`\n📌 ${b.todo.map(t=>t.replace(/\s*\d+분$/,"")).join(" / ")}`:""):(contents.includes(todoCard)?base:`${base}\n📌 ${b.todo.map(t=>t.replace(/\s*\d+분$/,"")).join(" / ")}`),200);
+      const tpl={object_type:"list",header_title:header,header_link:lk(`#/today?d=${date}`),contents:contents.slice(0,3),buttons:[{title:"답·풀이 전체 보기",link:lk(`#/today?d=${date}`)}]};
+      const r=await post("kapi.kakao.com","/v2/api/talk/memo/default/send",{template_object:JSON.stringify(tpl)},auth);
+      if(r.status===200&&r.json.result_code===0) sentN++; else console.error("리스트 템플릿 실패",r.json); }
+    if(sentN===groups.length){ console.log(`카카오 전송 ${sentN}/${groups.length} (리스트 템플릿)`); process.exit(0); }
+    console.error("리스트 템플릿 일부 실패 → 텍스트 분할로 재시도");
   }
   let ok=0; for(const m of msgs){ const r=await post("kapi.kakao.com","/v2/api/talk/memo/default/send",{template_object:JSON.stringify({object_type:"text",text:m,link:{web_url:url,mobile_web_url:url},button_title:"답·풀이 보기"})},auth); if(r.status===200&&r.json.result_code===0) ok++; else console.error("전송 실패",r.json); }
   console.log(`카카오 전송 ${ok}/${msgs.length}`); process.exit(ok===msgs.length?0:1);
