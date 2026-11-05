@@ -474,3 +474,25 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 .vis-formula{font-size:1.1rem;text-align:center;padding:6px 0}
 .vis-note{margin:6px 0 0;color:var(--muted);font-size:.85rem}
 @media(max-width:600px){.vis-cmp{grid-template-columns:1fr!important}}
+
+/* ===== 전 과목 공부방 (js/room.js) ===== */
+.stiles{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.stile{--c:var(--acc);border-top:4px solid var(--c);text-decoration:none;color:var(--ink)}.stile h3{margin:0;font-size:1.08rem}.stile .progress i{background:var(--c)}.stile b{color:var(--c)}
+.stag{--c:var(--acc);display:inline-block;font-size:.78rem;font-weight:700;padding:2px 10px;border-radius:999px;color:#fff;background:var(--c);margin-right:6px;vertical-align:middle}
+.pill.dim{opacity:.5}.pill.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.ucard{margin:10px 0}.ucard.cur{border-left:4px solid var(--acc)}.ucard h3 a{color:var(--ink);text-decoration:none}.ucard h3 a:hover{color:var(--acc)}
+.lchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.lchip{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-decoration:none}
+.lchip b{font-size:.74rem;color:var(--muted)}.lchip.s4 b,.lchip.s5 b{color:var(--ok)}.lchip.s4,.lchip.s5{border-color:var(--ok)}.lchip.s2,.lchip.s3{border-color:var(--acc)}.lchip:hover{border-color:var(--acc);text-decoration:none}
+.sumcard{background:linear-gradient(180deg,rgba(47,111,237,.05),transparent)}.sum{margin:0;padding-left:22px}.sum li{margin:6px 0;line-height:1.55}
+.kw{display:flex;flex-wrap:wrap;gap:6px}.kw .chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.84rem;font-weight:600}
+.tiers th{font-size:.8rem;color:var(--muted);text-align:left;padding:4px 6px}.tiers td:nth-child(3),.tiers td:nth-child(4),.tiers td:nth-child(5){white-space:nowrap;font-size:.84rem;text-align:center}
+.card.data{background:var(--bg);margin:10px 0 0}.card.data .fig-table{font-size:.88rem}.why3{margin:-4px 0 14px}
+.essay{margin:12px 0}.essay textarea{width:100%;box-sizing:border-box;margin:8px 0;font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.rqwrap{margin:14px 0;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card)}.rqwrap .quiz{margin:8px 0 0}
+.ck{display:grid;gap:4px;margin-top:8px;font-size:.86rem}.ck label{display:flex;gap:6px;align-items:center}
+.tbgrid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.tbgrid label{display:flex;flex-direction:column;gap:4px;font-size:.88rem;font-weight:600}.tbgrid select{font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+#selfx{width:100%;box-sizing:border-box;font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.quiz .qn em{font-style:normal;font-size:.72rem;background:var(--acc);color:#fff;border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:middle}
+.me-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+@media (max-width:640px){.stiles{grid-template-columns:1fr 1fr}.stile h3{font-size:1rem}}

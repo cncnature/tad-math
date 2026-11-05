@@ -6,7 +6,7 @@
   const GORDER = Object.keys(G); const gradeRank = g=>GORDER.indexOf(g);
   const BAND = { m11:"중학교", m12:"중학교", m21:"중학교", g22:"중학교", g31:"중학교", g32:"중학교", h11:"고등학교", h12:"고등학교", h2a:"고등학교", h2c:"고등학교", h2p:"고등학교", h3c:"고등학교", h3g:"고등학교" };
   D.curriculum.grades = G;
-  window.MERGE.apply(D); D.curriculum.units.sort((a,b)=>gradeRank(a.grade)-gradeRank(b.grade));
+  window.MERGE.apply(D,{textbooks:(()=>{ try{ return (JSON.parse(localStorage.getItem("imm:me")||"null")||{}).textbooks||{}; }catch(e){ return {}; } })()}); D.curriculum.units.sort((a,b)=>gradeRank(a.grade)-gradeRank(b.grade));
   // 시험 문항 그림·보기(data/exam-figs.js): 학교 시험 필수 문제 + 수능 패턴 도감
   (D.schoolExams||[]).forEach(e=>e.items.forEach((it,i)=>{ const x=(D.schoolExamExtra||{})[e.grade+":"+e.term+":"+i]; if(!x) return; Object.assign(it,x); if(it.opts&&it.opts.length===5){ const k=(i*2+e.grade.length+(e.term==="mid"?0:e.term==="final"?3:1))%5; it.opts=it.opts.map((_,j)=>it.opts[(j+k)%5]); it.a=(it.a-k+5)%5; } }));
   (D.suneung?D.suneung.patterns:[]).forEach(x=>{ const f=(D.patternFigs||{})[x.id]; if(f) Object.assign(x,f); });
@@ -543,7 +543,7 @@
   }
 
   // ---------- 홈 ----------
-  function home(){ return profile()?me():setup(); }
+  function home(){ if(!profile()) return setup(); if(window.ROOM) return window.ROOM.route("me",["me"],""); return me(); }
   function intro(){
     const nCore=D.formulas.filter(f=>f.core).length;
     const due = srsDue().length;
@@ -1225,7 +1225,8 @@
   // ---------- 검색 ----------
   function search(q){ q=(q||"").trim().toLowerCase(); if(!q) return render(`<h1>검색</h1>`);
     const L=lessonsAll.filter(l=>(l.title+l.concept.join(" ")).toLowerCase().includes(q)); const F=D.formulas.filter(f=>(f.title+f.tex).toLowerCase().includes(q)); const Cc=D.concepts.filter(c=>(c.term+c.def+c.en).toLowerCase().includes(q)); const Lf=D.life.filter(x=>(x.title+x.body).toLowerCase().includes(q)); const P=D.people.filter(p=>(p.name+p.body).toLowerCase().includes(q));
-    render(`<h1>🔍 "${esc(q)}" 검색 결과</h1>${L.length?`<h2>소단원</h2><ul>${L.map(l=>`<li><a href="#/study/${l.unit}/${l.id}">${l.title}</a> <span class="muted">${l.unitTitle}</span></li>`).join("")}</ul>`:""}${F.length?`<h2>공식</h2><ul>${F.map(f=>`<li><a href="#/formulas/${f.id}">${f.title}</a></li>`).join("")}</ul>`:""}${Cc.length?`<h2>개념</h2><ul>${Cc.map(c=>`<li><b>${c.term}</b> — ${md(c.def)}</li>`).join("")}</ul>`:""}${Lf.length?`<h2>생활 속 수학</h2><ul>${Lf.map(x=>`<li><a href="#/life">${x.title}</a></li>`).join("")}</ul>`:""}${P.length?`<h2>인물</h2><ul>${P.map(p=>`<li><a href="#/people">${p.name}</a></li>`).join("")}</ul>`:""}${!(L.length+F.length+Cc.length+Lf.length+P.length)?`<p class="muted">결과가 없습니다.</p>`:""}`); }
+    const SL=[]; SUBJ().forEach(s=>s.units.forEach(u=>u.lessons.forEach(l=>{ if((l.title+" "+l.concept.join(" ")+" "+(l.memo||"")).toLowerCase().includes(q)) SL.push({s,u,l}); })));
+    render(`<h1>🔍 "${esc(q)}" 검색 결과</h1>${SL.length?`<h2>과목 차시</h2><ul>${SL.map(({s,u,l})=>`<li>${s.icon} <a href="#/sub/${s.id}/${l.id}">${esc(l.title)}</a> <span class="muted">${esc(u.title)}</span></li>`).join("")}</ul>`:""}${L.length?`<h2>수학 소단원</h2><ul>${L.map(l=>`<li><a href="#/study/${l.unit}/${l.id}">${l.title}</a> <span class="muted">${l.unitTitle}</span></li>`).join("")}</ul>`:""}${F.length?`<h2>공식</h2><ul>${F.map(f=>`<li><a href="#/formulas/${f.id}">${f.title}</a></li>`).join("")}</ul>`:""}${Cc.length?`<h2>개념</h2><ul>${Cc.map(c=>`<li><b>${c.term}</b> — ${md(c.def)}</li>`).join("")}</ul>`:""}${Lf.length?`<h2>생활 속 수학</h2><ul>${Lf.map(x=>`<li><a href="#/life">${x.title}</a></li>`).join("")}</ul>`:""}${P.length?`<h2>인물</h2><ul>${P.map(p=>`<li><a href="#/people">${p.name}</a></li>`).join("")}</ul>`:""}${!(SL.length+L.length+F.length+Cc.length+Lf.length+P.length)?`<p class="muted">결과가 없습니다.</p>`:""}`); }
   $("#q").addEventListener("keydown",e=>{ if(e.key==="Enter"){ location.hash="#/search?q="+encodeURIComponent(e.target.value); } });
 
   function about(){ const OL=((D.overrides||{}).log||[]).slice().reverse().slice(0,20); const SA=D.standardsAll; render(`<h1>사이트 소개</h1>${SA?`<div class="card"><h3>📐 성취기준 자동 동기화</h3><p class="muted small">사이트가 쓰는 성취기준 ${SA.count}개의 문장을 교육부·국가교육위원회 고시 원문 공개 데이터셋(${esc(SA.version)})과 매일 대조합니다. 마지막 동기화 ${esc(SA.synced)}${SA.unknown&&SA.unknown.length?` · 미확인 코드 ${SA.unknown.length}개`:" · 전부 일치"}.</p></div>`:""}${OL.length?`<div class="card"><h3>🛠 최근 데이터 수정 기록</h3><table><tr><th>날짜</th><th>내용</th><th>근거</th></tr>${OL.map(x=>`<tr><td>${esc(x.date||"")}</td><td>${esc(x.what||"")}${x.why?` <span class="muted small">— ${esc(x.why)}</span>`:""}</td><td>${x.src?`<a href="${esc(x.src)}" target="_blank" rel="noopener">출처</a>`:""}</td></tr>`).join("")}</table></div>`:""}<div class="card"><p><b>TAD 공부방</b>는 중1부터 고3까지의 수학(중2-2~중3-2 를 가장 깊게)을 "외우기 전에 먼저 만져 보는" 방식으로 익히는 무료·오픈소스 학습 사이트입니다. 로그인·결제가 없고, 학습 기록은 사용자의 브라우저(localStorage)에만 저장됩니다.</p>
@@ -1239,8 +1240,10 @@
   function route(){
     const h=location.hash.replace(/^#\/?/,""); const [path,qs]=h.split("?"); const p=path.split("/").filter(Boolean);
     const r=p[0]||"";
+    if(window.ROOM&&window.ROOM.route(r,p,qs)) return;
     if(r==="") return home();
     if(r==="me") return me(qs);
+    if(r==="mathme") return me(qs);
     if(r==="setup") return setup();
     if(r==="intro") return intro();
     if(r==="practice") return practice(p[1],qs);
@@ -1298,5 +1301,8 @@
   $("#theme").onclick=()=>{ const cur=document.documentElement.dataset.theme==="dark"?"light":"dark"; applyTheme(cur); store.set("theme",cur); };
   // KaTeX 가 늦게 로드될 수 있으므로 로드 후 한 번 더 조판
   window.addEventListener("load",()=>setTimeout(typeset,50));
+  // 전 과목 공부방(js/room.js)에 공통 도구를 넘기고 라우터에 끼운다
+  window.APP={D,main,store,render,esc,md,tag,G,quizHtml,mastery,STATUS,profile,setup,lessonsAll,byLesson,byUnit,subLesson,subScore,SUBJ,todayKey,dayDiff,nextExam,schedGet,earnTok,logQ,calStats,typeset,aiPanel,aiBind,aiCall,notFound,activeDays};
+  if(window.ROOM_INIT) try{ window.ROOM_INIT(window.APP); }catch(e){ console.error("ROOM init",e); }
   route();
 })();

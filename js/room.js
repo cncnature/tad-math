@@ -1,0 +1,223 @@
+/* TAD 공부방 v3 — 전 과목 공부방 (국어·영어·수학·과학·사회·역사, 중1~고3)
+   app.js 가 window.APP 으로 넘겨준 공통 도구(저장소·렌더·퀴즈·목표율)를 써서 과목 홈 · 단원 페이지 · 3단계 차시 · 단원 테스트 · 시험 대비 · 복습 큐 · 교과서 고르기를 그린다.
+   학습 설계 근거: 인출 연습·간격 반복(Dunlosky 2013), 확신도 보정(Koriat 2012), 바람직한 어려움(Bjork), 자기 설명(Chi 1994), 이중 부호화(Mayer), 실행 의도(Gollwitzer). */
+window.ROOM_INIT=function(A){
+  const {D,store,render,esc,md,tag,G,quizHtml,mastery,STATUS,profile,setup,lessonsAll,byLesson,byUnit,subLesson,subScore,SUBJ,todayKey,dayDiff,nextExam,schedGet,earnTok,logQ,calStats,typeset,aiPanel,aiBind,aiCall,notFound}=A;
+  const $=s=>document.querySelector(s); const main=A.main;
+
+  // ---------- 학년·학기 체계 ----------
+  const BANDS=[{id:"m1",name:"중1",terms:["m11","m12"]},{id:"m2",name:"중2",terms:["m21","g22"]},{id:"m3",name:"중3",terms:["g31","g32"]},{id:"h1",name:"고1",terms:["h1"]},{id:"h2",name:"고2",terms:["h2"]},{id:"h3",name:"고3",terms:["h3"]}];
+  const TERM_NAME={m11:"중1-1",m12:"중1-2",m21:"중2-1",g22:"중2-2",g31:"중3-1",g32:"중3-2",h1:"고1",h2:"고2",h3:"고3"};
+  const MATH_BAND={m11:"m1",m12:"m1",m21:"m2",g22:"m2",g31:"m3",g32:"m3",h11:"h1",h12:"h1",h2a:"h2",h2c:"h2",h2p:"h2",h3c:"h3",h3g:"h3"};
+  const bandOf=g=>MATH_BAND[g]||BANDS.find(b=>b.terms.includes(g))?.id||"m2";
+  const termOf=g=>({h11:"h1",h12:"h1",h2a:"h2",h2c:"h2",h2p:"h2",h3c:"h3",h3g:"h3"})[g]||g; // 수학 학기 키 → 과목 학기 키
+  const SUBJECTS=[{id:"math",name:"수학",icon:"🧮",col:"#2f6fed"},{id:"kor",name:"국어",icon:"📖",col:"#c0392b"},{id:"eng",name:"영어",icon:"🔤",col:"#8e44ad"},{id:"sci",name:"과학",icon:"🔬",col:"#1f9d55"},{id:"soc",name:"사회",icon:"🌏",col:"#e08a00"},{id:"his",name:"역사",icon:"🏛",col:"#7a5230"}];
+  const SB=id=>SUBJECTS.find(s=>s.id===id);
+  const SUBJ_KO={수학:"math",국어:"kor",영어:"eng",과학:"sci",사회:"soc",역사:"his",한국사:"his"};
+  const prof=()=>profile()||{};
+  const curTerm=()=>termOf(prof().grade||"g22");
+
+  // ---------- 단원·차시 접근 (수학은 curriculum, 나머지는 subjects) ----------
+  function unitsOf(sid){ if(sid==="math") return D.curriculum.units.map(u=>({...u,sid:"math",g:u.grade,band:MATH_BAND[u.grade]||"m2",term:u.grade})); const s=D.subjects[sid]; if(!s) return []; return s.units.map(u=>({...u,sid,g:u.grade||s.grade,band:bandOf(u.grade||s.grade),termKey:u.grade||s.grade})); }
+  const unitById=(sid,uid)=>unitsOf(sid).find(u=>u.id===uid);
+  const lessonHref=(sid,u,l)=>sid==="math"?`#/study/${u.id}/${l.id}`:`#/sub/${sid}/${l.id}`;
+  const unitHref=(sid,u)=>`#/s/${sid}/${u.id}`;
+
+  // ---------- 목표율 (과목 차시): 퀴즈 60 · 개념 읽기 10 · 실력 15 · 1등급 15 ----------
+  const P2=l=>(l.problems||[]).filter(q=>q.lv===2&&q.kind==="mc"), P3=l=>(l.problems||[]).filter(q=>q.lv===3&&q.kind==="mc"), PE=l=>(l.problems||[]).filter(q=>q.kind==="essay");
+  function subMastery(l){ const prog=store.get("quiz",{}); const visit=store.get("visit",{}); const es=store.get("sess",{}); const L=store.get("qlog",[]);
+    const cnt=(key,n)=>{ let c=0; for(let i=0;i<n;i++) if(prog[key+"#"+i]) c++; return c; };
+    const qn=l.quiz.length, qc=cnt("sub:"+l.id,qn); const n2=P2(l).length, c2=cnt("p2:"+l.id,n2); const n3=P3(l).length, c3=cnt("p3:"+l.id,n3); const ne=PE(l).length; const ce=PE(l).filter((q,i)=>es[l.id+"#"+i]&&es[l.id+"#"+i].score>=6).length;
+    let wq=60, wv=10, w2=15, w3=15; if(!n2){ wq+=w2; w2=0; } if(!(n3+ne)){ wq+=w3; w3=0; }
+    const pct=Math.round((100*qc/Math.max(1,qn))*wq/100+(visit[l.id]?wv:0)+(n2?100*c2/n2:0)*w2/100+((n3+ne)?100*(c3+ce)/(n3+ne):0)*w3/100);
+    const att=L.filter(x=>/^(sub|p2|p3):/.test(x.k)&&x.k.slice(x.k.indexOf(":")+1)===l.id); const acc=att.length?att.filter(x=>x.ok).length/att.length:null;
+    return {pct:Math.min(150,pct),qc,qn,c2,n2,c3,n3,ce,ne,visited:!!visit[l.id],acc,attempts:att.length}; }
+  const M_OF=(sid,l)=>sid==="math"?mastery(byLesson(l.id)||l):subMastery(l);
+  const avg=a=>a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):0;
+  const unitPct=(sid,u)=>avg(u.lessons.map(l=>M_OF(sid,l).pct));
+  function currentUnits(sid){ const p=prof(); if(sid==="math") return unitsOf("math").filter(u=>u.grade===p.grade); const t=curTerm(); const s=D.subjects[sid]; if(!s) return []; const all=unitsOf(sid).filter(u=>u.termKey===t); const cur=all.filter(u=>!u.term||u.term===(s.term||u.term)); return cur.length?cur:all; }
+  const subjectPct=sid=>{ const us=currentUnits(sid); return avg(us.map(u=>unitPct(sid,u))); };
+
+  // ---------- 복습 큐 (간격 반복: 틀림·찍어서 맞힘 → 1일·3일·7일·14일) ----------
+  const RQ_GAPS=[1,3,7,14];
+  function rqAll(){ return store.get("rq",{}); }
+  function rqResolve(key,i){ const [kind,id]=key.split(":"); i=+i; if(kind==="sub"){ const h=subLesson(id); return h&&h.l.quiz[i]?{q:h.l.quiz[i],title:h.l.title,href:`#/sub/${h.s.id}/${h.l.id}`,sid:h.s.id}:null; } if(kind==="p2"||kind==="p3"){ const h=subLesson(id); if(!h) return null; const q=(kind==="p2"?P2(h.l):P3(h.l))[i]; return q?{q,title:h.l.title,href:`#/sub/${h.s.id}/${h.l.id}`,sid:h.s.id}:null; } if(kind==="lesson"){ const l=byLesson(id); return l&&l.quiz[i]?{q:l.quiz[i],title:l.title,href:`#/study/${l.unit}/${l.id}`,sid:"math"}:null; } return null; }
+  function rqSync(){ const L=store.get("qlog",[]); const R=rqAll(); const seen=new Set(); L.slice(-400).forEach(x=>{ if(!/^(sub|p2|p3|lesson):/.test(x.k)||/-/.test(x.i)) return; const k=x.k+"#"+x.i; if(seen.has(k)) return; seen.add(k); const bad=!x.ok||(x.c!=null&&x.c<3); if(bad&&!R[k]) R[k]={n:0,next:x.t+RQ_GAPS[0]*864e5,since:x.t}; }); store.set("rq",R); return R; }
+  function rqDue(){ const R=rqSync(); const now=Date.now(); return Object.entries(R).filter(([k,r])=>r.n<RQ_GAPS.length&&r.next<=now).map(([k,r])=>{ const [key,i]=k.split("#"); const it=rqResolve(key,i); return it?{k,key,i,r,...it}:null; }).filter(Boolean); }
+  main.addEventListener("click",e=>{ const b=e.target.closest(".quiz.rq .opts button"); if(!b) return; const q=b.closest(".quiz"); const k=q.dataset.key+"#"+q.dataset.i; const R=rqAll(); const r=R[k]; if(!r) return; const ok=Number(b.dataset.j)===Number(q.dataset.a); if(ok){ r.n++; r.next=Date.now()+(RQ_GAPS[r.n]||30)*864e5; if(r.n>=RQ_GAPS.length) earnTok(3,"복습 큐 졸업"); } else { r.n=0; r.next=Date.now()+RQ_GAPS[0]*864e5; } store.set("rq",R); const el=q.querySelector(".rq-state"); if(el) el.textContent=ok?(r.n>=RQ_GAPS.length?"🎓 졸업":`✓ 다음 ${RQ_GAPS[r.n]}일 뒤`):"✗ 내일 다시"; });
+
+  // ---------- 공통 조각 ----------
+  const ring=(p,label,s=96)=>`<div class="ring" style="--p:${Math.min(100,p)};--s:${s}px"><b>${p}%</b><span>${label}</span></div>`;
+  const bar=p=>`<div class="progress"><i style="width:${Math.min(100,p)}%"></i></div>`;
+  const stag=sid=>{ const s=SB(sid); return `<span class="stag" style="--c:${s.col}">${s.icon} ${s.name}</span>`; };
+  const dd=()=>{ const nx=nextExam(); if(nx) return {name:nx.name||({mid:"중간고사",final:"기말고사",mock:"모의고사",csat:"수능"})[nx.type],d:dayDiff(nx.date),date:nx.date,subjects:nx.subjects||[],type:nx.type}; const cfg=D.dailyConfig||{}; const e=(cfg.exams||[]).map(x=>({...x,d:dayDiff(x.date)})).filter(x=>x.d>=-3).sort((a,b)=>a.d-b.d)[0]; return e?{name:e.name,d:e.d,date:e.date,subjects:e.subjects||[],type:e.type}:null; };
+  const phaseOf=d=>d==null?"상시":d<0?"복기":d<=7?"실전":d<=21?"유형":"개념";
+  const PHASE_TIP={개념:"D-21 이전: 단원 노트 읽기 → 차시 ① 기본 퀴즈. 하루 2과목.",유형:"D-8~21: ② 실력 문제·틀린 풀이 찾기. 단원 테스트 1회.",실전:"D-7 이내: ③ 1등급 문제·시험 직전 요약표·복습 큐만. 새 내용 금지.",복기:"시험 후 3일: 틀린 문항 유형 태그 → 복습 큐 등록.",상시:"시험 일정을 등록하면 D-day 단계가 자동으로 바뀝니다."};
+  const subjName=sid=>SB(sid)?SB(sid).name:sid;
+  const unitNote=u=>u.notes||(D.unitNotes||{})[u.id]||null;
+  const stdText=c=>((D.standardsAll||{}).texts||{})[c]||(D.standards&&D.standards.codes&&D.standards.codes[c])||"";
+
+  // ---------- 1. 내 공부방 (홈) ----------
+  function home(){ const p=profile(); if(!p) return setup(); const ex=dd(); const ph=phaseOf(ex?ex.d:null); const t=curTerm();
+    const tiles=SUBJECTS.map(s=>{ const us=currentUnits(s.id); const ls=us.flatMap(u=>u.lessons.map(l=>({u,l,m:M_OF(s.id,l)}))); const pct=avg(us.map(u=>unitPct(s.id,u))); const next=ls.filter(x=>x.m.pct<100).sort((a,b)=>a.m.pct-b.m.pct)[0]||ls[0]; const done=ls.filter(x=>x.m.pct>=100).length;
+      return `<a class="card link stile" href="#/s/${s.id}" style="--c:${s.col}"><div class="row" style="justify-content:space-between"><h3>${s.icon} ${s.name}</h3><b>${us.length?pct+"%":"—"}</b></div>${bar(pct)}<p class="muted small">${us.length?`${TERM_NAME[s.id==="math"?p.grade:t]||G[p.grade]} ${us.length}단원 · 목표 달성 ${done}/${ls.length}`:"이 학기 콘텐츠 준비 중 (자동 조사가 채웁니다)"}</p>${next?`<p class="small">▶ 다음: <b>${esc(next.l.title)}</b></p>`:""}</a>`; }).join("");
+    const all=SUBJECTS.map(s=>subjectPct(s.id)); const overall=avg(all.filter((x,i)=>currentUnits(SUBJECTS[i].id).length));
+    const due=rqDue().length; const cal=calStats(14); const days=A.activeDays();
+    const b=window.BRIEF?window.BRIEF.build({D,date:todayKey(),grade:p.grade,name:p.name||"",exams:(()=>{ const S=schedGet(); const m=S.exams.map(e=>({name:e.name,date:e.date,type:e.type,subjects:e.subjects||[]})); return m.length?m:((D.dailyConfig||{}).exams||[]); })(),daily:(D.dailyConfig||{}).daily||[]}):null;
+    const adv=consultAll(p,ex,ph,cal,due);
+    render(`<div class="me-head"><div><div class="eyebrow">내 공부방 · ${G[p.grade]||p.grade}${ex?` · ${esc(ex.name)} D${ex.d>=0?"-"+ex.d:"+"+(-ex.d)} · <b>${ph} 단계</b>`:""}</div><h1>${p.name?esc(p.name)+" 님의 ":""}전 과목 공부방</h1><p class="muted">${PHASE_TIP[ph]} 목표율 = 기본 퀴즈 60 · 개념 읽기 10 · 실력 15 · 1등급 15.</p></div>${ring(overall,"학기 목표율",124)}</div>
+    <div class="stats me-stats"><div><b>${days.streak}</b>연속 학습일</div><div><b>${due}</b>오늘 복습 큐</div><div><b>${cal.rate!=null?cal.rate+"%":"—"}</b>확신 보정률(14일)</div><div><b>${cal.n.ill}</b>착각(확신+오답)</div><div><b>${store.get("qlog",[]).length}</b>푼 문제</div></div>
+    <h2>📚 과목 고르기 <span class="muted" style="font-weight:400;font-size:.9rem">— 카드를 누르면 학년·학기별 단원과 3단계 문제</span></h2><div class="grid stiles">${tiles}</div>
+    <div class="grid wide" style="margin-top:14px"><div class="card"><h3>📬 오늘의 5줄</h3>${b?`<ul class="bul small">${b.blocks.map(x=>`<li><b>${esc(x.subject)}</b> · <a href="${x.href}">${esc(x.title)}</a></li>`).join("")}</ul>`:""}<a class="btn sm" href="#/today">전체 보기 →</a></div>
+      <div class="card"><h3>🔁 복습 큐 <span class="tag">${due}건</span></h3><p class="muted small">틀렸거나 찍어서 맞힌 문제를 1·3·7·14일 간격으로 다시 냅니다. 네 번 연속 맞히면 졸업.</p><a class="btn sm ${due?"":"ghost"}" href="#/rq">${due?"지금 풀기":"큐 보기"}</a></div>
+      <div class="card"><h3>🧭 시험 대비</h3><p class="muted small">${ex?`${esc(ex.name)} ${esc(ex.date)} · 과목 ${ex.subjects.length?esc(ex.subjects.join("·")):"전체"}`:"시험 일정을 등록하면 D-day 단계 계획이 생깁니다"}</p><a class="btn sm" href="#/exam-prep">범위·체크리스트 →</a></div></div>
+    <h2>🧑‍🏫 학습 컨설팅 <span class="muted" style="font-weight:400;font-size:.9rem">— 지금 가장 효과가 큰 순서</span></h2><div class="grid wide">${adv.map(a=>`<div class="card adv p${a.pri}"><h3>${a.icon} ${a.title}</h3><p>${a.body}</p><a class="btn sm" href="${a.href}">${a.label} →</a></div>`).join("")}</div>
+    <h2>📅 이번 주 계획 <span class="muted" style="font-weight:400;font-size:.9rem">— 하루 2과목 + 수학, 일요일은 섞어 풀기·주간 돌아보기</span></h2>${weekHtml(p)}
+    <div class="row" style="margin-top:16px"><a class="btn ghost" href="#/mathme">🧮 수학 대시보드(개념 지도·공식·생성 문제)</a><a class="btn ghost" href="#/weekly">🏫 주간 테스트</a><a class="btn ghost" href="#/review">🪞 주간 돌아보기</a><a class="btn ghost" href="#/report">📄 학부모 리포트</a><a class="btn ghost" href="#/textbooks">📘 교과서 고르기</a><a class="btn ghost" href="#/setup">⚙️ 학기·이름·시험일</a></div>`); }
+  function consultAll(p,ex,ph,cal,due){ const out=[]; const rows=SUBJECTS.map(s=>({s,pct:subjectPct(s.id),n:currentUnits(s.id).length})).filter(x=>x.n);
+    if(ex&&ex.d>=0&&ex.d<=21){ const weak=rows.filter(x=>!ex.subjects.length||ex.subjects.includes(x.s.name)).sort((a,b)=>a.pct-b.pct)[0]; if(weak) out.push({pri:1,icon:"🚨",title:`${ex.name} D-${ex.d} · 가장 낮은 ${weak.s.name} ${weak.pct}%`,body:`${ph} 단계입니다. ${ph==="실전"?"새 내용은 멈추고 1등급 문제·요약표·복습 큐만.":ph==="유형"?"실력(②) 문제와 단원 테스트로 유형을 굳히세요.":"단원 노트를 읽고 기본 퀴즈부터 채우세요."}`,href:`#/s/${weak.s.id}`,label:`${weak.s.name} 단원 보기`}); }
+    if(cal.n.ill>=3) out.push({pri:1,icon:"🪞",title:`'확신했는데 틀림' ${cal.n.ill}회`,body:"개념을 반대로 알고 있을 가능성이 큽니다. 복습 큐에서 그 문항의 해설을 읽고 한 문장으로 다시 설명해 보세요.",href:"#/rq",label:"복습 큐"});
+    if(due>=5) out.push({pri:2,icon:"🔁",title:`복습 큐 ${due}건 밀림`,body:"간격 반복은 밀리면 효과가 급감합니다. 10분만 들여 오늘 분을 비우세요.",href:"#/rq",label:"지금 풀기"});
+    const low=rows.filter(x=>x.pct<40).sort((a,b)=>a.pct-b.pct); if(low.length) out.push({pri:2,icon:"📉",title:`${low.map(x=>x.s.name).join("·")} 목표율 40% 미만`,body:"기본 퀴즈만 채워도 60%까지 오릅니다. 한 과목 한 단원씩 — 오늘은 "+low[0].s.name+"부터.",href:`#/s/${low[0].s.id}`,label:low[0].s.name+" 시작"});
+    const noSelf=Object.keys(store.get("selfx",{})).length; if(noSelf<3) out.push({pri:3,icon:"🗣",title:"'한 문장 설명' 3개 채우기",body:"차시 맨 아래 '친구에게 한 문장으로' 칸에 직접 써 보는 자기 설명은 재읽기보다 기억이 2배 오래 갑니다(Chi 1994).",href:rows[0]?`#/s/${rows[0].s.id}`:"#/subjects",label:"차시로"});
+    const high=rows.filter(x=>x.pct>=80).sort((a,b)=>b.pct-a.pct)[0]; if(high) out.push({pri:3,icon:"🏆",title:`${high.s.name} ${high.pct}% — 1등급 도전`,body:"잘하는 과목은 ③ 1등급(학평·수능형 자료 해석·서술형)으로 올리세요. 내신 상위권은 서술형에서 갈립니다.",href:`#/s/${high.s.id}`,label:"1등급 문제"});
+    if(!out.length) out.push({pri:3,icon:"🌱",title:"오늘의 5줄부터",body:"하루 6차시(수·국·과 / 영·사·역) 한 줄 요약과 퀴즈 1개. 10분이면 됩니다.",href:"#/today",label:"오늘의 5줄"});
+    return out.sort((a,b)=>a.pri-b.pri).slice(0,4); }
+  function weekHtml(p){ const days=["일","월","화","수","목","금","토"]; const today=new Date(); const dow=today.getDay(); const rot=[["kor","sci"],["eng","soc"],["his","kor"],["sci","eng"],["soc","his"],["kor","eng"]]; const out=[];
+    for(let k=0;k<7;k++){ const d=new Date(today); d.setDate(today.getDate()-dow+k); const isT=k===dow; const items=[]; if(k===0){ items.push({t:"🔀 섞어 풀기 (수학)",h:"#/mix"},{t:"🪞 주간 돌아보기",h:"#/review"},{t:"🔁 복습 큐 비우기",h:"#/rq"}); } else { const pair=rot[k-1]; pair.forEach(sid=>{ const us=currentUnits(sid); const ls=us.flatMap(u=>u.lessons.map(l=>({u,l,m:M_OF(sid,l)}))).filter(x=>x.m.pct<100).sort((a,b)=>a.m.pct-b.m.pct); const x=ls[0]; if(x) items.push({t:`${SB(sid).icon} ${x.l.title}`,h:lessonHref(sid,x.u,x.l)}); }); const ml=lessonsAll.filter(l=>l.grade===p.grade).map(l=>({l,m:mastery(l)})).filter(x=>x.m.pct<100).sort((a,b)=>a.m.pct-b.m.pct)[k%3]; if(ml) items.push({t:`🧮 ${ml.l.title}`,h:`#/study/${ml.l.unit}/${ml.l.id}`}); }
+      out.push(`<div class="day ${isT?"today":""}"><div class="eyebrow">${days[k]} ${d.getMonth()+1}/${d.getDate()}${isT?" · 오늘":""}</div>${items.map(it=>`<a href="${it.h}">${esc(it.t)}</a>`).join("")}</div>`); }
+    return `<div class="week">${out.join("")}</div>`; }
+
+  // ---------- 2. 과목 홈 (#/s/:sid) ----------
+  function subjectHome(sid,qs){ const p=profile(); if(!p) return setup(); const s=SB(sid); if(!s) return notFound(); const pr=new URLSearchParams(qs||""); const us=unitsOf(sid);
+    const bands=BANDS.filter(b=>us.some(u=>u.band===b.id)); const myBand=bandOf(p.grade); const sel=pr.get("b")||(bands.some(b=>b.id===myBand)?myBand:(bands[0]&&bands[0].id));
+    const inBand=us.filter(u=>u.band===sel); const tbSel=((p.textbooks||{})[sel]||{})[sid]; const tbCfg=(D.dailyConfig&&D.dailyConfig.textbooks)||{}; const tbSchool=tbCfg[s.name];
+    const terms=[...new Set(inBand.map(u=>sid==="math"?u.grade:u.termKey))];
+    render(`<div class="lhead"><div class="crumb"><a href="#/me">내 공부방</a> › ${s.icon} ${s.name}</div><h1 style="--c:${s.col}">${s.icon} ${s.name} 공부방</h1><p class="lead muted">2022 개정 교육과정 성취기준 단위. 단원 → 차시(개념·오개념·출제 포인트·풀이 패턴) → <b>① 기본 ② 실력 ③ 1등급</b> 세 단계 문제 → 단원 테스트. ${sid==="math"?"수학은 개념 지도·공식 되살리기·생성 문제가 더 있습니다.":""}</p></div>
+    <div class="pill-row">${BANDS.map(b=>{ const has=bands.some(x=>x.id===b.id); return `<a class="pill ${b.id===sel?"on":""} ${has?"":"dim"}" href="#/s/${sid}?b=${b.id}">${b.name}${has?"":" (준비 중)"}</a>`; }).join("")}</div>
+    <p class="muted small">📘 교과서: ${tbSel?`<b>${esc(tbSel)}</b>${hasMap(sid,sel,tbSel)?' <span class="tag">차례 대조됨</span>':' <span class="tag">성취기준 순서</span>'}`:(sel===myBand&&tbSchool?`<b>${esc(tbSchool)}</b> <span class="tag">${esc((D.dailyConfig||{}).school||"학교")} 기준</span>`:"미선택")} · <a href="#/textbooks">교과서 고르기</a> — 출판사를 고르면 그 교과서의 학기·단원 순서로 바뀝니다(대조표가 있는 경우).</p>
+    ${inBand.length?terms.map(t=>{ const tu=inBand.filter(u=>(sid==="math"?u.grade:u.termKey)===t); return `<h2>${sid==="math"?G[t]:TERM_NAME[t]||t} <span class="muted" style="font-weight:400;font-size:.9rem">${tu.length}단원 · ${tu.reduce((a,u)=>a+u.lessons.length,0)}차시</span></h2>${tu.map(u=>unitCard(sid,u)).join("")}`; }).join(""):`<div class="box warn">${BANDS.find(b=>b.id===sel).name} ${s.name} 콘텐츠는 아직 없습니다. 주간 자동 조사가 교과서·성취기준을 확인해 채웁니다(docs/BACKLOG.md).</div>`}
+    <p class="muted small">근거: ${((sid==="math"?[]:(D.subjects[sid]||{}).src)||[]).slice(0,4).map(([t,u2])=>`<a href="${u2}" target="_blank" rel="noopener">${esc(t)}</a>`).join(" · ")}</p>`); }
+  const hasMap=(sid,band,pub)=>!!(D.textbookMaps||{})[sid+"|"+band+"|"+pub];
+  function unitCard(sid,u){ const pct=unitPct(sid,u); const [sn,sc]=STATUS(pct); const n=unitNote(u); const isCur=sid==="math"?u.grade===prof().grade:(u.termKey===curTerm()&&(!u.term||u.term===((D.subjects[sid]||{}).term||u.term)));
+    return `<div class="card ucard ${isCur?"cur":""}"><div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:nowrap"><div style="flex:1;min-width:0"><h3 style="margin:0"><a href="${unitHref(sid,u)}">${esc(u.title)}</a> ${u.tb?`<span class="tag">📘 ${esc(u.tb)}</span>`:""}${u.term===1?'<span class="tag">1학기</span>':""}${u.track?`<span class="tag">${u.track==="world"?"세계사":"한국사"}</span>`:""}</h3><p class="muted small" style="margin:4px 0">${(u.std||[]).slice(0,6).map(c=>`<code class="tcode">${c}</code>`).join(" ")}${u.exam?` · 🏫 ${md(u.exam)}`:""}</p></div><div style="text-align:right;flex:none;margin-left:10px"><b>${pct}%</b><br><span class="st ${sc}">${sn}</span></div></div>${bar(pct)}
+    <div class="lchips">${u.lessons.map(l=>{ const m=M_OF(sid,l); const [n2,c2]=STATUS(m.pct); return `<a class="lchip ${c2}" href="${lessonHref(sid,u,l)}" title="목표율 ${m.pct}%">${esc(l.title)} <b>${m.pct}%</b></a>`; }).join("")}</div>
+    <div class="row" style="margin-top:8px"><a class="btn sm" href="${unitHref(sid,u)}">📒 단원 노트${n?"":" (준비 중)"}</a>${sid!=="math"?`<a class="btn sm ghost" href="#/test/${sid}/${u.id}">📝 단원 테스트 10문항</a>`:`<a class="btn sm ghost" href="#/study/${u.id}">🧮 수학 단원 페이지</a>`}</div></div>`; }
+
+  // ---------- 3. 단원 페이지 (#/s/:sid/:uid) ----------
+  function unitPage(sid,uid){ const p=profile(); if(!p) return setup(); const s=SB(sid); const u=unitById(sid,uid); if(!s||!u) return notFound(); const n=unitNote(u); const pct=unitPct(sid,u); const stds=u.std||[...new Set(u.lessons.flatMap(l=>l.std||[]))];
+    const tables=u.lessons.flatMap(l=>(l.visuals||[]).filter(v=>v.type==="table").slice(0,1).map(v=>({l,v})));
+    const hist=(store.get("utest",{})[u.id]||[]);
+    render(`<div class="lhead"><div class="crumb"><a href="#/me">내 공부방</a> › <a href="#/s/${sid}">${s.icon} ${s.name}</a> › 단원</div><div class="me-head"><div style="flex:1;min-width:0">${stag(sid)} ${u.tb?`<span class="tag">📘 ${esc(u.tb)}</span>`:""} <span class="tag">${sid==="math"?G[u.grade]:TERM_NAME[u.termKey]||u.termKey}</span><h1>${esc(u.title)}</h1>${u.exam?`<p class="muted">🏫 ${md(u.exam)}</p>`:""}</div>${ring(pct,"단원 목표율",100)}</div></div>
+    <div class="pill-row">${[["goal","학습 목표"],["sum","핵심 요약"],["key","핵심 용어"],["tip","시험 경향"],["ls","차시"],["tbl","요약표"],["test","단원 테스트"]].map(([k,t])=>`<button class="pill" data-to="${k}">${t}</button>`).join("")}</div>
+    <h2 id="goal">🎯 학습 목표</h2>${n&&n.goals?`<ul class="bul">${n.goals.map(g=>`<li>${md(g)}</li>`).join("")}</ul>`:""}${stds.length?`<details class="muted small"><summary>성취기준 원문 ${stds.length}개</summary><ul>${stds.map(c=>`<li><code>[${c}]</code> ${esc(stdText(c))}</li>`).join("")}</ul></details>`:""}
+    <h2 id="sum">📒 교과서 핵심 요약 <span class="muted" style="font-weight:400;font-size:.9rem">— 시험 직전 3분</span></h2>${n&&n.summary?`<div class="card sumcard"><ol class="sum">${n.summary.map(x=>`<li>${md(x)}</li>`).join("")}</ol></div>`:`<div class="box warn">단원 노트 준비 중 — 차시의 '핵심 개념'을 읽으세요.</div>`}
+    ${n&&n.keywords?`<h2 id="key">🔑 핵심 용어</h2><div class="kw">${n.keywords.map(k=>`<span class="chip">${esc(k)}</span>`).join("")}</div>`:""}
+    ${n&&n.examTips?`<h2 id="tip">🏫 시험 경향 · 수능 연결</h2><ul class="bul">${n.examTips.map(x=>`<li>${md(x)}</li>`).join("")}</ul>`:""}
+    <h2 id="ls">📘 차시별 진행 <span class="muted" style="font-weight:400;font-size:.9rem">① 기본 ② 실력 ③ 1등급</span></h2>
+    <table class="mtable tiers"><tr><th>차시</th><th>목표율</th><th>①</th><th>②</th><th>③</th><th></th></tr>${u.lessons.map(l=>{ const m=M_OF(sid,l); const [sn,sc]=STATUS(m.pct); const t1=sid==="math"?`${m.qc}/${m.qn}`:`${m.qc}/${m.qn}`; const t2=sid==="math"?"—":(m.n2?`${m.c2}/${m.n2}`:"·"); const t3=sid==="math"?"—":((m.n3+m.ne)?`${m.c3+m.ce}/${m.n3+m.ne}`:"·"); return `<tr><td><a href="${lessonHref(sid,u,l)}">${esc(l.title)}</a></td><td class="bar"><div class="mbar"><i style="width:${Math.min(100,m.pct)}%"></i></div></td><td>${t1}</td><td>${t2}</td><td>${t3}</td><td><span class="st ${sc}">${sn}</span></td></tr>`; }).join("")}</table>
+    ${tables.length?`<h2 id="tbl">🖼 시험 직전 요약표 모음</h2><p class="muted small">각 차시의 요약정리표만 모았습니다. 시험 전날 한 번에 훑기.</p>${tables.map(({l,v})=>`<p class="muted small" style="margin:10px 0 0"><a href="${lessonHref(sid,u,l)}">${esc(l.title)}</a></p>${window.VIS.render(v)}`).join("")}`:""}
+    <h2 id="test">📝 단원 테스트</h2><div class="card"><p>기본·실력·1등급 문제를 섞어 <b>10문항 · 15분</b>. 틀린 문항은 복습 큐에 들어갑니다. ${hist.length?`최근 ${hist[0].score}/${hist[0].n} (${new Date(hist[0].when).toLocaleDateString("ko")})`:""}</p>${sid!=="math"?`<a class="btn" href="#/test/${sid}/${u.id}">테스트 시작</a>`:`<a class="btn" href="#/weekly">🏫 주간 테스트(수학)</a> <a class="btn ghost" href="#/study/${u.id}">수학 단원 페이지</a>`}</div>`);
+    pills(); }
+  const pills=()=>main.querySelectorAll(".pill[data-to]").forEach(b=>b.onclick=()=>{ const el=document.getElementById(b.dataset.to); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); });
+
+  // ---------- 4. 차시 페이지 (과목, #/sub/:sid/:lid) — 수학 소단원과 같은 설계 + 3단계 ----------
+  function lessonPage(sid,lid){ const p=profile(); if(!p) return setup(); const s=D.subjects[sid]; if(!s) return notFound(); const hit=subLesson(lid); if(!hit||hit.s.id!==sid) return notFound(); const {u,l}=hit; const sb=SB(sid); const idx=u.lessons.findIndex(x=>x.id===lid); const prev=u.lessons[idx-1], next=u.lessons[idx+1];
+    { const v=store.get("visit",{}); v[l.id]={n:(v[l.id]?v[l.id].n:0)+1,last:Date.now()}; store.set("visit",v); }
+    const m=subMastery(l); const [sn,sc]=STATUS(m.pct); const p2=P2(l), p3=P3(l), pe=PE(l); const es=store.get("sess",{}); const selfx=store.get("selfx",{})[l.id]||""; const spots=(D.spot||[]).filter(x=>x.lesson===l.id);
+    render(`<div class="lhead"><div class="crumb"><a href="#/me">내 공부방</a> › <a href="#/s/${sid}">${sb.icon} ${sb.name}</a> › <a href="#/s/${sid}/${u.id}">${esc(u.title)}</a></div>${stag(sid)} <span class="tag">${idx+1}/${u.lessons.length}</span> <span class="st ${sc}">목표율 ${m.pct}% · ${sn}</span>${u.tb?` <span class="tag">📘 ${esc(u.tb)}</span>`:""}<h1>${esc(l.title)}</h1>${l.memo?`<p class="lead">${md(l.memo)}</p>`:""}
+      ${(l.std||[]).length?`<details class="muted small"><summary>🎯 학습 목표 · 성취기준 ${l.std.length}</summary><ul>${l.std.map(c=>`<li><code>[${c}]</code> ${esc(stdText(c))}</li>`).join("")}</ul></details>`:""}</div>
+    <div class="pill-row">${[["c","핵심 개념"],["vis","한눈에"],["why","왜"],["pit","오개념"],["pt","출제 포인트"],["pat","풀이 패턴"],["q1","① 기본"],["q2","② 실력"],["q3","③ 1등급"],["self","설명하기"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
+    <h2 id="c">핵심 개념</h2><ul class="bul">${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>${l.memo?`<div class="box ok"><b>꼭 외울 한 줄:</b> ${md(l.memo)}</div>`:""}
+    ${l.visuals&&l.visuals.length?`<h2 id="vis">🖼 한눈에 보기</h2>${window.VIS.renderAll(l.visuals)}`:""}
+    ${l.why?`<h2 id="why">왜 그런지</h2><div class="box">${md(l.why)}</div>`:""}
+    ${l.pitfalls&&l.pitfalls.length?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
+    ${spots.map(x=>{ const r=store.get("spot",{})[x.id]; return `<a class="card link" href="#/spot/${x.id}" style="display:block;margin:8px 0">🔍 <b>틀린 풀이 찾기</b> — ${esc(x.title)} ${r?`<span class="tag">${r.ok?"오류 찾음 ✓":"다시 도전"}</span>`:'<span class="tag">채점자 되기</span>'}</a>`; }).join("")}
+    ${l.points&&l.points.length?`<h2 id="pt">🎯 출제 포인트</h2><ul class="bul">${l.points.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
+    ${l.pattern&&l.pattern.length?`<h2 id="pat">🧭 문제 풀이 패턴</h2><ol class="steps">${l.pattern.map(c=>`<li>${md(c)}</li>`).join("")}</ol>`:""}
+    <h2 id="q1">① 기본 — 확인 퀴즈 <span class="muted" style="font-weight:400;font-size:.9rem">맞힌 ${m.qc}/${m.qn} · 답 고르기 전에 확신도를 먼저</span></h2>${quizHtml(l.quiz,"sub:"+l.id)}
+    <h2 id="q2">② 실력 — 내신 중간·기말형 <span class="muted" style="font-weight:400;font-size:.9rem">${p2.length?`맞힌 ${m.c2}/${m.n2} · 두 개념 결합·함정 보기`:""}</span></h2>${p2.length?quizHtml(p2.map(q=>({...q,tag:q.tag||"내신형"})),"p2:"+l.id):'<div class="box warn">실력 문제 준비 중 (주간 자동 조사가 채웁니다)</div>'}
+    <h2 id="q3">③ 1등급 도전 — 학평·수능형 <span class="muted" style="font-weight:400;font-size:.9rem">${(p3.length+pe.length)?`${m.c3+m.ce}/${m.n3+m.ne} · 자료 해석·서술형`:""}</span></h2>
+    ${p3.length?p3.map((q,i)=>`${q.data?`<div class="card data"><div class="eyebrow">자료</div>${dataHtml(q.data)}</div>`:""}${quizHtml([{...q,tag:q.tag||"학평·수능형"}],"p3:"+l.id).replace('data-i="0"',`data-i="${i}"`)}${q.why3?`<p class="muted small why3">💡 1등급 포인트: ${md(q.why3)}</p>`:""}`).join(""):""}
+    ${pe.map((q,i)=>essayHtml(l,q,i,es[l.id+"#"+i])).join("")}
+    ${!(p3.length+pe.length)?'<div class="box warn">1등급 문제 준비 중</div>':""}
+    <h2 id="self">🗣 친구에게 한 문장으로 <span class="muted" style="font-weight:400;font-size:.9rem">자기 설명 — 쓰면 기억이 오래 갑니다</span></h2><div class="card"><textarea id="selfx" rows="2" placeholder="예: ${esc((l.memo||l.concept[0]).replace(/\*\*/g,"").slice(0,60))}…을 내 말로">${esc(selfx)}</textarea><div class="row"><button class="btn sm" id="selfx-save">저장</button><span class="muted small" id="selfx-msg">${selfx?"저장됨 ✓":"아직 안 씀"}</span></div><p class="muted small">기준: 핵심 용어 1개 이상 + '왜'가 들어가면 합격. 정답을 베끼지 말고 기억으로.</p></div>
+    ${aiPanel("ai-sub","AI 튜터에게 묻기 — 이 차시 범위 안에서만","예: 왜 이 보기가 틀렸나요? / 서술형 답안 봐 주세요",true)}
+    <div class="row" style="margin-top:14px">${prev?`<a class="btn ghost" href="#/sub/${sid}/${prev.id}">← ${esc(prev.title)}</a>`:""}${next?`<a class="btn" href="#/sub/${sid}/${next.id}">${esc(next.title)} →</a>`:`<a class="btn" href="#/test/${sid}/${u.id}">📝 단원 테스트 →</a>`}<a class="btn ghost" href="#/s/${sid}/${u.id}">📒 단원 노트</a><a class="btn ghost" href="#/today">📬 오늘의 5줄</a></div>
+    <p class="muted small" style="margin-top:12px">근거: ${(s.src||[]).slice(0,3).map(([t,u2])=>`<a href="${u2}" target="_blank" rel="noopener">${esc(t)}</a>`).join(" · ")}</p>`);
+    pills(); const sv=$("#selfx-save"); if(sv) sv.onclick=()=>{ const v=$("#selfx").value.trim(); const S=store.get("selfx",{}); if(v){ S[l.id]={t:v,when:Date.now()}; store.set("selfx",S); $("#selfx-msg").textContent="저장됨 ✓"; if(!selfx) earnTok(2,"자기 설명"); } };
+    main.querySelectorAll(".essay-rub input").forEach(cb=>cb.onchange=()=>{ const box=cb.closest(".essay"); const i=+box.dataset.i; const got=[...box.querySelectorAll(".essay-rub input")].map(x=>x.checked); const score=got.reduce((a,g,k)=>a+(g?+box.querySelectorAll(".essay-rub input")[k].dataset.p:0),0); const S=store.get("sess",{}); S[l.id+"#"+i]={score,got,when:Date.now()}; store.set("sess",S); box.querySelector(".essay-score").textContent=score+"/10"; });
+    aiBind("ai-sub",msg=>aiCall("/api/tad/chat",{message:msg,context:{title:l.title,concept:l.concept,why:l.why||"",pitfalls:l.pitfalls||[],pct:m.pct}})); }
+  function dataHtml(t){ t=String(t); if(t.includes("|")){ const lines=t.split("\n").filter(x=>x.trim()); const rows=lines.filter(x=>x.includes("|")); const rest=lines.filter(x=>!x.includes("|")); const tb=rows.map((r,i)=>`<tr>${r.split("|").map(c=>c.trim()).filter((c,k,a)=>!(c===""&&(k===0||k===a.length-1))).map(c=>i===0?`<th>${md(c)}</th>`:`<td>${md(c)}</td>`).join("")}</tr>`).filter(r=>!/^<tr>(<t[dh]>-+<\/t[dh]>)+<\/tr>$/.test(r)).join(""); return `${rest.map(x=>`<p>${md(x)}</p>`).join("")}<table class="fig-table">${tb}</table>`; } return t.split("\n").map(x=>`<p>${md(x)}</p>`).join(""); }
+  function essayHtml(l,q,i,r){ return `<div class="card essay" data-i="${i}"><div class="eyebrow">서술형 ${q.tag&&q.tag!=="서술형"?"· "+esc(q.tag):""}</div><p><b>문제.</b> ${md(q.q)}</p>${q.data?`<div class="box">${dataHtml(q.data)}</div>`:""}<textarea rows="4" placeholder="답안을 먼저 쓰고, 그다음 모범 답안과 채점 기준을 여세요"></textarea>
+    <details class="sol"><summary>모범 답안 · 채점 기준 보기</summary><div class="box ok">${md(q.model)}</div>${q.exp?`<p class="muted small">${md(q.exp)}</p>`:""}<table class="fig-table rubric essay-rub"><tr><th>채점 요소</th><th>배점</th><th>내 답안</th></tr>${q.rubric.map(([c,pt],k)=>`<tr><td>${md(c)}</td><td>${pt}</td><td><input type="checkbox" data-p="${pt}" ${r&&r.got&&r.got[k]?"checked":""}></td></tr>`).join("")}</table><p>자기 채점: <b class="essay-score">${r?r.score+"/10":"—"}</b> <span class="muted small">(6점 이상이면 ③ 달성)</span></p></details></div>`; }
+
+  // ---------- 5. 단원 테스트 (#/test/:sid/:uid) ----------
+  function unitTest(sid,uid,qs){ const p=profile(); if(!p) return setup(); const s=SB(sid); const u=unitById(sid,uid); if(!s||!u||sid==="math") return notFound(); const pr=new URLSearchParams(qs||""); const hist=(store.get("utest",{})[u.id]||[]);
+    if(pr.get("start")!=="1") return render(`<div class="crumb"><a href="#/s/${sid}/${u.id}">${esc(u.title)}</a> › 단원 테스트</div><h1>📝 ${esc(u.title)} 단원 테스트</h1><p class="lead">기본·실력·1등급 객관식을 섞어 <b>10문항 · 15분</b>. 목표율이 낮은 차시를 먼저 뽑고, 틀린 문항은 복습 큐(1·3·7·14일)에 들어갑니다. 90% 이상 1등급 추정.</p>
+      <div class="stats"><div><b>${hist.length}</b>응시</div><div><b>${hist[0]?hist[0].score+"/"+hist[0].n:"—"}</b>최근</div><div><b>${hist[0]?hist[0].grade+"등급":"—"}</b>추정</div></div><div class="row"><a class="btn" href="#/test/${sid}/${u.id}?start=1">▶ 시작</a><a class="btn ghost" href="#/s/${sid}/${u.id}">단원 노트</a></div>
+      ${hist.length?`<table><tr><th>날짜</th><th>점수</th><th>등급</th><th>틀린 차시</th></tr>${hist.slice(0,10).map(h=>`<tr><td>${new Date(h.when).toLocaleDateString("ko")}</td><td>${h.score}/${h.n}</td><td>${h.grade}</td><td>${(h.wrong||[]).map(id=>{ const x=subLesson(id); return x?esc(x.l.title):id; }).join(", ")||"없음"}</td></tr>`).join("")}</table>`:""}`);
+    const prog=store.get("quiz",{}); const pool=[]; u.lessons.forEach(l=>{ const m=subMastery(l); l.quiz.forEach((q,i)=>pool.push({l,q,key:"sub:"+l.id,i,w:(prog["sub:"+l.id+"#"+i]?1:3)+(100-m.pct)/50,lv:1})); P2(l).forEach((q,i)=>pool.push({l,q,key:"p2:"+l.id,i,w:(prog["p2:"+l.id+"#"+i]?1:3)+(100-m.pct)/50,lv:2})); P3(l).forEach((q,i)=>pool.push({l,q,key:"p3:"+l.id,i,w:(prog["p3:"+l.id+"#"+i]?1:2)+(100-m.pct)/50,lv:3})); });
+    const pick=[]; const byL={}; const sorted=pool.map(x=>({...x,r:x.w*Math.random()})).sort((a,b)=>b.r-a.r); const want={1:4,2:4,3:2}; const got={1:0,2:0,3:0};
+    for(const x of sorted){ if(pick.length>=10) break; if(got[x.lv]>=want[x.lv]&&sorted.length>10) continue; if((byL[x.l.id]||0)>=3) continue; pick.push(x); got[x.lv]++; byL[x.l.id]=(byL[x.l.id]||0)+1; }
+    for(const x of sorted){ if(pick.length>=10) break; if(!pick.includes(x)) pick.push(x); }
+    if(!pick.length) return render("<p>문항이 없습니다.</p>"); let left=900, done=false; const ans={}; const t0=Date.now();
+    render(`<div class="crumb"><a href="#/test/${sid}/${u.id}">단원 테스트</a> › 응시 중</div><div class="row" style="justify-content:space-between;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:2"><b>📝 ${esc(u.title)} · ${pick.length}문항</b><b id="ut-timer">15:00</b></div>
+      ${pick.map((it,k)=>`<div class="quiz wk" data-k="${k}"><span class="qn">${k+1} <em>${["","기본","실력","1등급"][it.lv]}</em></span> <span class="tag">${esc(it.l.title)}</span>${it.q.data?`<div class="box">${dataHtml(it.q.data)}</div>`:""}<br>${md(it.q.q)}<div class="opts">${it.q.opts.map((o,j)=>`<button data-j="${j}">${["①","②","③","④"][j]} ${md(o)}</button>`).join("")}</div></div>`).join("")}
+      <div class="row"><button class="btn" id="ut-sub">제출 (<span id="ut-n">0</span>/${pick.length})</button></div>`);
+    main.querySelectorAll(".quiz.wk .opts button").forEach(b=>b.onclick=()=>{ if(done) return; const q=b.closest(".quiz"); q.querySelectorAll("button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); ans[q.dataset.k]=+b.dataset.j; $("#ut-n").textContent=Object.keys(ans).length; });
+    const timer=setInterval(()=>{ left--; const el=$("#ut-timer"); if(!el){ clearInterval(timer); return; } el.textContent=`${String(Math.floor(left/60)).padStart(2,"0")}:${String(left%60).padStart(2,"0")}`; if(left<=0) submit(); },1000);
+    function submit(){ if(done) return; done=true; clearInterval(timer); let score=0; const wrong=[]; const pg=store.get("quiz",{}); const R=rqAll();
+      pick.forEach((it,k)=>{ const ok=ans[k]===it.q.a; if(ok) score++; else wrong.push(it.l.id); logQ(it.key,it.i,ok); if(!(it.key+"#"+it.i in pg)||ok) pg[it.key+"#"+it.i]=ok||pg[it.key+"#"+it.i]||false; if(!ok){ R[it.key+"#"+it.i]={n:0,next:Date.now()+864e5,since:Date.now()}; const notes=store.get("notes",[]); notes.unshift({key:it.key,i:it.i,q:it.q.q.replace(/\*\*/g,""),when:Date.now()}); store.set("notes",notes.slice(0,200)); } });
+      store.set("quiz",pg); store.set("rq",R); const grade=score/pick.length>=.9?1:score/pick.length>=.8?2:score/pick.length>=.7?3:score/pick.length>=.6?4:5; const uniq=[...new Set(wrong)];
+      const H=store.get("utest",{}); (H[u.id]=H[u.id]||[]).unshift({when:Date.now(),score,n:pick.length,grade,wrong:uniq,sec:Math.round((Date.now()-t0)/1000)}); H[u.id]=H[u.id].slice(0,20); store.set("utest",H); if(score) earnTok(score,"단원 테스트"); if(grade===1) earnTok(5,"단원 테스트 1등급");
+      render(`<div class="crumb"><a href="#/test/${sid}/${u.id}">단원 테스트</a> › 결과</div><h1>${score} / ${pick.length} <span class="st s${grade<=2?4:grade<=4?2:1}">추정 ${grade}등급</span></h1><div class="box ${grade<=2?"ok":"warn"}">${grade<=2?"안정권. 틀린 문항만 복습 큐로 마무리.":grade<=4?"유형에 구멍이 있습니다. 틀린 차시의 ② 실력 문제를 다시.":"개념부터. 단원 노트 핵심 요약 → 차시 ① 기본 퀴즈 순서로."}</div>
+        <table><tr><th>#</th><th>단계</th><th>차시</th><th>결과</th><th>풀이</th></tr>${pick.map((it,k)=>`<tr><td>${k+1}</td><td>${["","기본","실력","1등급"][it.lv]}</td><td><a href="#/sub/${sid}/${it.l.id}">${esc(it.l.title)}</a></td><td>${ans[k]===it.q.a?"✅":ans[k]==null?"— 미응답":"❌ (정답 "+["①","②","③","④"][it.q.a]+")"}</td><td>${md(it.q.exp||"")}${it.q.err?` <span class="tag">${esc(it.q.err)}</span>`:""}</td></tr>`).join("")}</table>
+        ${uniq.length?`<h2>🔁 복습 큐 등록 ${wrong.length}문항</h2><div class="row">${uniq.map(id=>`<a class="btn sm" href="#/sub/${sid}/${id}">${esc(subLesson(id).l.title)}</a>`).join("")}</div>`:""}<div class="row" style="margin-top:14px"><a class="btn ghost" href="#/s/${sid}/${u.id}">단원 노트</a><a class="btn ghost" href="#/me">🏠 내 공부방</a></div>`); typeset(); }
+    $("#ut-sub").onclick=()=>{ if(Object.keys(ans).length<pick.length&&!confirm("아직 안 푼 문항이 있습니다. 제출할까요?")) return; submit(); }; }
+
+  // ---------- 6. 복습 큐 (#/rq) ----------
+  function rqPage(){ const p=profile(); if(!p) return setup(); const due=rqDue(); const R=rqAll(); const all=Object.values(R); const grad=all.filter(r=>r.n>=RQ_GAPS.length).length;
+    render(`<div class="crumb"><a href="#/me">내 공부방</a> › 복습 큐</div><h1>🔁 복습 큐 <span class="tag">${due.length}건 오늘</span></h1><p class="lead">틀렸거나 '찍음·반반'으로 맞힌 문제가 자동으로 들어옵니다. <b>1 → 3 → 7 → 14일</b> 간격으로 다시 내고, 네 번 연속 맞히면 졸업합니다(간격 반복 · Cepeda 2006). 틀리면 간격이 처음으로 돌아갑니다.</p>
+    <div class="stats"><div><b>${all.length}</b>등록</div><div><b>${due.length}</b>오늘</div><div><b>${grad}</b>졸업</div><div><b>${all.filter(r=>r.n<RQ_GAPS.length&&r.next>Date.now()).length}</b>대기</div></div>
+    ${due.length?due.slice(0,20).map(it=>`<div class="rqwrap">${stag(it.sid)} <a class="muted small" href="${it.href}">${esc(it.title)}</a> <span class="muted small">회차 ${it.r.n+1}/${RQ_GAPS.length} · <b class="rq-state"></b></span>${it.q.data?`<div class="box">${dataHtml(it.q.data)}</div>`:""}${quizHtml([it.q],it.key,Date.now()).replace('class="quiz gen"','class="quiz gen rq"').replace(/data-i="[^"]*"/,`data-i="${it.i}"`)}</div>`).join(""):'<div class="box ok">오늘 복습할 것이 없습니다. 차시 퀴즈나 단원 테스트를 풀면 큐가 채워집니다.</div>'}`); }
+
+  // ---------- 7. 시험 대비 (#/exam-prep) ----------
+  function examPrep(qs){ const p=profile(); if(!p) return setup(); const S=schedGet(); const mine=S.exams.map(e=>({name:e.name||({mid:"중간고사",final:"기말고사",mock:"모의고사·학력평가",csat:"수능"})[e.type],date:e.date,type:e.type,subjects:e.subjects||[]})); const exams=(mine.length?mine:((D.dailyConfig||{}).exams||[])).map(e=>({...e,d:dayDiff(e.date)})).filter(e=>e.d>=-7).sort((a,b)=>a.d-b.d); const pr=new URLSearchParams(qs||""); const sel=exams[+(pr.get("i")||0)]||exams[0];
+    if(!sel) return render(`<h1>🧭 시험 대비</h1><div class="box warn">다가오는 시험이 없습니다. <a href="#/schedule">일정·스케줄</a>에서 중간·기말·학력평가 날짜를 등록하세요.</div>`);
+    const ph=phaseOf(sel.d); const sids=(sel.subjects&&sel.subjects.length?sel.subjects.map(n=>SUBJ_KO[n]).filter(Boolean):SUBJECTS.map(s=>s.id)); const ck=store.get("epck",{});
+    const rows=sids.map(sid=>{ const us=currentUnits(sid); return {sid,us,pct:avg(us.map(u=>unitPct(sid,u))),ls:us.flatMap(u=>u.lessons.map(l=>({u,l,m:M_OF(sid,l)})))}; });
+    const CK=[["note","단원 노트 핵심 요약 읽기"],["q1","① 기본 퀴즈 전부"],["q2","② 실력 문제"],["test","단원 테스트 1회(80%↑)"],["q3","③ 1등급 · 서술형"],["rq","복습 큐 비우기"]];
+    const days=Math.max(1,sel.d); const plan=[]; { const allUnits=rows.flatMap(r=>r.us.map(u=>({sid:r.sid,u}))); const per=Math.ceil(allUnits.length/Math.min(days,14)); for(let k=0;k<Math.min(days,14);k++){ const d=new Date(); d.setDate(d.getDate()+k); plan.push({date:`${d.getMonth()+1}/${d.getDate()}`,items:allUnits.slice(k*per,(k+1)*per)}); } }
+    render(`<div class="crumb"><a href="#/me">내 공부방</a> › 시험 대비</div><h1>🧭 ${esc(sel.name)} D${sel.d>=0?"-"+sel.d:"+"+(-sel.d)} <span class="st s3">${ph} 단계</span></h1><p class="lead">${PHASE_TIP[ph]}</p>
+    ${exams.length>1?`<div class="pill-row">${exams.map((e,i)=>`<a class="pill ${e===sel?"on":""}" href="#/exam-prep?i=${i}">${esc(e.name)} ${esc(e.date)}</a>`).join("")}</div>`:""}
+    <h2>📊 과목별 범위 · 목표율</h2><div class="grid">${rows.map(r=>{ const s=SB(r.sid); const done=CK.filter(([k])=>ck[sel.date+":"+r.sid+":"+k]).length; return `<div class="card" style="border-top-color:${s.col}"><h3>${s.icon} ${s.name} <b>${r.us.length?r.pct+"%":"—"}</b></h3>${bar(r.pct)}<p class="muted small">${r.us.map(u=>`<a href="${unitHref(r.sid,u)}">${esc(u.title)}</a>`).join(" · ")||"이 학기 콘텐츠 없음"}</p><div class="ck">${CK.map(([k,t])=>`<label><input type="checkbox" data-k="${sel.date}:${r.sid}:${k}" ${ck[sel.date+":"+r.sid+":"+k]?"checked":""}> ${t}</label>`).join("")}</div><p class="muted small">체크 ${done}/${CK.length}</p></div>`; }).join("")}</div>
+    <h2>📅 D-day 플랜 <span class="muted" style="font-weight:400;font-size:.9rem">— 범위 단원을 남은 날에 나눠 배치(14일까지)</span></h2><div class="week">${plan.map((d,k)=>`<div class="day ${k===0?"today":""}"><div class="eyebrow">${d.date}${k===0?" · 오늘":""}</div>${d.items.map(x=>`<a href="${unitHref(x.sid,x.u)}">${SB(x.sid).icon} ${esc(x.u.title)}</a>`).join("")||'<span class="muted small">복습 큐 · 요약표</span>'}</div>`).join("")}</div>
+    <div class="box"><b>1등급 공부 순서(연구 근거):</b> 요약 노트 읽기(10%) → 스스로 인출(퀴즈·백지 복습, 60%) → 틀린 것만 간격 반복(20%) → 자료 해석·서술형으로 전이(10%). 읽기·밑줄만 반복하는 공부는 효과가 가장 낮습니다(Dunlosky 2013).</div>`);
+    main.querySelectorAll(".ck input").forEach(cb=>cb.onchange=()=>{ const C=store.get("epck",{}); C[cb.dataset.k]=cb.checked; store.set("epck",C); if(cb.checked) earnTok(1,"시험 대비 체크"); }); }
+
+  // ---------- 8. 교과서 고르기 (#/textbooks) ----------
+  function textbooks(){ const p=profile(); if(!p) return setup(); const T=D.textbooks; if(!T) return render(`<h1>📘 교과서 고르기</h1><div class="box warn">출판사 목록(data/textbooks.js)이 없습니다.</div>`); const myBand=bandOf(p.grade); const sel=p.textbooks||{}; const school=(D.dailyConfig&&D.dailyConfig.textbooks)||{};
+    const catFor=b=>b.startsWith("m")?T.grades.m:b==="h1"?T.grades.h1:null; const bands=BANDS.filter(b=>catFor(b.id));
+    render(`<div class="crumb"><a href="#/me">내 공부방</a> › 교과서 고르기</div><h1>📘 교과서 고르기</h1><p class="lead">학년별로 우리 학교 교과서(출판사)를 고르면, <b>차례 대조표가 있는 과목</b>은 그 교과서의 학기·단원 순서로 바뀌고 매일 브리핑도 그 범위를 따릅니다. 대조표가 없으면 성취기준 순서로 보여 주고, 주간 자동 조사가 교과서 차례가 공개되는 대로 대조표를 추가합니다. 목록은 2022 개정 검정 교과서(조사 ${esc(T.synced)}).</p>
+    ${bands.map(b=>{ const cat=catFor(b.id); const cur=b.id===myBand; return `<div class="card ${cur?"cur":""}"><h3>${b.name} ${cur?'<span class="tag">현재 학년</span>':""}${b.id==="m2"&&Object.keys(school).length?` <span class="muted small">(${esc((D.dailyConfig||{}).school||"학교")} 기준: ${Object.entries(school).map(([k,v])=>k+" "+v).join(" · ")})</span>`:""}</h3><div class="grid tbgrid">${SUBJECTS.map(s=>{ const list=cat[s.id]||[]; const v=(sel[b.id]||{})[s.id]||""; return `<label>${s.icon} ${s.name}<select data-b="${b.id}" data-s="${s.id}"><option value="">(미선택 — 성취기준 순서)</option>${list.map(x=>{ const name=x.pub+(x.author?"("+x.author+")":""); return `<option value="${esc(name)}" ${v===name?"selected":""}>${esc(name)}${hasMap(s.id,b.id,name)?" ✓대조표":""}</option>`; }).join("")}</select></label>`; }).join("")}</div></div>`; }).join("")}
+    ${T.grades.h2?`<div class="card"><h3>고2~3 선택 과목</h3><p class="muted small">${Object.entries(T.grades.h2).map(([k,v])=>`<b>${esc(k)}</b> ${v.map(x=>esc(x.pub)).join("·")}`).join(" / ")}</p></div>`:""}
+    <div class="row"><button class="btn" id="tb-save">저장하고 적용</button><span class="muted small" id="tb-msg"></span></div><p class="muted small">출처: ${(T.src||[]).slice(0,6).map(([t,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(t)}</a>`).join(" · ")}${T.note?`<br>${esc(T.note)}`:""}</p>`);
+    $("#tb-save").onclick=()=>{ const tb={}; main.querySelectorAll("select[data-b]").forEach(se=>{ if(se.value){ (tb[se.dataset.b]=tb[se.dataset.b]||{})[se.dataset.s]=se.value; } }); const np={...profile(),textbooks:tb}; store.set("me",np); $("#tb-msg").textContent="저장됨 — 적용 중…"; setTimeout(()=>location.reload(),300); }; }
+
+  // ---------- 과목 목록(구 #/subjects) → 과목 홈으로 ----------
+  function subjectsIndex(){ const p=profile(); if(!p) return setup(); render(`<h1>📚 과목</h1><div class="grid stiles">${SUBJECTS.map(s=>`<a class="card link stile" href="#/s/${s.id}" style="--c:${s.col}"><h3>${s.icon} ${s.name}</h3><p class="muted small">${unitsOf(s.id).length}단원 · ${unitsOf(s.id).reduce((a,u)=>a+u.lessons.length,0)}차시 · ${[...new Set(unitsOf(s.id).map(u=>u.band))].map(b=>BANDS.find(x=>x.id===b).name).join("·")}</p></a>`).join("")}</div>`); }
+
+  // ---------- 라우터 훅 ----------
+  function route(r,p,qs){
+    if(r==="me") { home(); return true; }
+    if(r==="subjects") { subjectsIndex(); return true; }
+    if(r==="s"&&p[1]){ if(p[2]) unitPage(p[1],p[2]); else subjectHome(p[1],qs); return true; }
+    if(r==="sub"&&p[1]&&p[2]){ lessonPage(p[1],p[2]); return true; }
+    if(r==="test"&&p[1]&&p[2]){ unitTest(p[1],p[2],qs); return true; }
+    if(r==="rq"){ rqPage(); return true; }
+    if(r==="exam-prep"){ examPrep(qs); return true; }
+    if(r==="textbooks"){ textbooks(); return true; }
+    return false; }
+  window.ROOM={route,subMastery,SUBJECTS,BANDS,bandOf,currentUnits,unitsOf,rqDue};
+};
