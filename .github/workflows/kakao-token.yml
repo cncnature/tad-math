@@ -1,0 +1,42 @@
+name: Kakao token exchange (1회 설정)
+# 인가 코드를 넣고 실행하면 리프레시 토큰을 발급받아 Secrets 의 KAKAO_REFRESH_TOKEN 에 저장한다.
+# 필요한 Secrets: KAKAO_REST_KEY, KAKAO_CLIENT_SECRET(시크릿 ON 인 경우), REPO_PAT(repo 권한 classic 토큰)
+on:
+  workflow_dispatch:
+    inputs:
+      code:
+        description: "카카오 인가 코드 (kakao.html 에 표시된 값, 10분 안에)"
+        required: true
+permissions:
+  contents: read
+jobs:
+  exchange:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exchange code for tokens
+        env:
+          KAKAO_REST_KEY: ${{ secrets.KAKAO_REST_KEY }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          CODE: ${{ github.event.inputs.code }}
+        run: |
+          set -e
+          if [ -z "$KAKAO_REST_KEY" ]; then echo "::error::Secrets 에 KAKAO_REST_KEY 가 없습니다"; exit 1; fi
+          resp=$(curl -sS -X POST https://kauth.kakao.com/oauth/token \
+            -H "Content-Type: application/x-www-form-urlencoded;charset=utf-8" \
+            --data-urlencode "grant_type=authorization_code" \
+            --data-urlencode "client_id=$KAKAO_REST_KEY" \
+            ${KAKAO_CLIENT_SECRET:+--data-urlencode "client_secret=$KAKAO_CLIENT_SECRET"} \
+            --data-urlencode "redirect_uri=https://cncnature.github.io/tad-math/kakao.html" \
+            --data-urlencode "code=$CODE")
+          rt=$(echo "$resp" | jq -r '.refresh_token // empty')
+          if [ -z "$rt" ]; then echo "::error::토큰 발급 실패: $(echo "$resp" | jq -c 'del(.access_token,.refresh_token)')"; exit 1; fi
+          echo "::add-mask::$rt"
+          echo "REFRESH_TOKEN=$rt" >> "$GITHUB_ENV"
+          echo "리프레시 토큰 발급 성공 (유효 $(echo "$resp" | jq -r '.refresh_token_expires_in')초, 범위: $(echo "$resp" | jq -r '.scope'))"
+      - name: Save KAKAO_REFRESH_TOKEN to repository secrets
+        env:
+          GH_TOKEN: ${{ secrets.REPO_PAT }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then echo "::error::Secrets 에 REPO_PAT(repo 권한 classic 토큰) 이 없어 저장할 수 없습니다. https://github.com/settings/tokens 에서 만들어 REPO_PAT 으로 등록한 뒤 새 인가 코드로 다시 실행하세요."; exit 1; fi
+          gh secret set KAKAO_REFRESH_TOKEN --repo "${{ github.repository }}" --body "$REFRESH_TOKEN"
+          echo "KAKAO_REFRESH_TOKEN 저장 완료 — 이제 Daily brief 워크플로가 카카오톡으로도 보냅니다."

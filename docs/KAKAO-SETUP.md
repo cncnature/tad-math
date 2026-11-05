@@ -24,7 +24,9 @@ https://kauth.kakao.com/oauth/authorize?client_id=REST키&redirect_uri=https://c
 cd tad-math
 KAKAO_REST_KEY=REST키 KAKAO_CLIENT_SECRET=시크릿 node scripts/kakao-token.js 인가코드
 ```
-`KAKAO_REFRESH_TOKEN=…` 한 줄이 나옵니다. 터미널이 없으면 인가 코드·REST 키·시크릿을 저에게(Claude) 주셔도 같은 교환을 대신할 수 있습니다. (오류 KOE006 = 리다이렉트 URI 불일치, KOE004 = 카카오 로그인 사용 설정 OFF, KOE010 = 시크릿 누락·불일치)
+`KAKAO_REFRESH_TOKEN=…` 한 줄이 나옵니다.
+
+**터미널이 없을 때(권장)**: 먼저 3번·4번의 Secrets(`KAKAO_REST_KEY`, `KAKAO_CLIENT_SECRET`, `REPO_PAT`)를 넣어 두고, Actions → **Kakao token exchange (1회 설정)** → Run workflow 에 인가 코드를 붙여 넣으면 워크플로가 토큰을 발급받아 `KAKAO_REFRESH_TOKEN` Secret 까지 자동으로 저장합니다(토큰은 로그에 가려집니다). (오류 KOE006 = 리다이렉트 URI 불일치, KOE004 = 카카오 로그인 사용 설정 OFF, KOE010 = 시크릿 누락·불일치)
 
 ## 3. GitHub Secrets (2분)
 `https://github.com/cncnature/tad-math/settings/secrets/actions` → **New repository secret**:
