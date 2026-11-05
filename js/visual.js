@@ -1,0 +1,50 @@
+/* 학습 시각 자료 렌더러 — data/visuals/*.js 의 JSON 스펙을 표·도식·그래프·연표·수식 SVG/HTML 로 그린다 (외부 라이브러리 없음).
+   근거: 이중 부호화(Paivio; Mayer 멀티미디어 학습 원리) — 글과 그림을 함께 제시하면 기억·전이가 높아진다.
+   스펙 종류: table | flow | compare | timeline | cycle | chart(bar|line) | tree | formula | svg | img  (docs/VISUAL-SCHEMA.md) */
+(function(root){
+  const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+  const C={ink:"var(--ink)",muted:"var(--muted)",line:"var(--line)",acc:"var(--acc)",bg:"var(--card)",pal:["#3b6ef5","#1f9d55","#d9a400","#d64545","#8e5bd6","#0e9aa7"]};
+  const wrap=(s,n)=>{ const out=[]; let cur=""; for(const w of String(s).split(/\s+/)){ if((cur+" "+w).trim().length>n&&cur){ out.push(cur); cur=w; } else cur=(cur+" "+w).trim(); } if(cur) out.push(cur); return out.slice(0,3); };
+  const tspan=(lines,x,y,lh,attrs)=>lines.map((l,i)=>`<text x="${x}" y="${y+i*lh}" ${attrs}>${esc(l)}</text>`).join("");
+  const box=(spec)=>`<figure class="vis ${spec.type}">${spec.title?`<figcaption>${md(spec.title)}</figcaption>`:""}`;
+  const end=(spec)=>`${spec.note?`<p class="vis-note">${md(spec.note)}</p>`:""}</figure>`;
+  const R={
+    table(s){ return box(s)+`<div class="vis-scroll"><table class="vis-table">${s.head?`<tr>${s.head.map(h=>`<th>${md(h)}</th>`).join("")}</tr>`:""}${(s.rows||[]).map(r=>`<tr>${r.map((c,i)=>i===0&&s.rowhead!==false?`<th>${md(c)}</th>`:`<td>${md(c)}</td>`).join("")}</tr>`).join("")}</table></div>`+end(s); },
+    flow(s){ const st=s.steps||[]; const v=s.dir==="v"||st.length>5; const n=Math.max(1,st.length); const gap=v?28:34; const W=v?520:Math.max(520,n*150); const bw=v?440:Math.floor((W-48-(n-1)*gap)/n), bh=54; const H=v?n*(bh+gap)+16-gap:(st.some(x=>x.d)?110:90);
+      let g=`<defs><marker id="va" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${C.muted}"/></marker></defs>`;
+      st.forEach((x,i)=>{ const x0=v?(W-bw)/2:24+i*(bw+gap); const y0=v?8+i*(bh+gap):20; const main=x.t||x; const sub=x.d||""; const chars=Math.max(6,Math.floor(bw/9));
+        g+=`<rect x="${x0}" y="${y0}" width="${bw}" height="${bh}" rx="10" fill="${C.bg}" stroke="${x.hi?C.acc:C.line}" stroke-width="${x.hi?2:1.2}"/>${tspan(wrap(main,v?36:chars),x0+bw/2,y0+(sub?22:32),14,`text-anchor="middle" font-size="13" font-weight="600" fill="${C.ink}"`)}${sub?tspan(wrap(sub,v?44:chars+2),x0+bw/2,y0+40,12,`text-anchor="middle" font-size="11" fill="${C.muted}"`):""}`;
+        if(i<n-1){ if(v) g+=`<line x1="${W/2}" y1="${y0+bh}" x2="${W/2}" y2="${y0+bh+gap-2}" stroke="${C.muted}" stroke-width="1.5" marker-end="url(#va)"/>`; else g+=`<line x1="${x0+bw+2}" y1="${y0+bh/2}" x2="${x0+bw+gap-2}" y2="${y0+bh/2}" stroke="${C.muted}" stroke-width="1.5" marker-end="url(#va)"/>`; } });
+      return box(s)+`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title||"흐름도")}">${g}</svg>`+end(s); },
+    compare(s){ const it=s.items||[]; return box(s)+`<div class="vis-cmp" style="grid-template-columns:repeat(${Math.min(3,it.length)},1fr)">${it.map((x,i)=>`<div class="vis-cmp-col" style="border-top:3px solid ${C.pal[i%6]}"><b>${md(x.name)}</b><ul>${(x.points||[]).map(p=>`<li>${md(p)}</li>`).join("")}</ul></div>`).join("")}</div>`+end(s); },
+    timeline(s){ const ev=s.events||[]; const W=560, left=90, gap=46, H=ev.length*gap+24; let g=`<line x1="${left}" y1="12" x2="${left}" y2="${H-12}" stroke="${C.line}" stroke-width="2"/>`;
+      ev.forEach((e,i)=>{ const y=24+i*gap; g+=`<circle cx="${left}" cy="${y}" r="${e.hi?7:5}" fill="${e.hi?C.acc:C.bg}" stroke="${C.acc}" stroke-width="2"/><text x="${left-14}" y="${y+4}" text-anchor="end" font-size="12" font-weight="600" fill="${C.muted}">${esc(e.y)}</text>${tspan(wrap(e.t,40),left+16,y+4,14,`font-size="13" fill="${C.ink}" ${e.hi?'font-weight="600"':""}`)}`; });
+      return box(s)+`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title||"연표")}">${g}</svg>`+end(s); },
+    cycle(s){ const n=s.nodes||[]; const W=520,H=320,cx=W/2,cy=H/2,r=110; let g=`<defs><marker id="vc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="${C.muted}"/></marker></defs>`;
+      n.forEach((x,i)=>{ const a=-Math.PI/2+i*2*Math.PI/n.length, a2=-Math.PI/2+(i+1)*2*Math.PI/n.length; const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a); const m=a+(a2-a)*0.22, m2=a2-(a2-a)*0.22; g+=`<path d="M${cx+r*Math.cos(m)} ${cy+r*Math.sin(m)} A${r} ${r} 0 0 1 ${cx+r*Math.cos(m2)} ${cy+r*Math.sin(m2)}" fill="none" stroke="${C.muted}" stroke-width="1.5" marker-end="url(#vc)"/>`; g+=`<rect x="${x1-58}" y="${y1-22}" width="116" height="44" rx="10" fill="${C.bg}" stroke="${C.line}"/>${tspan(wrap(x.t||x,12),x1,y1+(x.d?0:5),13,`text-anchor="middle" font-size="12.5" font-weight="600" fill="${C.ink}"`)}${x.d?`<text x="${x1}" y="${y1+16}" text-anchor="middle" font-size="10.5" fill="${C.muted}">${esc(x.d)}</text>`:""}`; });
+      if(s.center) g+=tspan(wrap(s.center,14),cx,cy+4,14,`text-anchor="middle" font-size="13" font-weight="600" fill="${C.acc}"`);
+      return box(s)+`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title||"순환")}">${g}</svg>`+end(s); },
+    chart(s){ const W=560,H=300,pl=56,pr=16,pt=20,pb=48; const xs=s.x||[]; const ser=s.series||[]; const all=ser.flatMap(q=>q.data); const nice=r=>{ const p=Math.pow(10,Math.floor(Math.log10(Math.max(r,1e-9)))); const f=r/p; return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p; }; const lo=s.ymin??Math.min(0,...all), hi0=s.ymax??Math.max(1,...all); const step=nice((hi0-lo)/4||1); const ymin=Math.floor(lo/step)*step, ymax=s.ymax??Math.ceil((hi0*1.02)/step)*step; const X=i=>pl+(i+0.5)*(W-pl-pr)/Math.max(1,xs.length); const Y=v=>pt+(H-pt-pb)*(1-(v-ymin)/(ymax-ymin||1));
+      let g=`<line x1="${pl}" y1="${Y(ymin)}" x2="${W-pr}" y2="${Y(ymin)}" stroke="${C.line}"/><line x1="${pl}" y1="${pt}" x2="${pl}" y2="${H-pb}" stroke="${C.line}"/>`;
+      const nt=Math.round((ymax-ymin)/step); for(let k=0;k<=nt;k++){ const v=ymin+step*k; g+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="${C.line}" stroke-dasharray="3 4" opacity=".6"/><text x="${pl-6}" y="${Y(v)+4}" text-anchor="end" font-size="10.5" fill="${C.muted}">${Number.isInteger(v)?v:v.toFixed(1)}</text>`; }
+      xs.forEach((x,i)=>g+=`<text x="${X(i)}" y="${H-pb+16}" text-anchor="middle" font-size="11" fill="${C.muted}">${esc(x)}</text>`);
+      const bw=(W-pl-pr)/Math.max(1,xs.length)/(ser.length+1);
+      ser.forEach((q,si)=>{ const col=q.color||C.pal[si%6]; if((s.kind||"bar")==="line"){ g+=`<polyline fill="none" stroke="${col}" stroke-width="2.5" points="${q.data.map((v,i)=>`${X(i)},${Y(v)}`).join(" ")}"/>`+q.data.map((v,i)=>`<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" fill="${col}"/>`).join(""); } else { q.data.forEach((v,i)=>{ const x0=X(i)-bw*ser.length/2+si*bw; g+=`<rect x="${x0}" y="${Y(Math.max(v,ymin))}" width="${bw*0.9}" height="${Math.abs(Y(v)-Y(ymin))}" rx="3" fill="${col}" opacity=".9"/>`; if(s.labels!==false) g+=`<text x="${x0+bw*0.45}" y="${Y(v)-4}" text-anchor="middle" font-size="10" fill="${C.ink}">${esc(v)}</text>`; }); } });
+      if(ser.length>1||ser[0]&&ser[0].name) g+=ser.map((q,si)=>`<rect x="${W-pr-ser.length*110+si*110}" y="4" width="12" height="12" rx="2" fill="${q.color||C.pal[si%6]}"/><text x="${W-pr-ser.length*110+si*110+16}" y="14" font-size="11" fill="${C.muted}">${esc(q.name||"")}</text>`).join("");
+      if(s.xlabel) g+=`<text x="${(pl+W-pr)/2}" y="${H-pb+32}" text-anchor="middle" font-size="11" fill="${C.muted}">${esc(s.xlabel)}</text>`; if(s.ylabel) g+=`<text x="12" y="${pt-6}" font-size="11" fill="${C.muted}">${esc(s.ylabel)}</text>`;
+      return box(s)+`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title||"그래프")}">${g}</svg>`+end(s); },
+    tree(s){ const rt=s.root||{}; const kids=rt.children||[]; const W=560, colw=(W-32)/Math.max(1,kids.length); const depth=kids.some(k=>(k.children||[]).length)?3:2; const H=depth===3?250:150;
+      let g=`<rect x="${W/2-80}" y="10" width="160" height="40" rx="10" fill="${C.acc}" opacity=".15" stroke="${C.acc}"/>${tspan(wrap(rt.t,16),W/2,35,13,`text-anchor="middle" font-size="13" font-weight="700" fill="${C.ink}"`)}`;
+      kids.forEach((k,i)=>{ const cx=16+colw*(i+0.5); g+=`<line x1="${W/2}" y1="50" x2="${cx}" y2="90" stroke="${C.line}"/><rect x="${cx-colw*0.45}" y="90" width="${colw*0.9}" height="40" rx="8" fill="${C.bg}" stroke="${C.line}"/>${tspan(wrap(k.t,Math.max(8,Math.floor(colw/8))),cx,108+(wrap(k.t,Math.max(8,Math.floor(colw/8))).length>1?-3:5),13,`text-anchor="middle" font-size="12" font-weight="600" fill="${C.ink}"`)}`;
+        (k.children||[]).slice(0,4).forEach((c,j)=>{ const y=150+j*24; g+=`<line x1="${cx}" y1="130" x2="${cx}" y2="${y-8}" stroke="${C.line}" opacity=".6"/><text x="${cx}" y="${y+4}" text-anchor="middle" font-size="11" fill="${C.muted}">${esc(wrap(c.t||c,Math.max(8,Math.floor(colw/7)))[0])}</text>`; }); });
+      return box(s)+`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title||"개념도")}">${g}</svg>`+end(s); },
+    formula(s){ return box(s)+`<div class="vis-formula">$$${s.tex}$$</div>${s.where?`<p class="vis-note">${(s.where||[]).map(w=>md(w)).join(" · ")}</p>`:""}`+end(s); },
+    svg(s){ return box(s)+`<div class="vis-svg">${String(s.svg||"").replace(/<script[\s\S]*?<\/script>/gi,"")}</div>`+end(s); },
+    img(s){ return box(s)+`<img src="${esc(s.src)}" alt="${esc(s.alt||s.title||"")}" loading="lazy">${s.credit?`<p class="vis-note">출처: ${md(s.credit)}</p>`:""}`+end(s); }
+  };
+  function render(spec){ try{ const f=R[spec.type]; return f?f(spec):""; }catch(e){ return `<p class="muted small">(시각 자료 오류: ${esc(spec.type)})</p>`; } }
+  function renderAll(list){ return (list||[]).map(render).join(""); }
+  const api={render,renderAll,types:Object.keys(R)};
+  if(typeof module!=="undefined"&&module.exports) module.exports=api; else root.VIS=api;
+})(typeof window!=="undefined"?window:globalThis);

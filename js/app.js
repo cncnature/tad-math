@@ -637,6 +637,7 @@
     <h2 id="c">핵심 개념</h2><div class="concept-row"><ul>${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>${figOf(l.id)}</div>
     <h2 id="why">왜 그런지</h2><div class="box">${md(l.why)}</div>
     ${l.story?`<h2 id="story">📖 공식이 태어나는 이야기</h2><p class="muted">외우기 전에 읽는 서너 문단. 어디서 왔고 왜 그 모양인지 알면 공식은 저절로 나옵니다.</p><div class="story">${l.story.map((st,i)=>`<div class="st"><div class="st-n">${i+1}</div><div><h4>${md(st.h)}</h4><p>${md(st.t)}</p></div></div>`).join("")}</div>`:""}
+    ${l.visuals&&l.visuals.length?`<h2 id="vis">🖼 한눈에 보기</h2>${window.VIS.renderAll(l.visuals)}`:""}
     ${l.pitfalls?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${(D.spot||[]).filter(x=>x.lesson===l.id).map(x=>{ const r=store.get("spot",{})[x.id]; return `<a class="card link" href="#/spot/${x.id}" style="display:block;margin:8px 0">🔍 <b>틀린 풀이 찾기</b> — ${x.title} ${r?`<span class="tag">${r.ok?"오류 찾음 ✓":"다시 도전"}</span>`:'<span class="tag">채점자 되기</span>'}</a>`; }).join("")}
     ${l.points?`<h2 id="pt">🎯 출제 포인트</h2><ul class="pt">${l.points.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
@@ -1197,9 +1198,10 @@
   function sub(sid,lid){ const p=profile(); if(!p) return setup(); const s=(D.subjects||{})[sid]; if(!s) return notFound(); if(!lid){ location.hash="#/subjects"; return; }
     const hit=subLesson(lid); if(!hit||hit.s.id!==sid) return notFound(); const {u,l}=hit; const idx=u.lessons.findIndex(x=>x.id===lid); const prev=u.lessons[idx-1], next=u.lessons[idx+1]; const r=subScore(l);
     render(`<div class="lhead ${GCOL(s.grade)}"><div class="crumb"><a href="#/subjects">전 과목</a> › ${s.icon} ${s.name} › ${u.title}</div>${tag(s.grade)} <span class="tag">${idx+1}/${u.lessons.length}</span> <span class="tag">퀴즈 ${r.c}/${r.n}</span><h1>${l.title}</h1><p class="muted small">🏫 ${esc(u.exam||"")}</p>${(l.std||[]).length?`<ul class="muted small" style="margin:6px 0 0;padding-left:18px">${l.std.map(c=>`<li><code>[${c}]</code> ${esc(((D.standardsAll||{}).texts||{})[c]||"")}</li>`).join("")}</ul><p class="muted small">— 2022 개정 교육과정 고시 원문 성취기준${D.standardsAll?` (동기화 ${esc(D.standardsAll.synced)})`:""}</p>`:""}</div>
-    <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["pit","오개념"],["pt","출제 포인트"],["pat","풀이 패턴"],["quiz","퀴즈"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
+    <div class="pill-row">${[["c","핵심 개념"],["vis","한눈에 보기"],["why","왜 그런지"],["pit","오개념"],["pt","출제 포인트"],["pat","풀이 패턴"],["quiz","퀴즈"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
     <h2 id="c">핵심 개념</h2><ul class="bul">${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>
     ${l.memo?`<div class="box ok"><b>꼭 외울 한 줄:</b> ${md(l.memo)}</div>`:""}
+    ${l.visuals&&l.visuals.length?`<h2 id="vis">🖼 한눈에 보기</h2>${window.VIS.renderAll(l.visuals)}`:""}
     ${l.why?`<h2 id="why">왜 그런지</h2><p>${md(l.why)}</p>`:""}
     ${l.pitfalls&&l.pitfalls.length?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${l.points&&l.points.length?`<h2 id="pt">🎯 출제 포인트</h2><ul class="bul">${l.points.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
