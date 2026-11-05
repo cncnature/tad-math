@@ -22,10 +22,12 @@
     const phase=act?(act.e.type==="csat"||act.e.type==="mock"?(act.dd<=7?"final":"csat"):phaseOf(act.dd)):"csat";
     const examSubjects=act&&act.e.subjects&&act.e.subjects.length?act.e.subjects:["수학","국어","영어","과학","사회","역사"];
     const others=examSubjects.filter(s=>s!=="수학"&&SUBJ_ID[s]&&D.subjects&&D.subjects[SUBJ_ID[s]]);
-    const nOther=phase==="final"?2:1; const pick=[]; for(let k=0;k<nOther&&others.length;k++) pick.push(others[(di+k)%others.length]);
+    // 매일 나올 과목: opt.daily(예: ["수학","국어","과학"])가 있으면 그 순서대로 고정, 없으면 날짜 순환 1과목(실전기 2과목)
+    const fixed=(opt.daily||[]).filter(s=>s!=="수학"&&SUBJ_ID[s]&&D.subjects&&D.subjects[SUBJ_ID[s]]);
+    const nOther=phase==="final"?2:1; const pick=fixed.length?fixed:[]; if(!fixed.length) for(let k=0;k<nOther&&others.length;k++) pick.push(others[(di+k)%others.length]);
     const blocks=[];
     // 수학: 학년 소단원을 날짜로 순환 (약점 정보는 브라우저에서만 있으므로 여기선 순환)
-    const ml=mathLessons(D,grade); if(ml.length&&examSubjects.includes("수학")){ const {u,l}=ml[di%ml.length]; const pat=(D.suneung&&D.suneung.patterns||[])[di%Math.max(1,(D.suneung&&D.suneung.patterns||[]).length)];
+    const ml=mathLessons(D,grade); if(ml.length&&(examSubjects.includes("수학")||(opt.daily||[]).includes("수학"))){ const {u,l}=ml[di%ml.length]; const pat=(D.suneung&&D.suneung.patterns||[])[di%Math.max(1,(D.suneung&&D.suneung.patterns||[]).length)];
       blocks.push({subject:"수학",title:l.title,href:`#/study/${u.id}/${l.id}`,need:cut(l.concept[0],110),trap:cut((l.pitfalls||[])[0]||"",110),pattern:cut((l.points||[])[0]||(pat?pat.name+": "+(pat.first||pat.desc||""):""),110),quiz:l.quiz&&l.quiz[0]?{q:cut(l.quiz[0].q,120),opts:l.quiz[0].opts.map(o=>cut(o,28))}:null,std:(D.standards&&D.standards.lessons[l.id])||[]}); }
     pick.forEach(sn=>{ const sl=subjLessons(D,SUBJ_ID[sn]); if(!sl.length) return; const {s,u,l}=sl[di%sl.length];
       blocks.push({subject:s.name,title:l.title,href:`#/sub/${s.id}/${l.id}`,need:cut(l.memo||l.concept[0],110),trap:cut((l.pitfalls||[])[0]||"",110),pattern:cut((l.pattern||[])[0]||(l.points||[])[0]||"",110),quiz:l.quiz&&l.quiz[0]?{q:cut(l.quiz[0].q,120),opts:l.quiz[0].opts.map(o=>cut(o,28))}:null,std:l.std||[]}); });

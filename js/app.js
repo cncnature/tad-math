@@ -1210,7 +1210,7 @@
   // ---------- 오늘의 5줄 (텔레그램과 같은 내용 + 답·풀이 링크) ----------
   function today(qs){ const p=profile(); if(!p) return setup(); const pr=new URLSearchParams(qs||""); const date=pr.get("d")||todayKey(); const cfg=D.dailyConfig||{};
     const mine=schedGet().exams.map(e=>({name:e.name||EXAM_TYPES[e.type],date:e.date,type:e.type,subjects:e.subjects||[]})); const exams=mine.length?mine:(cfg.exams||[]);
-    const b=window.BRIEF.build({D,date,grade:p.grade,name:p.name||"",exams});
+    const b=window.BRIEF.build({D,date,grade:p.grade,name:p.name||"",exams,daily:cfg.daily||[]});
     const L=["①","②","③","④"];
     render(`<div class="crumb"><a href="#/me">내 학습</a> › 오늘의 5줄</div><h1>📬 ${esc(b.head.replace("📘 ",""))}</h1><p class="lead">${esc(b.exam)} ${mine.length?"":'<span class="muted small">(시험 일정은 <a href="#/schedule">일정·스케줄</a>에 등록하면 내 일정으로 바뀝니다)</span>'}</p>
     ${b.blocks.map(x=>{ const hit=x.href.startsWith("#/sub/")?subLesson(x.href.split("/").pop()):null; const ml=!hit?byLesson(x.href.split("/").pop()):null; const q=hit?hit.l.quiz[0]:(ml?ml.quiz[0]:null);

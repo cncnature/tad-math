@@ -3,6 +3,7 @@
 window.DATA = window.DATA || {};
 window.DATA.dailyConfig = {
  grade:"g22", name:"",
+ daily:["수학","국어","과학"],   // 매일 메시지에 넣을 과목(순서대로). 비우면 수학 + 날짜 순환 1과목. 영어·사회·역사를 더하려면 여기에 추가
  exams:[
   {name:"2학기 기말고사", date:"2026-12-16", type:"final", subjects:["수학","국어","영어","과학","사회","역사"]},
   {name:"3월 전국연합학력평가(고1)", date:"2027-03-24", type:"mock", subjects:["수학","국어","영어"]}

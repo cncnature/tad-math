@@ -9,7 +9,7 @@ const D=w.DATA; D.curriculum.units=[...D.curriculum.units,...(D.curriculumExtra|
 D.curriculum.units.forEach(u=>u.lessons.forEach(l=>{const d=(D.deepen||{})[l.id];if(!d)return;l.pitfalls=[...(l.pitfalls||[]),...(d.pitfalls||[])];l.points=[...(l.points||[]),...(d.points||[])];l.quiz=[...l.quiz,...(d.quiz||[])];}));
 const BRIEF=require(path.join(root,"js/brief.js"));
 const kst=new Date(Date.now()+9*3600e3); const date=di>=0?args[di+1]:kst.toISOString().slice(0,10);
-const cfg=D.dailyConfig||{}; const b=BRIEF.build({D,date,grade:cfg.grade||"g22",name:cfg.name||"",exams:cfg.exams||[]});
+const cfg=D.dailyConfig||{}; const b=BRIEF.build({D,date,grade:cfg.grade||"g22",name:cfg.name||"",exams:cfg.exams||[],daily:cfg.daily||[]});
 if(dry){ console.log(b.text); process.exit(0); }
 const token=process.env.TELEGRAM_BOT_TOKEN, chat=process.env.TELEGRAM_CHAT_ID; if(!token||!chat){ console.error("TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID 가 없습니다"); process.exit(1); }
 const body=JSON.stringify({chat_id:chat,text:b.html,parse_mode:"HTML",disable_web_page_preview:true});
