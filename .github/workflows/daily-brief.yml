@@ -12,14 +12,24 @@ permissions:
 jobs:
   send:
     runs-on: ubuntu-latest
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      KAKAO_REST_KEY: ${{ secrets.KAKAO_REST_KEY }}
+      KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+      REPO_PAT: ${{ secrets.REPO_PAT }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Build and send
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      - name: Telegram
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' }}
         run: |
           if [ -n "${{ github.event.inputs.date }}" ]; then node scripts/send-telegram.js --date "${{ github.event.inputs.date }}"; else node scripts/send-telegram.js; fi
+      - name: KakaoTalk (나에게 보내기, 설정된 경우만)
+        if: ${{ env.KAKAO_REFRESH_TOKEN != '' }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then node scripts/send-kakao.js --date "${{ github.event.inputs.date }}"; else node scripts/send-kakao.js; fi

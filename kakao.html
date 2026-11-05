@@ -1,0 +1,4 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>카카오 인가 코드</title>
+<style>body{font-family:system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 16px;line-height:1.6}code{background:#f3f4f6;padding:2px 6px;border-radius:6px;word-break:break-all}button{padding:8px 14px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer}</style></head>
+<body><h1>카카오 인가 코드</h1><p id="msg">주소에 code 가 없습니다. <code>docs/KAKAO-SETUP.md</code> 의 인가 주소로 다시 들어오세요.</p>
+<script>const c=new URLSearchParams(location.search).get("code");if(c){document.getElementById("msg").innerHTML=`아래 코드를 복사해 <code>node scripts/kakao-token.js &lt;코드&gt;</code> 에 넣으세요 (10분 안에 1회만 사용 가능).<br><br><code id="c">${c}</code><br><br><button onclick="navigator.clipboard.writeText('${c}').then(()=>this.textContent='복사됨 ✓')">복사</button>`;}</script></body></html>
