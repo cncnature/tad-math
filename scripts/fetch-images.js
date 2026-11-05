@@ -8,6 +8,9 @@ const UA="TAD-study-site/1.0 (https://cncnature.github.io/tad-math/; cncnature@g
 const OK_LIC=/^(public domain|pd|cc0|cc by(-sa)?( ?\d(\.\d)?)?( [a-z]{2,3})?|cc-by(-sa)?-\d\.\d|gfdl)/i; const BAD=/non-free|fair use|all rights reserved|copyright/i;
 const qp=path.join(root,"data/image-queries.json"), mp=path.join(root,"data/images-manifest.json"), outDir=path.join(root,"assets/img"); fs.mkdirSync(outDir,{recursive:true});
 const queries=JSON.parse(fs.readFileSync(qp,"utf8")).filter(q=>q.want>0&&(!ONLY||q.id===ONLY)); const manifest=fs.existsSync(mp)?JSON.parse(fs.readFileSync(mp,"utf8")):{};
+const exP=path.join(root,"data/image-exclude.json"); const EX=new Set(fs.existsSync(exP)?JSON.parse(fs.readFileSync(exP,"utf8")):[]); // 사람이 '관련 없음' 으로 표시한 파일명 — 다시 받지 않는다
+Object.keys(manifest).forEach(id=>{ const before=manifest[id].length; manifest[id]=manifest[id].filter(x=>{ const bad=EX.has(x.file); if(bad){ try{ fs.unlinkSync(path.join(root,x.src)); }catch(e){} } return !bad; }); });
+const tokens=s=>String(s).toLowerCase().replace(/[^a-z0-9가-힣 ]/g," ").split(/\s+/).filter(w=>w.length>=4&&!["with","from","file","image","photo","diagram","map","view","korea","korean","south"].includes(w));
 async function api(url){ const r=await fetch(url,{headers:{"User-Agent":UA,"Accept":"application/json"}}); if(!r.ok) throw new Error("HTTP "+r.status+" "+url.slice(0,80)); return r.json(); }
 const strip=h=>String(h||"").replace(/<[^>]+>/g,"").replace(/\s+/g," ").trim();
 async function info(file){ // Commons imageinfo + license
@@ -18,13 +21,14 @@ async function info(file){ // Commons imageinfo + license
 async function fromWiki(t){ const m=/^(en|ko|ja|de|fr):(.+)$/.exec(t); const lang=m?m[1]:"en", title=m?m[2]:t;
   const j=await api(`https://${lang}.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages&piprop=name&titles=${encodeURIComponent(title)}&redirects=1`); const p=Object.values(j.query.pages||{})[0]; if(!p||!p.pageimage) return null; return info(p.pageimage); }
 async function fromCommons(q){ const j=await api(`https://commons.wikimedia.org/w/api.php?action=query&format=json&list=search&srnamespace=6&srlimit=8&srsearch=${encodeURIComponent(q+" filetype:bitmap")}`); const hits=(j.query&&j.query.search||[]).map(s=>s.title.replace(/^File:/,"")).filter(f=>/\.(jpe?g|png)$/i.test(f));
-  for(const f of hits){ const i=await info(f); await sleep(150); if(i) return i; } return null; }
+  const want=tokens(q); const ranked=hits.map(f=>({f,score:tokens(f).filter(w=>want.some(x=>x.startsWith(w.slice(0,5))||w.startsWith(x.slice(0,5)))).length})).sort((a,b)=>b.score-a.score);
+  for(const {f,score} of ranked){ if(score===0&&ranked.length>1) continue; if(EX.has(f)) continue; const i=await info(f); await sleep(150); if(i) return i; } return null; }
 async function download(url,dest){ const r=await fetch(url,{headers:{"User-Agent":UA}}); if(!r.ok) throw new Error("download "+r.status); fs.writeFileSync(dest,Buffer.from(await r.arrayBuffer())); }
 (async()=>{ let done=0, got=0, fail=[];
   for(const q of queries){ if(done>=LIMIT) break; if(!FORCE&&manifest[q.id]&&manifest[q.id].length>=q.want){ continue; } done++; const found=[]; const seen=new Set((manifest[q.id]||[]).map(x=>x.file));
-    try{ for(const t of (q.wiki||[])){ if(found.length>=q.want) break; const i=await fromWiki(t).catch(()=>null); await sleep(250); if(i&&!seen.has(i.file)&&!found.some(x=>x.file===i.file)) found.push(i); }
+    try{ for(const t of (q.wiki||[])){ if(found.length>=q.want) break; const i=await fromWiki(t).catch(()=>null); await sleep(250); if(i&&!EX.has(i.file)&&!seen.has(i.file)&&!found.some(x=>x.file===i.file)) found.push(i); }
       for(const c of (q.commons||[])){ if(found.length>=q.want) break; const i=await fromCommons(c).catch(()=>null); await sleep(250); if(i&&!seen.has(i.file)&&!found.some(x=>x.file===i.file)) found.push(i); }
-      const saved=manifest[q.id]||[]; for(const i of found){ const ext=/png/.test(i.mime)?"png":"jpg"; const name=`${q.id}-${saved.length+1}.${ext}`; await download(i.thumb,path.join(outDir,name)); saved.push({file:i.file,src:"assets/img/"+name,page:i.page,lic:i.lic,artist:i.artist,alt:q.alt||q.id}); got++; await sleep(200); }
+      const saved=manifest[q.id]||[]; for(const i of found){ const ext=/png/.test(i.mime)?"png":/gif/.test(i.mime)?"gif":"jpg"; const name=`${q.id}-${saved.length+1}.${ext}`; await download(i.thumb,path.join(outDir,name)); saved.push({file:i.file,src:"assets/img/"+name,page:i.page,lic:i.lic,artist:i.artist,alt:q.alt||q.id}); got++; await sleep(200); }
       manifest[q.id]=saved; if(!found.length) fail.push(q.id); }
     catch(e){ fail.push(q.id+" ("+String(e.message).slice(0,60)+")"); }
     fs.writeFileSync(mp,JSON.stringify(manifest,null,1)); }
