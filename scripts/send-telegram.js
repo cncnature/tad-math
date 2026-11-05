@@ -4,10 +4,9 @@
 const vm=require("vm"),fs=require("fs"),path=require("path"),https=require("https");
 const root=path.join(__dirname,".."); const args=process.argv.slice(2); const dry=args.includes("--dry"); const di=args.indexOf("--date");
 const w={DATA:{},WIDGETS:{}}; const ctx=vm.createContext({window:w,document:{createElement:()=>({}),documentElement:{}},getComputedStyle:()=>({getPropertyValue:()=>""})});
-for(const f of ["curriculum","curriculum-m1","curriculum-m21","curriculum-h1","curriculum-h23","deepen-m","deepen-h1","deepen-h23","deepen-core","suneung","study-methods","standards","daily-config","subjects/kor","subjects/eng","subjects/sci","subjects/soc","subjects/his",...fs.readdirSync(path.join(root,"data/subjects")).filter(f=>/-(g3|h1|h2|h3)\.js$/.test(f)).map(f=>"subjects/"+f.replace(/\.js$/,""))]) vm.runInContext(fs.readFileSync(path.join(root,"data",f+".js"),"utf8"),ctx);
-const D=w.DATA; D.curriculum.units=[...D.curriculum.units,...(D.curriculumExtra||[]).flatMap(x=>x.units||x)];
+for(const f of ["curriculum","curriculum-m1","curriculum-m21","curriculum-h1","curriculum-h23","deepen-m","deepen-h1","deepen-h23","deepen-core","suneung","study-methods","standards","daily-config","overrides","subjects/kor","subjects/eng","subjects/sci","subjects/soc","subjects/his",...fs.readdirSync(path.join(root,"data/subjects")).filter(f=>/-(g3|h1|h2|h3)\.js$/.test(f)).map(f=>"subjects/"+f.replace(/\.js$/,""))]) vm.runInContext(fs.readFileSync(path.join(root,"data",f+".js"),"utf8"),ctx);
+const D=w.DATA; require(path.join(root,"js/merge.js")).apply(D);
 D.curriculum.units.forEach(u=>u.lessons.forEach(l=>{const d=(D.deepen||{})[l.id];if(!d)return;l.pitfalls=[...(l.pitfalls||[]),...(d.pitfalls||[])];l.points=[...(l.points||[]),...(d.points||[])];l.quiz=[...l.quiz,...(d.quiz||[])];}));
-(D.subjectsExtra||[]).forEach(x=>{ const sj=D.subjects&&D.subjects[x.sid]; if(sj) sj.units.push(...x.units.map(u=>({...u,grade:u.grade||x.grade}))); });
 const BRIEF=require(path.join(root,"js/brief.js"));
 const kst=new Date(Date.now()+9*3600e3); const date=di>=0?args[di+1]:kst.toISOString().slice(0,10);
 const cfg=D.dailyConfig||{}; const b=BRIEF.build({D,date,grade:cfg.grade||"g22",name:cfg.name||"",exams:cfg.exams||[],daily:cfg.daily||[]});

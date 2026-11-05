@@ -19,8 +19,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: 데이터 무결성 검사
-        run: node scripts/check.js
+      - name: 데이터 무결성 검사 (실패하면 배포하지 않음)
+        run: |
+          node scripts/check.js
+          node scripts/send-telegram.js --dry > /dev/null
+          node scripts/send-kakao.js --dry > /dev/null
+          node scripts/audit.js --json > /dev/null
       - uses: actions/configure-pages@v5
         with:
           enablement: true   # Pages 가 꺼져 있으면 자동으로 켭니다

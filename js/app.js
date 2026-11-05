@@ -6,8 +6,7 @@
   const GORDER = Object.keys(G); const gradeRank = g=>GORDER.indexOf(g);
   const BAND = { m11:"중학교", m12:"중학교", m21:"중학교", g22:"중학교", g31:"중학교", g32:"중학교", h11:"고등학교", h12:"고등학교", h2a:"고등학교", h2c:"고등학교", h2p:"고등학교", h3c:"고등학교", h3g:"고등학교" };
   D.curriculum.grades = G;
-  D.curriculum.units = [...D.curriculum.units, ...(D.curriculumExtra||[])].sort((a,b)=>gradeRank(a.grade)-gradeRank(b.grade));
-  (D.subjectsExtra||[]).forEach(x=>{ const sj=D.subjects&&D.subjects[x.sid]; if(sj) sj.units.push(...x.units.map(u=>({...u,grade:u.grade||x.grade}))); });
+  window.MERGE.apply(D); D.curriculum.units.sort((a,b)=>gradeRank(a.grade)-gradeRank(b.grade));
   // 시험 문항 그림·보기(data/exam-figs.js): 학교 시험 필수 문제 + 수능 패턴 도감
   (D.schoolExams||[]).forEach(e=>e.items.forEach((it,i)=>{ const x=(D.schoolExamExtra||{})[e.grade+":"+e.term+":"+i]; if(!x) return; Object.assign(it,x); if(it.opts&&it.opts.length===5){ const k=(i*2+e.grade.length+(e.term==="mid"?0:e.term==="final"?3:1))%5; it.opts=it.opts.map((_,j)=>it.opts[(j+k)%5]); it.a=(it.a-k+5)%5; } }));
   (D.suneung?D.suneung.patterns:[]).forEach(x=>{ const f=(D.patternFigs||{})[x.id]; if(f) Object.assign(x,f); });
@@ -1226,7 +1225,7 @@
     render(`<h1>🔍 "${esc(q)}" 검색 결과</h1>${L.length?`<h2>소단원</h2><ul>${L.map(l=>`<li><a href="#/study/${l.unit}/${l.id}">${l.title}</a> <span class="muted">${l.unitTitle}</span></li>`).join("")}</ul>`:""}${F.length?`<h2>공식</h2><ul>${F.map(f=>`<li><a href="#/formulas/${f.id}">${f.title}</a></li>`).join("")}</ul>`:""}${Cc.length?`<h2>개념</h2><ul>${Cc.map(c=>`<li><b>${c.term}</b> — ${md(c.def)}</li>`).join("")}</ul>`:""}${Lf.length?`<h2>생활 속 수학</h2><ul>${Lf.map(x=>`<li><a href="#/life">${x.title}</a></li>`).join("")}</ul>`:""}${P.length?`<h2>인물</h2><ul>${P.map(p=>`<li><a href="#/people">${p.name}</a></li>`).join("")}</ul>`:""}${!(L.length+F.length+Cc.length+Lf.length+P.length)?`<p class="muted">결과가 없습니다.</p>`:""}`); }
   $("#q").addEventListener("keydown",e=>{ if(e.key==="Enter"){ location.hash="#/search?q="+encodeURIComponent(e.target.value); } });
 
-  function about(){ render(`<h1>사이트 소개</h1><div class="card"><p><b>TAD 공부방</b>는 중1부터 고3까지의 수학(중2-2~중3-2 를 가장 깊게)을 "외우기 전에 먼저 만져 보는" 방식으로 익히는 무료·오픈소스 학습 사이트입니다. 로그인·결제가 없고, 학습 기록은 사용자의 브라우저(localStorage)에만 저장됩니다.</p>
+  function about(){ const OL=((D.overrides||{}).log||[]).slice().reverse().slice(0,20); render(`<h1>사이트 소개</h1>${OL.length?`<div class="card"><h3>🛠 최근 데이터 수정 기록</h3><table><tr><th>날짜</th><th>내용</th><th>근거</th></tr>${OL.map(x=>`<tr><td>${esc(x.date||"")}</td><td>${esc(x.what||"")}${x.why?` <span class="muted small">— ${esc(x.why)}</span>`:""}</td><td>${x.src?`<a href="${esc(x.src)}" target="_blank" rel="noopener">출처</a>`:""}</td></tr>`).join("")}</table></div>`:""}<div class="card"><p><b>TAD 공부방</b>는 중1부터 고3까지의 수학(중2-2~중3-2 를 가장 깊게)을 "외우기 전에 먼저 만져 보는" 방식으로 익히는 무료·오픈소스 학습 사이트입니다. 로그인·결제가 없고, 학습 기록은 사용자의 브라우저(localStorage)에만 저장됩니다.</p>
     <h3>단원 체계의 근거</h3><p>교육부 고시 2022 개정 수학과 교육과정(중학교 2·3학년 영역: 수와 연산, 변화와 관계, 도형과 측정, 자료와 가능성)의 성취기준을 따르며, 2015 개정 교육과정과 공통인 범위(이등변삼각형·사각형·닮음·피타고라스·확률 / 제곱근·인수분해·이차방정식·이차함수 / 삼각비·원·통계)를 다룹니다. 상자그림은 2022 개정에서 중3 통계에 추가된 내용입니다. 학교별 진도·범위는 교과서 차례로 확인하세요.</p>
     <h3>기술</h3><p>정적 HTML/CSS/JS, 수식 렌더링은 KaTeX(MIT), 위젯은 순수 Canvas 2D. 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. 콘텐츠는 <code>data/*.js</code> 파일을 고치면 바로 반영됩니다.</p>
     <h3>저작권</h3><p>본문·문항·위젯 코드는 이 저장소의 저작자가 작성했으며 MIT 라이선스로 공개합니다. 사이트 구조(개념 지도·공식 되살리기·끊긴 고리 진단 등)는 공개된 수학 학습 사이트들의 접근 방식을 참고하되 텍스트·코드·이미지를 복제하지 않았습니다. 인물 정보는 일반적으로 알려진 수학사 사실에 근거합니다.</p>

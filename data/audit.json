@@ -1,0 +1,305 @@
+{
+ "date": "2026-11-05",
+ "coverage": [
+  {
+   "subject": "영어",
+   "sid": "eng",
+   "grade": "g22",
+   "lessons": 10,
+   "target": 10
+  },
+  {
+   "subject": "영어",
+   "sid": "eng",
+   "grade": "g31",
+   "lessons": 4,
+   "target": 8
+  },
+  {
+   "subject": "영어",
+   "sid": "eng",
+   "grade": "g32",
+   "lessons": 4,
+   "target": 8
+  },
+  {
+   "subject": "영어",
+   "sid": "eng",
+   "grade": "h1",
+   "lessons": 8,
+   "target": 12
+  },
+  {
+   "subject": "영어",
+   "sid": "eng",
+   "grade": "h2",
+   "lessons": 8,
+   "target": 12
+  },
+  {
+   "subject": "역사",
+   "sid": "his",
+   "grade": "g22",
+   "lessons": 10,
+   "target": 12
+  },
+  {
+   "subject": "역사",
+   "sid": "his",
+   "grade": "g31",
+   "lessons": 5,
+   "target": 8
+  },
+  {
+   "subject": "역사",
+   "sid": "his",
+   "grade": "g32",
+   "lessons": 5,
+   "target": 8
+  },
+  {
+   "subject": "역사",
+   "sid": "his",
+   "grade": "h1",
+   "lessons": 10,
+   "target": 14
+  },
+  {
+   "subject": "국어",
+   "sid": "kor",
+   "grade": "g22",
+   "lessons": 10,
+   "target": 10
+  },
+  {
+   "subject": "국어",
+   "sid": "kor",
+   "grade": "g31",
+   "lessons": 4,
+   "target": 8
+  },
+  {
+   "subject": "국어",
+   "sid": "kor",
+   "grade": "g32",
+   "lessons": 4,
+   "target": 8
+  },
+  {
+   "subject": "국어",
+   "sid": "kor",
+   "grade": "h1",
+   "lessons": 8,
+   "target": 12
+  },
+  {
+   "subject": "국어",
+   "sid": "kor",
+   "grade": "h2",
+   "lessons": 9,
+   "target": 15
+  },
+  {
+   "subject": "과학",
+   "sid": "sci",
+   "grade": "g22",
+   "lessons": 10,
+   "target": 14
+  },
+  {
+   "subject": "과학",
+   "sid": "sci",
+   "grade": "g31",
+   "lessons": 5,
+   "target": 10
+  },
+  {
+   "subject": "과학",
+   "sid": "sci",
+   "grade": "g32",
+   "lessons": 5,
+   "target": 10
+  },
+  {
+   "subject": "과학",
+   "sid": "sci",
+   "grade": "h1",
+   "lessons": 10,
+   "target": 16
+  },
+  {
+   "subject": "사회",
+   "sid": "soc",
+   "grade": "g22",
+   "lessons": 10,
+   "target": 12
+  },
+  {
+   "subject": "사회",
+   "sid": "soc",
+   "grade": "g31",
+   "lessons": 4,
+   "target": 8
+  },
+  {
+   "subject": "사회",
+   "sid": "soc",
+   "grade": "g32",
+   "lessons": 4,
+   "target": 8
+  },
+  {
+   "subject": "사회",
+   "sid": "soc",
+   "grade": "h1",
+   "lessons": 10,
+   "target": 16
+  }
+ ],
+ "gaps": [
+  {
+   "sid": "kor",
+   "subject": "국어",
+   "grade": "h2",
+   "need": 6
+  },
+  {
+   "sid": "sci",
+   "subject": "과학",
+   "grade": "h1",
+   "need": 6
+  },
+  {
+   "sid": "soc",
+   "subject": "사회",
+   "grade": "h1",
+   "need": 6
+  },
+  {
+   "sid": "sci",
+   "subject": "과학",
+   "grade": "g31",
+   "need": 5
+  },
+  {
+   "sid": "sci",
+   "subject": "과학",
+   "grade": "g32",
+   "need": 5
+  },
+  {
+   "sid": "eng",
+   "subject": "영어",
+   "grade": "g31",
+   "need": 4
+  },
+  {
+   "sid": "eng",
+   "subject": "영어",
+   "grade": "g32",
+   "need": 4
+  },
+  {
+   "sid": "eng",
+   "subject": "영어",
+   "grade": "h1",
+   "need": 4
+  },
+  {
+   "sid": "eng",
+   "subject": "영어",
+   "grade": "h2",
+   "need": 4
+  },
+  {
+   "sid": "his",
+   "subject": "역사",
+   "grade": "h1",
+   "need": 4
+  },
+  {
+   "sid": "kor",
+   "subject": "국어",
+   "grade": "g31",
+   "need": 4
+  },
+  {
+   "sid": "kor",
+   "subject": "국어",
+   "grade": "g32",
+   "need": 4
+  },
+  {
+   "sid": "kor",
+   "subject": "국어",
+   "grade": "h1",
+   "need": 4
+  },
+  {
+   "sid": "sci",
+   "subject": "과학",
+   "grade": "g22",
+   "need": 4
+  },
+  {
+   "sid": "soc",
+   "subject": "사회",
+   "grade": "g31",
+   "need": 4
+  },
+  {
+   "sid": "soc",
+   "subject": "사회",
+   "grade": "g32",
+   "need": 4
+  },
+  {
+   "sid": "his",
+   "subject": "역사",
+   "grade": "g31",
+   "need": 3
+  },
+  {
+   "sid": "his",
+   "subject": "역사",
+   "grade": "g32",
+   "need": 3
+  },
+  {
+   "sid": "his",
+   "subject": "역사",
+   "grade": "g22",
+   "need": 2
+  },
+  {
+   "sid": "soc",
+   "subject": "사회",
+   "grade": "g22",
+   "need": 2
+  }
+ ],
+ "assumptions": [
+  "eng-g3.js",
+  "eng-h1.js",
+  "eng-h2.js",
+  "his-g3.js",
+  "his-h1.js",
+  "kor-g3.js",
+  "kor-h1.js",
+  "kor-h2.js",
+  "sci-g3.js",
+  "sci-h1.js",
+  "sci.js",
+  "soc-g3.js",
+  "soc-h1.js"
+ ],
+ "pastExams": [],
+ "thin": [],
+ "noStd": [],
+ "dupTitles": [],
+ "overrides": {
+  "lessons": 0,
+  "units": 0,
+  "hide": 0
+ }
+}

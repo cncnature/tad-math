@@ -92,6 +92,12 @@ node scripts/check.js
 ```
 모든 id 참조(소단원↔노드↔공식↔시험↔슬라이드)가 연결되는지 확인합니다.
 
+## 자동 업그레이드 구조
+- **매주 월요일**: 예약 작업이 `scripts/weekly-advisor.md` 절차대로 조사 → `node scripts/audit.js`(부족분·추정·지난 일정 진단, `docs/AUDIT.md`) → `docs/BACKLOG.md` 의 기한 항목과 부족분 순으로 콘텐츠 추가 → 검사·커밋·배포.
+- **정정은 덧씌우기**: `data/overrides.js` 에 차시·단원 단위로 고칠 필드만 적으면 사이트·검사·브리핑이 로드 때 적용(`js/merge.js`). 변경 기록은 사이트 소개 화면에 표시.
+- **배포 보호**: `node scripts/check.js`·브리핑 생성·진단이 실패하면 GitHub Pages 배포가 중단되어 잘못된 자동 수정이 사이트에 올라가지 않음.
+- **매일 07:00**: 텔레그램·카카오톡 브리핑(`scripts/send-*.js`), 시험 일정은 `data/daily-config.js`.
+
 ## 기술
 - 순수 HTML / CSS / JavaScript (ES2020), 프레임워크·번들러 없음
 - 수식: [KaTeX](https://katex.org) 0.16.11 — `vendor/katex/` 에 동봉 (MIT), CDN 불필요·오프라인 동작
