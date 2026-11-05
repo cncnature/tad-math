@@ -1,5 +1,5 @@
 // 수학 중1·중2-1·중2-2 시각 자료 (docs/VISUAL-SCHEMA.md). circumcenter 는 pilot.js 에 있음.
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
  /* ===================== 중1-1 ===================== */
  "prime-factor": [
   {type:"table", title:"소인수분해 요약", head:["항목","내용","주의"], rows:[["소수","약수가 1과 자신뿐","1 은 소수 아님"],["거듭제곱","$2\\times2\\times2=2^3$","$2^3=8$ (6 아님)"],["소인수분해","$72=2^3\\times3^2$","소인수의 곱으로"],["약수의 개수","$a^mb^n$ → $(m+1)(n+1)$","지수에 1 더해 곱"]]},

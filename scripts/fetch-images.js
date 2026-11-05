@@ -34,6 +34,6 @@ async function download(url,dest){ const r=await fetch(url,{headers:{"User-Agent
     fs.writeFileSync(mp,JSON.stringify(manifest,null,1)); }
   // visuals 파일 생성 (manifest 전체에서)
   const V={}; Object.entries(manifest).forEach(([id,list])=>{ if(list.length) V[id]=list.map(x=>({type:"img",title:x.alt,src:x.src,alt:x.alt,credit:`${x.artist} · ${x.lic} · Wikimedia Commons`,link:x.page})); });
-  fs.writeFileSync(path.join(root,"data/visuals/images.js"),`// 자동 수집 이미지(scripts/fetch-images.js) — 위키백과·위키미디어 공용의 자유 라이선스 이미지만. 출처·저자·라이선스는 각 항목 credit/link. 수정 금지(재실행 시 덮어씀)\nwindow.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, ${JSON.stringify(V,null,1)});\n`);
+  fs.writeFileSync(path.join(root,"data/visuals/images.js"),`// 자동 수집 이미지(scripts/fetch-images.js) — 위키백과·위키미디어 공용의 자유 라이선스 이미지만. 출처·저자·라이선스는 각 항목 credit/link. 수정 금지(재실행 시 덮어씀)\nwindow.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push(${JSON.stringify(V,null,1)});\n`);
   console.log(`처리 ${done}개 차시 · 새 이미지 ${got}장 · 누적 ${Object.values(manifest).reduce((a,l)=>a+l.length,0)}장 · 실패 ${fail.length}`); if(fail.length) console.log("실패:",fail.join(", "));
 })().catch(e=>{ console.error(e); process.exit(1); });

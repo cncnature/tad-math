@@ -1,5 +1,5 @@
 // 국어 고등(공통국어1·2, 화법과 언어·독서와 작문·문학) 시각 자료 — 출처: data/subjects/kor-h1.js, kor-h2.js 의 concept/pitfalls/points 만 사용. 렌더러 js/visual.js, 스키마 docs/VISUAL-SCHEMA.md
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
 
  /* ===================== 고1 공통국어 · 화법과 작문 ===================== */
  "kor-h1-debate": [

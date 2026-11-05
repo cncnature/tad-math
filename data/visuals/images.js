@@ -1,5 +1,5 @@
 // 자동 수집 이미지(scripts/fetch-images.js) — 위키백과·위키미디어 공용의 자유 라이선스 이미지만. 출처·저자·라이선스는 각 항목 credit/link. 수정 금지(재실행 시 덮어씀)
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
  "his-mongol": [
   {
    "type": "img",
@@ -564,7 +564,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "심장의 구조와 온몸·폐순환",
-   "src": "assets/img/sci-circ-1.png",
+   "src": "assets/img/sci-circ-1.jpg",
    "alt": "심장의 구조와 온몸·폐순환",
    "credit": "Jerm · CC BY 2.5 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Heart_anterior_exterior_view.png"
@@ -600,7 +600,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "금속박 검전기와 정전기 현상",
-   "src": "assets/img/sci-static-1.png",
+   "src": "assets/img/sci-static-1.jpg",
    "alt": "금속박 검전기와 정전기 현상",
    "credit": "Sylvanus Phillips Thompson · Public domain · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Gilberts_versorium_needle_electroscope.png"
@@ -618,7 +618,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "옴의 법칙 회로와 전류계·전압계",
-   "src": "assets/img/sci-ohm-1.png",
+   "src": "assets/img/sci-ohm-1.jpg",
    "alt": "옴의 법칙 회로와 전류계·전압계",
    "credit": "User:Evan-Amos · Public domain · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Electronic-Axial-Lead-Resistors-Array.png"
@@ -672,7 +672,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "연주 시차로 별까지의 거리를 재는 원리",
-   "src": "assets/img/sci-parallax-2.png",
+   "src": "assets/img/sci-parallax-2.jpg",
    "alt": "연주 시차로 별까지의 거리를 재는 원리",
    "credit": "JustinWick at English Wikipedia · CC BY-SA 3.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Parallax_Example.png"
@@ -818,7 +818,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "뉴런의 구조와 반사 경로",
-   "src": "assets/img/sci-g3-nerve-hormone-1.png",
+   "src": "assets/img/sci-g3-nerve-hormone-1.jpg",
    "alt": "뉴런의 구조와 반사 경로",
    "credit": "BruceBlaus · CC BY 3.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Blausen_0657_MultipolarNeuron.png"
@@ -872,7 +872,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "가계도와 색맹 검사표",
-   "src": "assets/img/sci-g3-human-heredity-1.png",
+   "src": "assets/img/sci-g3-human-heredity-1.jpg",
    "alt": "가계도와 색맹 검사표",
    "credit": "explorebiology · CC BY 4.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:XBio_illustration_%E2%80%93_Pedigree.png"
@@ -988,7 +988,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "세포막 구조와 유전 정보의 흐름",
-   "src": "assets/img/sci-h1-life-2.png",
+   "src": "assets/img/sci-h1-life-2.jpg",
    "alt": "세포막 구조와 유전 정보의 흐름",
    "credit": "Thomas Shafee · CC BY 4.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Glucosidase_enzyme.png"
@@ -1016,7 +1016,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "고생대 삼엽충·중생대 암모나이트 화석",
-   "src": "assets/img/sci-h1-evolution-1.png",
+   "src": "assets/img/sci-h1-evolution-1.jpg",
    "alt": "고생대 삼엽충·중생대 암모나이트 화석",
    "credit": "PaleoNeolitic (montage creator) · CC BY 4.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Trilobita_Diversity.png"
@@ -1070,7 +1070,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "여의도 국회 의사당과 본회의장",
-   "src": "assets/img/soc-assembly-1.png",
+   "src": "assets/img/soc-assembly-1.jpg",
    "alt": "여의도 국회 의사당과 본회의장",
    "credit": "clumsyforeigner · CC BY-SA 4.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:National_Assembly_Building_of_the_Republic_of_Korea.png"
@@ -1116,7 +1116,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "생산 가능 곡선으로 본 기회비용",
-   "src": "assets/img/soc-choice-1.png",
+   "src": "assets/img/soc-choice-1.jpg",
    "alt": "생산 가능 곡선으로 본 기회비용",
    "credit": "Namtranhoang1992 · CC BY-SA 4.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:04_production-possibilities-frontier-2.png"
@@ -1188,7 +1188,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "독도 전경과 영해·배타적 경제 수역 구분",
-   "src": "assets/img/soc-territory-2.png",
+   "src": "assets/img/soc-territory-2.jpg",
    "alt": "독도 전경과 영해·배타적 경제 수역 구분",
    "credit": "demis.nl · Public domain · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Location-of-Liancourt-rocks-en.png"
@@ -1198,7 +1198,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "한반도 지형도(동고서저)와 태백산맥",
-   "src": "assets/img/soc-climate-1.png",
+   "src": "assets/img/soc-climate-1.jpg",
    "alt": "한반도 지형도(동고서저)와 태백산맥",
    "credit": "Kokiri, uploaded to Commons by User:Electionworld; modified by User:Valentim · CC BY-SA 3.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Korea_south_map_-_Valentim.png"
@@ -1328,7 +1328,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "남북 정상 회담과 지속 가능 발전 목표(SDGs)",
-   "src": "assets/img/soc-g3-peace-local-1.png",
+   "src": "assets/img/soc-g3-peace-local-1.jpg",
    "alt": "남북 정상 회담과 지속 가능 발전 목표(SDGs)",
    "credit": "Henrik Ishihara Globaljuggler · CC BY-SA 3.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Panmunjeom_DMZ.png"
@@ -1578,7 +1578,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "지도의 축척과 축소 모형",
-   "src": "assets/img/similar-apply-1.png",
+   "src": "assets/img/similar-apply-1.jpg",
    "alt": "지도의 축척과 축소 모형",
    "credit": "TKN · CC BY-SA 3.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Ma%C3%9Fstabsleiste.png"
@@ -1674,7 +1674,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "원주각과 중심각, 탈레스의 정리",
-   "src": "assets/img/inscribed-angle-1.png",
+   "src": "assets/img/inscribed-angle-1.jpg",
    "alt": "원주각과 중심각, 탈레스의 정리",
    "credit": "JeffCampsall · CC0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Inscribed_Angle.png"
@@ -1712,7 +1712,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "히스토그램과 도수분포다각형",
-   "src": "assets/img/freq-1.png",
+   "src": "assets/img/freq-1.jpg",
    "alt": "히스토그램과 도수분포다각형",
    "credit": "JavaFXpert · CC0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Example_histogram_showing_quantum_measurement_results.png"
@@ -1760,7 +1760,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "여러 가지 정다각형",
-   "src": "assets/img/polygon-1.png",
+   "src": "assets/img/polygon-1.jpg",
    "alt": "여러 가지 정다각형",
    "credit": "original by Cmgleederivative by B. Jankuloski · CC BY-SA 4.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Regular_star_polygons_mk.png"
@@ -1788,7 +1788,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "정다면체 모형과 회전체",
-   "src": "assets/img/solids-2.png",
+   "src": "assets/img/solids-2.jpg",
    "alt": "정다면체 모형과 회전체",
    "credit": "Cyp · CC BY 4.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Tetrahedron_(green).png"
@@ -1914,7 +1914,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "파스칼의 삼각형과 이항계수",
-   "src": "assets/img/adv-counting-1.png",
+   "src": "assets/img/adv-counting-1.jpg",
    "alt": "파스칼의 삼각형과 이항계수",
    "credit": "Alexis Monnerot-Dumaine · CC BY-SA 3.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Pascal_triangle_modulo_3.png"
@@ -2074,7 +2074,7 @@ window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA
   {
    "type": "img",
    "title": "도표 문제에 나오는 막대그래프",
-   "src": "assets/img/eng-h2-read-topic-1.png",
+   "src": "assets/img/eng-h2-read-topic-1.jpg",
    "alt": "도표 문제에 나오는 막대그래프",
    "credit": "Wikimedia Commons 기여자 · Public domain · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:Human_losses_of_world_war_two_by_country.png"

@@ -1,5 +1,5 @@
 // 고1 통합과학1·2 시각 자료 — data/subjects/sci-h1.js 의 10개 차시(concept/pitfalls/points 범위 안의 사실만 사용). 스키마: docs/VISUAL-SCHEMA.md
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
 
  /* ===== 통합과학1 I. 과학의 기초 ===== */
  "sci-h1-measure": [

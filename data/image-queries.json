@@ -1,146 +1,2030 @@
 [
-  {"id":"his-mongol","wiki":["en:Mongol_Empire","ko:칭기즈_칸","ko:몽골_제국"],"commons":["Mongol Empire map expansion","Genghis Khan portrait Yuan"],"alt":"몽골 제국의 최대 영역 지도와 칭기즈 칸","want":2,"kind":"map"},
-  {"id":"his-mingqing","wiki":["en:Forbidden_City","en:Zheng_He","ko:정화_(명나라)"],"commons":["Forbidden City Beijing panorama","Zheng He treasure ship"],"alt":"베이징 자금성과 정화의 원정","want":2,"kind":"photo"},
-  {"id":"his-newroute","wiki":["en:Age_of_Discovery","en:Christopher_Columbus","en:Ferdinand_Magellan"],"commons":["Age of Discovery routes map","Columbus Gama Magellan voyages map"],"alt":"신항로 개척 항해로 지도(다 가마·콜럼버스·마젤란)","want":2,"kind":"map"},
-  {"id":"his-revolution","wiki":["en:Storming_of_the_Bastille","en:Declaration_of_the_Rights_of_Man_and_of_the_Citizen","en:Bill_of_Rights_1689"],"commons":["Storming of the Bastille painting","Declaration of the Rights of Man 1789"],"alt":"바스티유 습격과 인권 선언문","want":2,"kind":"artifact"},
-  {"id":"his-imperialism","wiki":["en:Watt_steam_engine","en:Scramble_for_Africa","en:Industrial_Revolution"],"commons":["Watt steam engine museum","Africa colonial partition 1914 map"],"alt":"와트 증기 기관과 아프리카 분할 지도","want":2,"kind":"photo"},
-  {"id":"his-asia-nation","wiki":["en:First_Opium_War","en:Meiji_Restoration","ko:신해혁명"],"commons":["Opium War Nemesis painting","Meiji Emperor Charter Oath"],"alt":"아편 전쟁과 메이지 유신","want":2,"kind":"photo"},
-  {"id":"his-gojoseon","wiki":["ko:비파형_동검","en:Dolmen","ko:고인돌"],"commons":["Liaoning bronze dagger Korea","Ganghwa dolmen Korea"],"alt":"비파형 동검과 강화 고인돌","want":2,"kind":"artifact"},
-  {"id":"his-threekingdoms","wiki":["ko:금동미륵보살반가사유상","en:Gwanggaeto_Stele","ko:광개토대왕릉비"],"commons":["Gilt-bronze Maitreya pensive bodhisattva Korea","Gwanggaeto Stele Jian"],"alt":"금동 미륵보살 반가 사유상과 광개토 대왕릉비","want":2,"kind":"artifact"},
-  {"id":"his-namboukguk","wiki":["ko:석굴암","en:Seokguram","ko:발해"],"commons":["Seokguram Buddha statue","Balhae map Haedong Seongguk"],"alt":"석굴암 본존불과 발해 영역","want":2,"kind":"photo"},
-  {"id":"his-goryeo","wiki":["ko:팔만대장경","en:Tripitaka_Koreana","en:Goryeo_ware"],"commons":["Tripitaka Koreana Haeinsa woodblocks","Goryeo celadon inlaid"],"alt":"팔만대장경 경판과 고려청자","want":2,"kind":"artifact"},
-  {"id":"his-g3-joseon-rule","wiki":["ko:훈민정음","en:Gyeongbokgung","ko:경국대전"],"commons":["Hunminjeongeum Haerye manuscript","Gyeongbokgung Geunjeongjeon"],"alt":"훈민정음 해례본과 경복궁 근정전","want":2,"kind":"artifact"},
-  {"id":"his-g3-sarim","wiki":["ko:소수서원","en:Sosu_Seowon","ko:도산서원"],"commons":["Sosu Seowon Yeongju","Dosan Seowon Andong"],"alt":"사림의 근거지 서원(소수서원·도산서원)","want":2,"kind":"photo"},
-  {"id":"his-g3-waeran-horan","wiki":["ko:거북선","en:Turtle_ship","ko:삼전도비"],"commons":["Turtle ship Geobukseon model","Samjeondo monument Seoul"],"alt":"거북선과 삼전도비","want":2,"kind":"artifact"},
-  {"id":"his-g3-tangpyeong","wiki":["ko:수원_화성","en:Hwaseong_Fortress","ko:탕평비"],"commons":["Hwaseong Fortress Suwon Paldalmun","Tangpyeongbi Sungkyunkwan"],"alt":"정조의 수원 화성과 영조의 탕평비","want":2,"kind":"photo"},
-  {"id":"his-g3-economy-culture","wiki":["ko:김홍도","en:Kim_Hong-do","ko:대동여지도"],"commons":["Kim Hong-do Ssireum painting","Daedongyeojido map Kim Jeong-ho"],"alt":"김홍도 풍속화와 대동여지도","want":2,"kind":"artifact"},
-  {"id":"his-g3-opening","wiki":["ko:척화비","en:Treaty_of_Ganghwa","ko:강화도_조약"],"commons":["Cheokhwabi stele Korea","Ganghwa Treaty 1876 signing"],"alt":"흥선 대원군의 척화비와 강화도 조약","want":2,"kind":"artifact"},
-  {"id":"his-g3-gabo-empire","wiki":["ko:독립문","en:Independence_Gate","ko:전봉준"],"commons":["Dongnimmun Independence Gate Seoul","Jeon Bong-jun photograph 1895"],"alt":"독립문과 동학 농민군 지도자 전봉준","want":2,"kind":"photo"},
-  {"id":"his-g3-sovereignty","wiki":["ko:안중근","en:Japan–Korea_Treaty_of_1905","ko:헤이그_특사"],"commons":["An Jung-geun photograph","Hague secret emissaries 1907 Yi Jun"],"alt":"안중근 의사와 헤이그 특사","want":2,"kind":"portrait"},
-  {"id":"his-g3-colonial-resist","wiki":["ko:3·1_운동","en:March_1st_Movement","ko:유관순"],"commons":["March 1st Movement 1919 Korea crowd","Yu Gwan-sun photograph"],"alt":"3·1 운동 만세 시위와 유관순","want":2,"kind":"photo"},
-  {"id":"his-g3-republic","wiki":["ko:4·19_혁명","en:Korean_War","ko:6·25_전쟁"],"commons":["Korean War refugees 1950","April 19 revolution 1960 Seoul students"],"alt":"6·25 전쟁과 4·19 혁명","want":2,"kind":"photo"},
-  {"id":"his-h1-ancient","wiki":["ko:무령왕릉","en:Tomb_of_King_Muryeong","en:Silla_crown"],"commons":["Tomb of King Muryeong Gongju","Silla gold crown Cheonmachong"],"alt":"무령왕릉과 신라 금관","want":2,"kind":"artifact"},
-  {"id":"his-h1-goryeo","wiki":["ko:고려청자","en:Goryeo_ware","ko:공민왕"],"commons":["Goryeo celadon inlaid cranes","Goryeo Buddhist painting"],"alt":"고려청자와 고려 지배층 문화","want":2,"kind":"artifact"},
-  {"id":"his-h1-joseon","wiki":["ko:경복궁","en:Gyeongbokgung","ko:규장각"],"commons":["Gyeongbokgung palace Seoul","Gyujanggak library Changdeokgung"],"alt":"조선의 정궁 경복궁과 정조의 규장각","want":2,"kind":"photo"},
-  {"id":"his-h1-opening","wiki":["ko:강화도_조약","en:Japan–Korea_Treaty_of_1876","ko:독립문"],"commons":["Ganghwa Treaty 1876","Independence Gate Seoul 1897"],"alt":"강화도 조약 체결과 독립문","want":2,"kind":"photo"},
-  {"id":"his-h1-sovereignty","wiki":["ko:안중근","en:An_Jung-geun","ko:을사늑약"],"commons":["An Jung-geun portrait","Eulsa Treaty 1905 document"],"alt":"안중근과 을사늑약 문서","want":2,"kind":"portrait"},
-  {"id":"his-h1-colonial-rule","wiki":["ko:조선총독부_청사","en:Japanese_General_Government_Building,_Seoul","ko:토지_조사_사업"],"commons":["Japanese General Government Building Seoul 1930s","Korea land survey Japanese colonial"],"alt":"조선 총독부 청사와 식민 통치","want":2,"kind":"photo"},
-  {"id":"his-h1-national-movement","wiki":["ko:대한민국_임시정부","en:Provisional_Government_of_the_Republic_of_Korea","ko:윤봉길"],"commons":["Provisional Government of Korea Shanghai 1919","Yun Bong-gil photograph"],"alt":"상하이 임시 정부와 윤봉길 의사","want":2,"kind":"photo"},
-  {"id":"his-h1-founding-war","wiki":["en:Korean_War","ko:6·25_전쟁","ko:제헌_국회"],"commons":["Korean War 1950 Incheon landing","Constituent National Assembly Korea 1948"],"alt":"제헌 국회와 6·25 전쟁","want":2,"kind":"photo"},
-  {"id":"his-h1-democracy-industry","wiki":["ko:4·19_혁명","en:April_Revolution","en:Gyeongbu_Expressway"],"commons":["April Revolution 1960 Korea","Gyeongbu Expressway construction 1970"],"alt":"4·19 혁명과 경부 고속 도로","want":2,"kind":"photo"},
-  {"id":"his-h1-today-unification","wiki":["ko:6월_민주_항쟁","en:June_Democratic_Struggle","en:2018_inter-Korean_summit"],"commons":["June Democratic Uprising 1987 Seoul","2018 inter-Korean summit Panmunjom handshake"],"alt":"6월 민주 항쟁과 2018 판문점 남북 정상 회담","want":2,"kind":"photo"},
-
-  {"id":"sci-photosyn","wiki":["en:Photosynthesis","ko:광합성","en:Chloroplast"],"commons":["photosynthesis leaf chloroplast diagram","chloroplast micrograph"],"alt":"잎의 엽록체와 광합성 과정","want":2,"kind":"diagram"},
-  {"id":"sci-transp-resp","wiki":["en:Stoma","ko:기공","en:Transpiration"],"commons":["stoma guard cells micrograph","leaf stomata SEM"],"alt":"잎 뒷면의 기공과 공변세포","want":2,"kind":"photo"},
-  {"id":"sci-digest","wiki":["en:Human_digestive_system","ko:소화계","en:Intestinal_villus"],"commons":["human digestive system diagram","small intestine villi micrograph"],"alt":"사람의 소화 기관과 소장 융털","want":2,"kind":"diagram"},
-  {"id":"sci-circ","wiki":["en:Heart","ko:심장","en:Circulatory_system"],"commons":["human heart anatomy diagram","blood circulation systemic pulmonary diagram"],"alt":"심장의 구조와 온몸·폐순환","want":2,"kind":"diagram"},
-  {"id":"sci-resp-excret","wiki":["en:Pulmonary_alveolus","en:Nephron","ko:콩팥"],"commons":["alveoli gas exchange diagram","nephron structure diagram"],"alt":"폐포의 기체 교환과 네프론","want":2,"kind":"diagram"},
-  {"id":"sci-static","wiki":["en:Electroscope","en:Static_electricity","ko:검전기"],"commons":["gold leaf electroscope","static electricity hair balloon"],"alt":"금속박 검전기와 정전기 현상","want":2,"kind":"photo"},
-  {"id":"sci-ohm","wiki":["en:Ohm's_law","en:Resistor","en:Ammeter"],"commons":["Ohm's law circuit diagram","analog ammeter voltmeter"],"alt":"옴의 법칙 회로와 전류계·전압계","want":2,"kind":"diagram"},
-  {"id":"sci-magnet","wiki":["en:Electromagnet","en:Right-hand_rule","ko:전자석"],"commons":["electromagnet coil nail","magnetic field iron filings wire"],"alt":"전자석과 전류 주위 자기장","want":2,"kind":"photo"},
-  {"id":"sci-g22-elec-energy","wiki":["en:Electricity_meter","en:Incandescent_light_bulb","ko:전력량계"],"commons":["electricity meter kWh","energy label appliance power rating"],"alt":"전력량계와 전기 기구의 정격 표시","want":1,"kind":"photo"},
-  {"id":"sci-parallax","wiki":["en:Stellar_parallax","en:Parallax","ko:연주_시차"],"commons":["stellar parallax diagram","parallax finger thumb demonstration"],"alt":"연주 시차로 별까지의 거리를 재는 원리","want":2,"kind":"diagram"},
-  {"id":"sci-galaxy","wiki":["en:Milky_Way","en:Globular_cluster","en:Hubble's_law"],"commons":["Milky Way galaxy structure diagram","globular cluster open cluster Hubble"],"alt":"우리은하의 구조와 성단","want":2,"kind":"photo"},
-  {"id":"sci-g22-space-explore","wiki":["en:Sputnik_1","en:Apollo_11","en:Hubble_Space_Telescope"],"commons":["Sputnik 1 replica","Apollo 11 Aldrin moon"],"alt":"스푸트니크 1호와 아폴로 11호 달 착륙","want":2,"kind":"photo"},
-  {"id":"sci-g3-chem-eq","wiki":["en:Electrolysis_of_water","en:Combustion","en:Chemical_equation"],"commons":["electrolysis of water Hofmann apparatus","magnesium ribbon burning"],"alt":"물의 전기 분해와 마그네슘 연소","want":2,"kind":"photo"},
-  {"id":"sci-g3-mass-laws","wiki":["en:Antoine_Lavoisier","en:Conservation_of_mass","en:Joseph_Proust"],"commons":["Antoine Lavoisier portrait","Joseph Proust portrait"],"alt":"질량 보존 법칙의 라부아지에와 프루스트","want":2,"kind":"portrait"},
-  {"id":"sci-g3-gas-energy","wiki":["en:Joseph_Louis_Gay-Lussac","en:Exothermic_reaction","en:Thermite"],"commons":["Gay-Lussac portrait","thermite reaction exothermic"],"alt":"게이뤼삭과 발열 반응(테르밋)","want":2,"kind":"photo"},
-  {"id":"sci-g3-speed-fall","wiki":["en:Free_fall","en:Galileo_Galilei","en:Equations_for_a_falling_body"],"commons":["free fall stroboscopic photograph ball","feather hammer drop vacuum"],"alt":"자유 낙하 다중 섬광 사진","want":2,"kind":"photo"},
-  {"id":"sci-g3-work-energy","wiki":["en:Roller_coaster","en:Pendulum","en:Conservation_of_energy"],"commons":["roller coaster first drop","pendulum energy conservation diagram"],"alt":"롤러코스터와 진자의 역학적 에너지 보존","want":2,"kind":"photo"},
-  {"id":"sci-g3-senses","wiki":["en:Human_eye","en:Ear","ko:눈"],"commons":["human eye anatomy diagram","ear anatomy cochlea semicircular canals diagram"],"alt":"눈과 귀의 구조","want":2,"kind":"diagram"},
-  {"id":"sci-g3-nerve-hormone","wiki":["en:Neuron","en:Reflex_arc","en:Pancreas"],"commons":["neuron structure diagram","reflex arc knee jerk diagram"],"alt":"뉴런의 구조와 반사 경로","want":2,"kind":"diagram"},
-  {"id":"sci-g3-cell-division","wiki":["en:Mitosis","en:Meiosis","ko:체세포_분열"],"commons":["mitosis stages onion root micrograph","meiosis diagram stages"],"alt":"양파 뿌리 체세포 분열과 감수 분열 단계","want":2,"kind":"diagram"},
-  {"id":"sci-g3-mendel","wiki":["en:Gregor_Mendel","en:Punnett_square","en:Pea"],"commons":["Gregor Mendel portrait","Punnett square pea dihybrid"],"alt":"멘델과 완두 교배 퍼넷 사각형","want":2,"kind":"portrait"},
-  {"id":"sci-g3-human-heredity","wiki":["en:Pedigree_chart","en:Ishihara_test","en:Color_blindness"],"commons":["pedigree chart genetics diagram","Ishihara color blindness test plate"],"alt":"가계도와 색맹 검사표","want":2,"kind":"diagram"},
-  {"id":"sci-h1-measure","wiki":["en:International_System_of_Units","en:Kilogram","en:Vernier_scale"],"commons":["SI base units diagram","vernier caliper measurement"],"alt":"SI 기본 단위와 버니어 캘리퍼스","want":2,"kind":"photo"},
-  {"id":"sci-h1-elements","wiki":["en:Periodic_table","en:Supernova","en:Crab_Nebula"],"commons":["periodic table of elements","Crab Nebula supernova remnant Hubble"],"alt":"주기율표와 초신성 잔해(게성운)","want":2,"kind":"diagram"},
-  {"id":"sci-h1-bonding","wiki":["en:Sodium_chloride","en:Covalent_bond","en:Silicate_mineral"],"commons":["sodium chloride crystal lattice diagram","silicate tetrahedron SiO4 diagram"],"alt":"염화 나트륨 이온 결정과 규산염 사면체","want":2,"kind":"diagram"},
-  {"id":"sci-h1-mechanics","wiki":["en:Airbag","en:Newton's_cradle","en:Impulse_(physics)"],"commons":["airbag deployment crash test","Newton's cradle"],"alt":"에어백과 뉴턴의 요람(운동량·충격량)","want":2,"kind":"photo"},
-  {"id":"sci-h1-earth","wiki":["en:Plate_tectonics","en:Mid-Atlantic_Ridge","en:Water_cycle"],"commons":["tectonic plates world map","plate boundary types diagram"],"alt":"지구의 판 경계 지도와 판 구조","want":2,"kind":"map"},
-  {"id":"sci-h1-life","wiki":["en:Cell_membrane","en:Enzyme","en:DNA"],"commons":["cell membrane phospholipid bilayer diagram","DNA transcription translation central dogma diagram"],"alt":"세포막 구조와 유전 정보의 흐름","want":2,"kind":"diagram"},
-  {"id":"sci-h1-chem-change","wiki":["en:Rust","en:Titration","en:Neutralization_(chemistry)"],"commons":["rusted iron chain","acid base titration burette indicator"],"alt":"철의 녹(산화)과 중화 적정","want":2,"kind":"photo"},
-  {"id":"sci-h1-evolution","wiki":["en:Trilobite","en:Ammonoidea","en:Charles_Darwin"],"commons":["trilobite fossil","ammonite fossil"],"alt":"고생대 삼엽충·중생대 암모나이트 화석","want":2,"kind":"photo"},
-  {"id":"sci-h1-ecosystem","wiki":["en:Food_web","en:Greenhouse_effect","en:Ecosystem"],"commons":["food web diagram ecosystem","greenhouse effect diagram"],"alt":"먹이 그물과 온실 효과","want":2,"kind":"diagram"},
-  {"id":"sci-h1-energy","wiki":["en:Wind_turbine","en:Electric_generator","en:Solar_panel"],"commons":["wind farm turbines","solar panels photovoltaic farm"],"alt":"풍력 발전기와 태양광 패널","want":2,"kind":"photo"},
-
-  {"id":"soc-assembly","wiki":["en:National_Assembly_of_South_Korea","ko:국회의사당_(대한민국)","en:National_Assembly_Proceeding_Hall"],"commons":["National Assembly Building Seoul Yeouido","National Assembly plenary chamber Korea"],"alt":"여의도 국회 의사당과 본회의장","want":2,"kind":"photo"},
-  {"id":"soc-president","wiki":["en:Blue_House","ko:청와대","en:Office_of_the_President_(South_Korea)"],"commons":["Cheong Wa Dae Blue House Seoul","Yongsan presidential office Korea"],"alt":"청와대와 대통령실","want":1,"kind":"photo"},
-  {"id":"soc-court","wiki":["en:Constitutional_Court_of_Korea","ko:헌법재판소_(대한민국)","en:Supreme_Court_of_Korea"],"commons":["Constitutional Court of Korea building","Supreme Court of Korea building Seocho"],"alt":"헌법 재판소와 대법원 건물","want":2,"kind":"photo"},
-  {"id":"soc-choice","wiki":["en:Opportunity_cost","en:Production–possibility_frontier"],"commons":["production possibility frontier diagram","opportunity cost graph"],"alt":"생산 가능 곡선으로 본 기회비용","want":1,"kind":"diagram"},
-  {"id":"soc-market","wiki":["en:Supply_and_demand","ko:수요와_공급"],"commons":["supply and demand curve equilibrium","demand curve shift diagram"],"alt":"수요·공급 곡선과 균형 가격","want":2,"kind":"diagram"},
-  {"id":"soc-gdp","wiki":["en:Gross_domestic_product","en:South_Korean_won","en:Exchange_rate"],"commons":["GDP nominal world map","South Korean won banknotes"],"alt":"국가별 GDP 지도와 원화","want":2,"kind":"diagram"},
-  {"id":"soc-intl","wiki":["en:Headquarters_of_the_United_Nations","en:United_Nations","en:Greenpeace"],"commons":["United Nations headquarters New York","UN General Assembly hall"],"alt":"뉴욕 국제 연합(UN) 본부","want":2,"kind":"photo"},
-  {"id":"soc-territory","wiki":["ko:독도","en:Liancourt_Rocks","en:Exclusive_economic_zone"],"commons":["Dokdo island aerial","territorial waters EEZ diagram"],"alt":"독도 전경과 영해·배타적 경제 수역 구분","want":2,"kind":"photo"},
-  {"id":"soc-climate","wiki":["en:Geography_of_South_Korea","en:Taebaek_Mountains","ko:태백산맥"],"commons":["South Korea topographic map","Taebaek Mountains Korea"],"alt":"한반도 지형도(동고서저)와 태백산맥","want":2,"kind":"map"},
-  {"id":"soc-region","wiki":["en:Seoul_Capital_Area","ko:수도권_(대한민국)","en:Seoul"],"commons":["Seoul Capital Area map","Seoul skyline Han River"],"alt":"수도권 범위 지도와 서울 도심","want":2,"kind":"map"},
-  {"id":"soc-g3-politics","wiki":["en:Elections_in_South_Korea","ko:대한민국의_선거","en:Ballot_box"],"commons":["South Korea election polling station ballot","National Election Commission Korea voting"],"alt":"투표소에서 투표하는 장면","want":1,"kind":"photo"},
-  {"id":"soc-g3-law","wiki":["en:Supreme_Court_of_Korea","ko:대법원_(대한민국)","en:Courtroom"],"commons":["Supreme Court of Korea courtroom","Korean court trial courtroom"],"alt":"대법원과 법정 내부","want":2,"kind":"photo"},
-  {"id":"soc-g3-trend","wiki":["en:Population_pyramid","en:Aging_of_South_Korea","en:Globalization"],"commons":["South Korea population pyramid","population pyramid aging society"],"alt":"고령화를 보여 주는 인구 피라미드","want":1,"kind":"diagram"},
-  {"id":"soc-g3-problems","wiki":["en:Air_pollution","en:Climate_change","en:Unemployment"],"commons":["air pollution smog city Seoul","climate change global temperature graph"],"alt":"대기 오염 스모그와 기후 변화","want":1,"kind":"photo"},
-  {"id":"soc-g3-yeongho","wiki":["en:Ulsan","en:POSCO","en:Hyundai_Heavy_Industries"],"commons":["Ulsan shipyard Hyundai Heavy Industries","POSCO Pohang steelworks"],"alt":"울산 조선소와 포항 제철소","want":2,"kind":"photo"},
-  {"id":"soc-g3-jeju","wiki":["ko:제주도","en:Jeju_Island","en:Seongsan_Ilchulbong"],"commons":["Jeju Island Hallasan aerial","Seongsan Ilchulbong tuff cone"],"alt":"제주도 한라산과 성산 일출봉","want":2,"kind":"photo"},
-  {"id":"soc-g3-nk","wiki":["en:Korean_Demilitarized_Zone","ko:한반도_비무장_지대","en:Joint_Security_Area"],"commons":["Korean DMZ map","Joint Security Area Panmunjom"],"alt":"비무장 지대(DMZ) 지도와 판문점","want":2,"kind":"photo"},
-  {"id":"soc-g3-peace-local","wiki":["en:2018_inter-Korean_summit","ko:판문점","en:Sustainable_Development_Goals"],"commons":["2018 inter-Korean summit handshake","Sustainable Development Goals icons"],"alt":"남북 정상 회담과 지속 가능 발전 목표(SDGs)","want":2,"kind":"photo"},
-  {"id":"soc-h1-perspectives","wiki":["en:Seoul","ko:서울특별시","en:Gwanghwamun"],"commons":["Seoul Gwanghwamun square aerial","Seoul old and new city"],"alt":"시간·공간·사회가 겹쳐 있는 도시 공간, 서울","want":1,"kind":"photo"},
-  {"id":"soc-h1-happiness","wiki":["en:World_Happiness_Report","en:Happiness","en:Bhutan"],"commons":["World Happiness Report map","Gross National Happiness Bhutan"],"alt":"세계 행복 보고서 국가별 지도","want":1,"kind":"map"},
-  {"id":"soc-h1-nature-human","wiki":["en:Köppen_climate_classification","en:Deforestation","en:Asian_dust"],"commons":["Koppen climate classification world map","deforestation Amazon aerial"],"alt":"세계 기후 구분 지도와 삼림 파괴","want":2,"kind":"map"},
-  {"id":"soc-h1-culture","wiki":["en:Major_religious_groups","en:Chinatown","en:Mosque"],"commons":["world religions map","Chinatown gate street"],"alt":"세계 종교 분포 지도와 다문화 공간(차이나타운)","want":2,"kind":"map"},
-  {"id":"soc-h1-living-space","wiki":["en:Urbanization","en:Korea_Train_Express","en:Gangnam_District"],"commons":["urbanization skyline high rise apartments Korea","KTX high speed train"],"alt":"도시화된 아파트 단지와 KTX","want":2,"kind":"photo"},
-  {"id":"soc-h1-human-rights","wiki":["en:Universal_Declaration_of_Human_Rights","ko:세계_인권_선언","en:Weimar_Constitution"],"commons":["Universal Declaration of Human Rights Eleanor Roosevelt","Weimar Constitution 1919 document"],"alt":"세계 인권 선언과 바이마르 헌법","want":2,"kind":"artifact"},
-  {"id":"soc-h1-justice","wiki":["en:John_Rawls","en:Robert_Nozick","en:Welfare_state"],"commons":["John Rawls portrait","Robert Nozick portrait"],"alt":"정의론의 롤스와 노직","want":2,"kind":"portrait"},
-  {"id":"soc-h1-capitalism-choice","wiki":["en:Great_Depression","en:John_Maynard_Keynes","en:Adam_Smith"],"commons":["Great Depression unemployed men soup line","John Maynard Keynes portrait"],"alt":"대공황 실업자 행렬과 케인스","want":2,"kind":"photo"},
-  {"id":"soc-h1-finance-trade","wiki":["en:Port_of_Busan","en:Container_ship","en:Foreign_exchange_market"],"commons":["Busan port container terminal","container ship cargo"],"alt":"부산항 컨테이너 터미널과 국제 무역","want":2,"kind":"photo"},
-  {"id":"soc-h1-global-peace-future","wiki":["en:Sustainable_Development_Goals","en:Population_pyramid","en:Johan_Galtung"],"commons":["Sustainable Development Goals 17 icons","world population pyramid"],"alt":"지속 가능 발전 목표와 인구 피라미드","want":2,"kind":"diagram"},
-
-  {"id":"pythagoras","wiki":["en:Pythagorean_theorem","ko:피타고라스의_정리"],"commons":["Pythagorean theorem squares diagram","Pythagorean theorem proof rearrangement"],"alt":"직각삼각형 세 변 위의 정사각형 넓이 관계","want":2,"kind":"diagram"},
-  {"id":"pythagoras-apply","wiki":["en:Pythagorean_triple","en:Pythagoras","en:Spiral_of_Theodorus"],"commons":["Pythagorean triple 3 4 5 diagram","spiral of Theodorus"],"alt":"피타고라스 수와 테오도루스의 나선","want":1,"kind":"diagram"},
-  {"id":"isosceles","wiki":["en:Isosceles_triangle"],"commons":["isosceles triangle diagram"],"alt":"이등변삼각형의 두 밑각","want":1,"kind":"diagram"},
-  {"id":"circumcenter","wiki":["en:Circumscribed_circle","en:Circumcenter"],"commons":["triangle circumcircle perpendicular bisectors diagram"],"alt":"삼각형의 외접원과 수직이등분선","want":1,"kind":"diagram"},
-  {"id":"incenter","wiki":["en:Incircle_and_excircles","en:Incenter"],"commons":["triangle incircle angle bisectors diagram"],"alt":"삼각형의 내접원과 각의 이등분선","want":1,"kind":"diagram"},
-  {"id":"midsegment-centroid","wiki":["en:Centroid","en:Medial_triangle"],"commons":["triangle centroid medians diagram","medial triangle midsegment"],"alt":"삼각형의 중선과 무게중심","want":1,"kind":"diagram"},
-  {"id":"similar-apply","wiki":["en:Scale_(map)","en:Scale_model"],"commons":["map scale bar","architectural scale model building"],"alt":"지도의 축척과 축소 모형","want":1,"kind":"photo"},
-  {"id":"counting","wiki":["en:Tree_diagram_(probability)","en:Dice"],"commons":["probability tree diagram coin","two dice"],"alt":"수형도와 주사위","want":1,"kind":"diagram"},
-  {"id":"probability","wiki":["en:Dice","en:Probability"],"commons":["dice probability","coin toss"],"alt":"주사위·동전 던지기와 확률","want":1,"kind":"photo"},
-  {"id":"real-numbers","wiki":["en:Square_root_of_2","en:Hippasus"],"commons":["square root of 2 unit square diagonal","irrational number number line"],"alt":"한 변이 1인 정사각형의 대각선 √2","want":1,"kind":"diagram"},
-  {"id":"quad-func-basic","wiki":["en:Parabola","en:Projectile_motion"],"commons":["parabola graph quadratic function","projectile motion parabola water fountain"],"alt":"포물선 그래프와 분수의 물줄기","want":2,"kind":"diagram"},
-  {"id":"trig-ratio","wiki":["en:Trigonometric_functions","en:Trigonometry"],"commons":["right triangle sine cosine tangent diagram"],"alt":"직각삼각형에서 사인·코사인·탄젠트","want":1,"kind":"diagram"},
-  {"id":"special-angles","wiki":["en:Special_right_triangle"],"commons":["30 60 90 and 45 45 90 triangles diagram"],"alt":"30°·45°·60° 특수각 삼각형","want":1,"kind":"diagram"},
-  {"id":"trig-apply","wiki":["en:Theodolite","en:Clinometer","en:Great_Pyramid_of_Giza"],"commons":["theodolite surveying","clinometer measuring tree height"],"alt":"측량용 경위의(세오돌라이트)로 높이 재기","want":2,"kind":"photo"},
-  {"id":"inscribed-angle","wiki":["en:Inscribed_angle","en:Thales's_theorem"],"commons":["inscribed angle theorem diagram","Thales theorem semicircle"],"alt":"원주각과 중심각, 탈레스의 정리","want":1,"kind":"diagram"},
-  {"id":"dispersion","wiki":["en:Standard_deviation"],"commons":["standard deviation diagram normal curve"],"alt":"표준편차가 다른 두 자료의 분포","want":1,"kind":"diagram"},
-  {"id":"boxplot-scatter","wiki":["en:Box_plot","en:Scatter_plot","en:Correlation"],"commons":["box plot diagram quartiles","scatter plot correlation examples"],"alt":"상자그림과 산점도의 상관관계","want":2,"kind":"diagram"},
-  {"id":"freq","wiki":["en:Histogram","en:Frequency_distribution"],"commons":["histogram example","frequency polygon histogram"],"alt":"히스토그램과 도수분포다각형","want":1,"kind":"diagram"},
-  {"id":"coord-graph","wiki":["en:Cartesian_coordinate_system","en:René_Descartes"],"commons":["Cartesian coordinate system quadrants","Rene Descartes portrait"],"alt":"좌표평면과 데카르트","want":2,"kind":"diagram"},
-  {"id":"angles","wiki":["en:Transversal_(geometry)","en:Parallel_(geometry)"],"commons":["parallel lines transversal corresponding angles diagram"],"alt":"평행선과 동위각·엇각","want":1,"kind":"diagram"},
-  {"id":"construction-congruence","wiki":["en:Straightedge_and_compass_construction","en:Compass_(drawing_tool)"],"commons":["compass straightedge construction","drawing compass"],"alt":"눈금 없는 자와 컴퍼스로 하는 작도","want":1,"kind":"photo"},
-  {"id":"polygon","wiki":["en:Regular_polygon","en:Polygon"],"commons":["regular polygons diagram","polygon diagonals diagram"],"alt":"여러 가지 정다각형","want":1,"kind":"diagram"},
-  {"id":"circle-sector","wiki":["en:Circular_sector","en:Pizza"],"commons":["circular sector arc diagram","pizza slices"],"alt":"부채꼴의 중심각과 호","want":1,"kind":"diagram"},
-  {"id":"solids","wiki":["en:Platonic_solid","en:Polyhedron","en:Solid_of_revolution"],"commons":["Platonic solids models","solid of revolution diagram"],"alt":"정다면체 모형과 회전체","want":2,"kind":"diagram"},
-  {"id":"prime-factor","wiki":["en:Sieve_of_Eratosthenes","en:Prime_number"],"commons":["sieve of Eratosthenes animation grid"],"alt":"에라토스테네스의 체로 소수 찾기","want":1,"kind":"diagram"},
-  {"id":"sets","wiki":["en:Venn_diagram","en:John_Venn"],"commons":["Venn diagram three sets"],"alt":"집합의 포함 관계를 나타낸 벤 다이어그램","want":1,"kind":"diagram"},
-  {"id":"complex","wiki":["en:Complex_plane","en:Complex_number"],"commons":["complex plane Argand diagram"],"alt":"복소평면 위의 복소수","want":1,"kind":"diagram"},
-  {"id":"conics","wiki":["en:Conic_section","en:Ellipse","en:Hyperbola"],"commons":["conic sections cone diagram","ellipse foci diagram"],"alt":"원뿔을 잘라 얻는 이차곡선","want":2,"kind":"diagram"},
-  {"id":"exp-log-func","wiki":["en:Exponential_growth","en:Logarithmic_scale","en:Richter_scale"],"commons":["exponential growth graph","logarithmic scale ruler"],"alt":"지수적 증가 그래프와 로그 눈금","want":1,"kind":"diagram"},
-  {"id":"trig-func","wiki":["en:Unit_circle","en:Sine_wave"],"commons":["unit circle sine cosine","sine wave graph"],"alt":"단위원과 사인 곡선","want":2,"kind":"diagram"},
-  {"id":"sine-cosine-law","wiki":["en:Law_of_sines","en:Triangulation_(surveying)"],"commons":["triangulation surveying network","law of sines triangle diagram"],"alt":"삼각 측량으로 거리 재기","want":1,"kind":"diagram"},
-  {"id":"series","wiki":["en:Koch_snowflake","en:Geometric_series"],"commons":["Koch snowflake iterations","geometric series square diagram"],"alt":"코흐 눈송이와 등비급수","want":1,"kind":"diagram"},
-  {"id":"derivative","wiki":["en:Derivative","en:Tangent"],"commons":["tangent line derivative graph","secant tangent limit diagram"],"alt":"곡선의 접선과 미분계수","want":1,"kind":"diagram"},
-  {"id":"integral","wiki":["en:Integral","en:Riemann_sum"],"commons":["Riemann sum rectangles area under curve","definite integral area graph"],"alt":"구분구적법으로 곡선 아래 넓이 구하기","want":1,"kind":"diagram"},
-  {"id":"adv-counting","wiki":["en:Pascal's_triangle","en:Binomial_theorem"],"commons":["Pascal's triangle diagram"],"alt":"파스칼의 삼각형과 이항계수","want":1,"kind":"diagram"},
-  {"id":"distributions","wiki":["en:Normal_distribution","en:Galton_board"],"commons":["normal distribution bell curve","Galton board quincunx"],"alt":"정규분포 곡선과 골턴 보드","want":2,"kind":"diagram"},
-  {"id":"vectors","wiki":["en:Euclidean_vector","en:Dot_product"],"commons":["vector addition parallelogram diagram"],"alt":"벡터의 덧셈과 내적","want":1,"kind":"diagram"},
-
-  {"id":"kor-g22-cj-gram-phoneme-system","wiki":["ko:훈민정음","en:Hunminjeongeum","ko:훈민정음_해례본"],"commons":["Hunminjeongeum Haerye","Hangul consonants articulation diagram"],"alt":"훈민정음 해례본과 자음 발음 기관 상형","want":2,"kind":"artifact"},
-  {"id":"kor-g22-cj-lit-society","wiki":["ko:윤동주","en:Yun_Dong-ju","ko:이육사"],"commons":["Yun Dong-ju photograph","Yi Yuksa poet"],"alt":"일제 강점기 저항 시인 윤동주·이육사","want":1,"kind":"portrait"},
-  {"id":"kor-g22-cj-media-ad","wiki":["en:Advertising","en:Billboard"],"commons":["billboard advertising city street","advertising poster vintage"],"alt":"거리의 광고판 — 광고는 현실을 선택해 보여 준다","want":1,"kind":"photo"},
-  {"id":"kor-write-debate","wiki":["en:Debate","ko:토론"],"commons":["debate competition students podium"],"alt":"토론 대회에서 발언하는 학생들","want":1,"kind":"photo"},
-  {"id":"kor-g3-lit-classic","wiki":["ko:홍길동전","ko:춘향전","en:Hong_Gildong_jeon"],"commons":["Hong Gildong jeon hangul manuscript","Chunhyangjeon woodblock print"],"alt":"한글 고전 소설 홍길동전·춘향전 판본","want":2,"kind":"artifact"},
-  {"id":"kor-g3-gram-spelling","wiki":["en:Hangul","ko:한글"],"commons":["Hangul alphabet chart","Hangul letters calligraphy"],"alt":"한글 자모표","want":1,"kind":"artifact"},
-  {"id":"kor-h1-lit-genre","wiki":["ko:하회별신굿탈놀이","en:Talchum","ko:탈춤"],"commons":["Hahoe mask dance drama","Korean talchum mask dance"],"alt":"극 갈래의 예 — 하회 별신굿 탈놀이","want":1,"kind":"photo"},
-  {"id":"kor-h1-lit-history","wiki":["ko:삼국유사","en:Samguk_yusa","ko:청구영언"],"commons":["Samguk Yusa book","Cheonggu yeongeon sijo anthology"],"alt":"향가가 실린 삼국유사와 시조집 청구영언","want":2,"kind":"artifact"},
-  {"id":"kor-h2-munhak-history","wiki":["ko:판소리","en:Pansori","ko:용비어천가"],"commons":["pansori performance singer drummer","Yongbieocheonga manuscript"],"alt":"판소리 공연과 용비어천가","want":2,"kind":"photo"},
-  {"id":"kor-h2-munhak-modern","wiki":["ko:김소월","en:Kim_Sowol","ko:이상_(작가)"],"commons":["Kim Sowol poet portrait","Yi Sang writer portrait"],"alt":"현대시의 김소월과 이상","want":1,"kind":"portrait"},
-
-  {"id":"eng-h2-read-topic","wiki":["en:Bar_chart","en:Infographic"],"commons":["bar chart example statistics","infographic example"],"alt":"도표 문제에 나오는 막대그래프","want":1,"kind":"diagram"},
-  {"id":"eng-h1-read-detail","wiki":["en:Poster","en:Bar_chart"],"commons":["event poster announcement","bar chart example"],"alt":"안내문 포스터와 도표","want":1,"kind":"photo"}
+ {
+  "id": "his-mongol",
+  "wiki": [
+   "en:Mongol_Empire",
+   "ko:칭기즈_칸",
+   "ko:몽골_제국"
+  ],
+  "commons": [
+   "Mongol Empire map expansion",
+   "Genghis Khan portrait Yuan"
+  ],
+  "alt": "몽골 제국의 최대 영역 지도와 칭기즈 칸",
+  "want": 2,
+  "kind": "map"
+ },
+ {
+  "id": "his-mingqing",
+  "wiki": [
+   "en:Forbidden_City",
+   "en:Zheng_He",
+   "ko:정화_(명나라)"
+  ],
+  "commons": [
+   "Forbidden City Beijing panorama",
+   "Zheng He treasure ship"
+  ],
+  "alt": "베이징 자금성과 정화의 원정",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-newroute",
+  "wiki": [
+   "en:Age_of_Discovery",
+   "en:Christopher_Columbus",
+   "en:Ferdinand_Magellan"
+  ],
+  "commons": [
+   "Age of Discovery routes map",
+   "Columbus Gama Magellan voyages map"
+  ],
+  "alt": "신항로 개척 항해로 지도(다 가마·콜럼버스·마젤란)",
+  "want": 2,
+  "kind": "map"
+ },
+ {
+  "id": "his-revolution",
+  "wiki": [
+   "en:Storming_of_the_Bastille",
+   "en:Declaration_of_the_Rights_of_Man_and_of_the_Citizen",
+   "en:Bill_of_Rights_1689"
+  ],
+  "commons": [
+   "Storming of the Bastille painting",
+   "Declaration of the Rights of Man 1789"
+  ],
+  "alt": "바스티유 습격과 인권 선언문",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-imperialism",
+  "wiki": [
+   "en:Watt_steam_engine",
+   "en:Scramble_for_Africa",
+   "en:Industrial_Revolution"
+  ],
+  "commons": [
+   "Watt steam engine museum",
+   "Africa colonial partition 1914 map"
+  ],
+  "alt": "와트 증기 기관과 아프리카 분할 지도",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-asia-nation",
+  "wiki": [
+   "en:First_Opium_War",
+   "en:Meiji_Restoration",
+   "ko:신해혁명"
+  ],
+  "commons": [
+   "Opium War Nemesis painting",
+   "Meiji Emperor Charter Oath"
+  ],
+  "alt": "아편 전쟁과 메이지 유신",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-gojoseon",
+  "wiki": [
+   "ko:비파형_동검",
+   "en:Dolmen",
+   "ko:고인돌"
+  ],
+  "commons": [
+   "Liaoning bronze dagger Korea",
+   "Ganghwa dolmen Korea"
+  ],
+  "alt": "비파형 동검과 강화 고인돌",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-threekingdoms",
+  "wiki": [
+   "ko:금동미륵보살반가사유상",
+   "en:Gwanggaeto_Stele",
+   "ko:광개토대왕릉비"
+  ],
+  "commons": [
+   "Gilt-bronze Maitreya pensive bodhisattva Korea",
+   "Gwanggaeto Stele Jian"
+  ],
+  "alt": "금동 미륵보살 반가 사유상과 광개토 대왕릉비",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-namboukguk",
+  "wiki": [
+   "ko:석굴암",
+   "en:Seokguram",
+   "ko:발해"
+  ],
+  "commons": [
+   "Seokguram Buddha statue",
+   "Balhae map Haedong Seongguk"
+  ],
+  "alt": "석굴암 본존불과 발해 영역",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-goryeo",
+  "wiki": [
+   "ko:팔만대장경",
+   "en:Tripitaka_Koreana",
+   "en:Goryeo_ware"
+  ],
+  "commons": [
+   "Tripitaka Koreana Haeinsa woodblocks",
+   "Goryeo celadon inlaid"
+  ],
+  "alt": "팔만대장경 경판과 고려청자",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-g3-joseon-rule",
+  "wiki": [
+   "ko:훈민정음",
+   "en:Gyeongbokgung",
+   "ko:경국대전"
+  ],
+  "commons": [
+   "Hunminjeongeum Haerye manuscript",
+   "Gyeongbokgung Geunjeongjeon"
+  ],
+  "alt": "훈민정음 해례본과 경복궁 근정전",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-g3-sarim",
+  "wiki": [
+   "ko:소수서원",
+   "en:Sosu_Seowon",
+   "ko:도산서원"
+  ],
+  "commons": [
+   "Sosu Seowon Yeongju",
+   "Dosan Seowon Andong"
+  ],
+  "alt": "사림의 근거지 서원(소수서원·도산서원)",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g3-waeran-horan",
+  "wiki": [
+   "ko:거북선",
+   "en:Turtle_ship",
+   "ko:삼전도비"
+  ],
+  "commons": [
+   "Turtle ship Geobukseon model",
+   "Samjeondo monument Seoul"
+  ],
+  "alt": "거북선과 삼전도비",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-g3-tangpyeong",
+  "wiki": [
+   "ko:수원_화성",
+   "en:Hwaseong_Fortress",
+   "ko:탕평비"
+  ],
+  "commons": [
+   "Hwaseong Fortress Suwon Paldalmun",
+   "Tangpyeongbi Sungkyunkwan"
+  ],
+  "alt": "정조의 수원 화성과 영조의 탕평비",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g3-economy-culture",
+  "wiki": [
+   "ko:김홍도",
+   "en:Kim_Hong-do",
+   "ko:대동여지도"
+  ],
+  "commons": [
+   "Kim Hong-do Ssireum painting",
+   "Daedongyeojido map Kim Jeong-ho"
+  ],
+  "alt": "김홍도 풍속화와 대동여지도",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-g3-opening",
+  "wiki": [
+   "ko:척화비",
+   "en:Treaty_of_Ganghwa",
+   "ko:강화도_조약"
+  ],
+  "commons": [
+   "Cheokhwabi stele Korea",
+   "Ganghwa Treaty 1876 signing"
+  ],
+  "alt": "흥선 대원군의 척화비와 강화도 조약",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-g3-gabo-empire",
+  "wiki": [
+   "ko:독립문",
+   "en:Independence_Gate",
+   "ko:전봉준"
+  ],
+  "commons": [
+   "Dongnimmun Independence Gate Seoul",
+   "Jeon Bong-jun photograph 1895"
+  ],
+  "alt": "독립문과 동학 농민군 지도자 전봉준",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g3-sovereignty",
+  "wiki": [
+   "ko:안중근",
+   "en:Japan–Korea_Treaty_of_1905",
+   "ko:헤이그_특사"
+  ],
+  "commons": [
+   "An Jung-geun photograph",
+   "Hague secret emissaries 1907 Yi Jun"
+  ],
+  "alt": "안중근 의사와 헤이그 특사",
+  "want": 2,
+  "kind": "portrait"
+ },
+ {
+  "id": "his-g3-colonial-resist",
+  "wiki": [
+   "ko:3·1_운동",
+   "en:March_1st_Movement",
+   "ko:유관순"
+  ],
+  "commons": [
+   "March 1st Movement 1919 Korea crowd",
+   "Yu Gwan-sun photograph"
+  ],
+  "alt": "3·1 운동 만세 시위와 유관순",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-g3-republic",
+  "wiki": [
+   "ko:4·19_혁명",
+   "en:Korean_War",
+   "ko:6·25_전쟁"
+  ],
+  "commons": [
+   "Korean War refugees 1950",
+   "April 19 revolution 1960 Seoul students"
+  ],
+  "alt": "6·25 전쟁과 4·19 혁명",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-h1-ancient",
+  "wiki": [
+   "ko:무령왕릉",
+   "en:Tomb_of_King_Muryeong",
+   "en:Silla_crown"
+  ],
+  "commons": [
+   "Tomb of King Muryeong Gongju",
+   "Silla gold crown Cheonmachong"
+  ],
+  "alt": "무령왕릉과 신라 금관",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-h1-goryeo",
+  "wiki": [
+   "ko:고려청자",
+   "en:Goryeo_ware",
+   "ko:공민왕"
+  ],
+  "commons": [
+   "Goryeo celadon inlaid cranes",
+   "Goryeo Buddhist painting"
+  ],
+  "alt": "고려청자와 고려 지배층 문화",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "his-h1-joseon",
+  "wiki": [
+   "ko:경복궁",
+   "en:Gyeongbokgung",
+   "ko:규장각"
+  ],
+  "commons": [
+   "Gyeongbokgung palace Seoul",
+   "Gyujanggak library Changdeokgung"
+  ],
+  "alt": "조선의 정궁 경복궁과 정조의 규장각",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-h1-opening",
+  "wiki": [
+   "ko:강화도_조약",
+   "en:Japan–Korea_Treaty_of_1876",
+   "ko:독립문"
+  ],
+  "commons": [
+   "Ganghwa Treaty 1876",
+   "Independence Gate Seoul 1897"
+  ],
+  "alt": "강화도 조약 체결과 독립문",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-h1-sovereignty",
+  "wiki": [
+   "ko:안중근",
+   "en:An_Jung-geun",
+   "ko:을사늑약"
+  ],
+  "commons": [
+   "An Jung-geun portrait",
+   "Eulsa Treaty 1905 document"
+  ],
+  "alt": "안중근과 을사늑약 문서",
+  "want": 2,
+  "kind": "portrait"
+ },
+ {
+  "id": "his-h1-colonial-rule",
+  "wiki": [
+   "ko:조선총독부_청사",
+   "en:Japanese_General_Government_Building,_Seoul",
+   "ko:토지_조사_사업"
+  ],
+  "commons": [
+   "Japanese General Government Building Seoul 1930s",
+   "Korea land survey Japanese colonial"
+  ],
+  "alt": "조선 총독부 청사와 식민 통치",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-h1-national-movement",
+  "wiki": [
+   "ko:대한민국_임시정부",
+   "en:Provisional_Government_of_the_Republic_of_Korea",
+   "ko:윤봉길"
+  ],
+  "commons": [
+   "Provisional Government of Korea Shanghai 1919",
+   "Yun Bong-gil photograph"
+  ],
+  "alt": "상하이 임시 정부와 윤봉길 의사",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-h1-founding-war",
+  "wiki": [
+   "en:Korean_War",
+   "ko:6·25_전쟁",
+   "ko:제헌_국회"
+  ],
+  "commons": [
+   "Korean War 1950 Incheon landing",
+   "Constituent National Assembly Korea 1948"
+  ],
+  "alt": "제헌 국회와 6·25 전쟁",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-h1-democracy-industry",
+  "wiki": [
+   "ko:4·19_혁명",
+   "en:April_Revolution",
+   "en:Gyeongbu_Expressway"
+  ],
+  "commons": [
+   "April Revolution 1960 Korea",
+   "Gyeongbu Expressway construction 1970"
+  ],
+  "alt": "4·19 혁명과 경부 고속 도로",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "his-h1-today-unification",
+  "wiki": [
+   "ko:6월_민주_항쟁",
+   "en:June_Democratic_Struggle",
+   "en:2018_inter-Korean_summit"
+  ],
+  "commons": [
+   "June Democratic Uprising 1987 Seoul",
+   "2018 inter-Korean summit Panmunjom handshake"
+  ],
+  "alt": "6월 민주 항쟁과 2018 판문점 남북 정상 회담",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-photosyn",
+  "wiki": [
+   "en:Photosynthesis",
+   "ko:광합성",
+   "en:Chloroplast"
+  ],
+  "commons": [
+   "photosynthesis leaf chloroplast diagram",
+   "chloroplast micrograph"
+  ],
+  "alt": "잎의 엽록체와 광합성 과정",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-transp-resp",
+  "wiki": [
+   "en:Stoma",
+   "ko:기공",
+   "en:Transpiration"
+  ],
+  "commons": [
+   "stoma guard cells micrograph",
+   "leaf stomata SEM"
+  ],
+  "alt": "잎 뒷면의 기공과 공변세포",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-digest",
+  "wiki": [
+   "en:Human_digestive_system",
+   "ko:소화계",
+   "en:Intestinal_villus"
+  ],
+  "commons": [
+   "human digestive system diagram",
+   "small intestine villi micrograph"
+  ],
+  "alt": "사람의 소화 기관과 소장 융털",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-circ",
+  "wiki": [
+   "en:Heart",
+   "ko:심장",
+   "en:Circulatory_system"
+  ],
+  "commons": [
+   "human heart anatomy diagram",
+   "blood circulation systemic pulmonary diagram"
+  ],
+  "alt": "심장의 구조와 온몸·폐순환",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-resp-excret",
+  "wiki": [
+   "en:Pulmonary_alveolus",
+   "en:Nephron",
+   "ko:콩팥"
+  ],
+  "commons": [
+   "alveoli gas exchange diagram",
+   "nephron structure diagram"
+  ],
+  "alt": "폐포의 기체 교환과 네프론",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-static",
+  "wiki": [
+   "en:Electroscope",
+   "en:Static_electricity",
+   "ko:검전기"
+  ],
+  "commons": [
+   "gold leaf electroscope",
+   "static electricity hair balloon"
+  ],
+  "alt": "금속박 검전기와 정전기 현상",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-ohm",
+  "wiki": [
+   "en:Ohm's_law",
+   "en:Resistor",
+   "en:Ammeter"
+  ],
+  "commons": [
+   "Ohm's law circuit diagram",
+   "analog ammeter voltmeter"
+  ],
+  "alt": "옴의 법칙 회로와 전류계·전압계",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-magnet",
+  "wiki": [
+   "en:Electromagnet",
+   "en:Right-hand_rule",
+   "ko:전자석"
+  ],
+  "commons": [
+   "electromagnet coil nail",
+   "magnetic field iron filings wire"
+  ],
+  "alt": "전자석과 전류 주위 자기장",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-g22-elec-energy",
+  "wiki": [
+   "en:Electricity_meter",
+   "en:Incandescent_light_bulb",
+   "ko:전력량계"
+  ],
+  "commons": [
+   "electricity meter kWh",
+   "energy label appliance power rating"
+  ],
+  "alt": "전력량계와 전기 기구의 정격 표시",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-parallax",
+  "wiki": [
+   "en:Stellar_parallax",
+   "en:Parallax",
+   "ko:연주_시차"
+  ],
+  "commons": [
+   "stellar parallax diagram",
+   "parallax finger thumb demonstration"
+  ],
+  "alt": "연주 시차로 별까지의 거리를 재는 원리",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-galaxy",
+  "wiki": [
+   "en:Milky_Way",
+   "en:Globular_cluster",
+   "en:Hubble's_law"
+  ],
+  "commons": [
+   "Milky Way galaxy structure diagram",
+   "globular cluster open cluster Hubble"
+  ],
+  "alt": "우리은하의 구조와 성단",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-g22-space-explore",
+  "wiki": [
+   "en:Sputnik_1",
+   "en:Apollo_11",
+   "en:Hubble_Space_Telescope"
+  ],
+  "commons": [
+   "Sputnik 1 replica",
+   "Apollo 11 Aldrin moon"
+  ],
+  "alt": "스푸트니크 1호와 아폴로 11호 달 착륙",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-g3-chem-eq",
+  "wiki": [
+   "en:Electrolysis_of_water",
+   "en:Combustion",
+   "en:Chemical_equation"
+  ],
+  "commons": [
+   "electrolysis of water Hofmann apparatus",
+   "magnesium ribbon burning"
+  ],
+  "alt": "물의 전기 분해와 마그네슘 연소",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-g3-mass-laws",
+  "wiki": [
+   "en:Antoine_Lavoisier",
+   "en:Conservation_of_mass",
+   "en:Joseph_Proust"
+  ],
+  "commons": [
+   "Antoine Lavoisier portrait",
+   "Joseph Proust portrait"
+  ],
+  "alt": "질량 보존 법칙의 라부아지에와 프루스트",
+  "want": 2,
+  "kind": "portrait"
+ },
+ {
+  "id": "sci-g3-gas-energy",
+  "wiki": [
+   "en:Joseph_Louis_Gay-Lussac",
+   "en:Exothermic_reaction",
+   "en:Thermite"
+  ],
+  "commons": [
+   "Gay-Lussac portrait",
+   "thermite reaction exothermic"
+  ],
+  "alt": "게이뤼삭과 발열 반응(테르밋)",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-g3-speed-fall",
+  "wiki": [
+   "en:Free_fall",
+   "en:Galileo_Galilei",
+   "en:Equations_for_a_falling_body"
+  ],
+  "commons": [
+   "free fall stroboscopic photograph ball",
+   "feather hammer drop vacuum"
+  ],
+  "alt": "자유 낙하 다중 섬광 사진",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-g3-work-energy",
+  "wiki": [
+   "en:Roller_coaster",
+   "en:Pendulum",
+   "en:Conservation_of_energy"
+  ],
+  "commons": [
+   "roller coaster first drop",
+   "pendulum energy conservation diagram"
+  ],
+  "alt": "롤러코스터와 진자의 역학적 에너지 보존",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-g3-senses",
+  "wiki": [
+   "en:Human_eye",
+   "en:Ear",
+   "ko:눈"
+  ],
+  "commons": [
+   "human eye anatomy diagram",
+   "ear anatomy cochlea semicircular canals diagram"
+  ],
+  "alt": "눈과 귀의 구조",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-g3-nerve-hormone",
+  "wiki": [
+   "en:Neuron",
+   "en:Reflex_arc",
+   "en:Pancreas"
+  ],
+  "commons": [
+   "neuron structure diagram",
+   "reflex arc knee jerk diagram"
+  ],
+  "alt": "뉴런의 구조와 반사 경로",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-g3-cell-division",
+  "wiki": [
+   "en:Mitosis",
+   "en:Meiosis",
+   "ko:체세포_분열"
+  ],
+  "commons": [
+   "mitosis stages onion root micrograph",
+   "meiosis diagram stages"
+  ],
+  "alt": "양파 뿌리 체세포 분열과 감수 분열 단계",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-g3-mendel",
+  "wiki": [
+   "en:Gregor_Mendel",
+   "en:Punnett_square",
+   "en:Pea"
+  ],
+  "commons": [
+   "Gregor Mendel portrait",
+   "Punnett square pea dihybrid"
+  ],
+  "alt": "멘델과 완두 교배 퍼넷 사각형",
+  "want": 2,
+  "kind": "portrait"
+ },
+ {
+  "id": "sci-g3-human-heredity",
+  "wiki": [
+   "en:Pedigree_chart",
+   "en:Ishihara_test",
+   "en:Color_blindness"
+  ],
+  "commons": [
+   "pedigree chart genetics diagram",
+   "Ishihara color blindness test plate"
+  ],
+  "alt": "가계도와 색맹 검사표",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-h1-measure",
+  "wiki": [
+   "en:International_System_of_Units",
+   "en:Kilogram",
+   "en:Vernier_scale"
+  ],
+  "commons": [
+   "SI base units diagram",
+   "vernier caliper measurement"
+  ],
+  "alt": "SI 기본 단위와 버니어 캘리퍼스",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-h1-elements",
+  "wiki": [
+   "en:Periodic_table",
+   "en:Supernova",
+   "en:Crab_Nebula"
+  ],
+  "commons": [
+   "periodic table of elements",
+   "Crab Nebula supernova remnant Hubble"
+  ],
+  "alt": "주기율표와 초신성 잔해(게성운)",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-h1-bonding",
+  "wiki": [
+   "en:Sodium_chloride",
+   "en:Covalent_bond",
+   "en:Silicate_mineral"
+  ],
+  "commons": [
+   "sodium chloride crystal lattice diagram",
+   "silicate tetrahedron SiO4 diagram"
+  ],
+  "alt": "염화 나트륨 이온 결정과 규산염 사면체",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-h1-mechanics",
+  "wiki": [
+   "en:Airbag",
+   "en:Newton's_cradle",
+   "en:Impulse_(physics)"
+  ],
+  "commons": [
+   "airbag deployment crash test",
+   "Newton's cradle"
+  ],
+  "alt": "에어백과 뉴턴의 요람(운동량·충격량)",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-h1-earth",
+  "wiki": [
+   "en:Plate_tectonics",
+   "en:Mid-Atlantic_Ridge",
+   "en:Water_cycle"
+  ],
+  "commons": [
+   "tectonic plates world map",
+   "plate boundary types diagram"
+  ],
+  "alt": "지구의 판 경계 지도와 판 구조",
+  "want": 2,
+  "kind": "map"
+ },
+ {
+  "id": "sci-h1-life",
+  "wiki": [
+   "en:Cell_membrane",
+   "en:Enzyme",
+   "en:DNA"
+  ],
+  "commons": [
+   "cell membrane phospholipid bilayer diagram",
+   "DNA transcription translation central dogma diagram"
+  ],
+  "alt": "세포막 구조와 유전 정보의 흐름",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-h1-chem-change",
+  "wiki": [
+   "en:Rust",
+   "en:Titration",
+   "en:Neutralization_(chemistry)"
+  ],
+  "commons": [
+   "rusted iron chain",
+   "acid base titration burette indicator"
+  ],
+  "alt": "철의 녹(산화)과 중화 적정",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-h1-evolution",
+  "wiki": [
+   "en:Trilobite",
+   "en:Ammonoidea",
+   "en:Charles_Darwin"
+  ],
+  "commons": [
+   "trilobite fossil",
+   "ammonite fossil"
+  ],
+  "alt": "고생대 삼엽충·중생대 암모나이트 화석",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-h1-ecosystem",
+  "wiki": [
+   "en:Food_web",
+   "en:Greenhouse_effect",
+   "en:Ecosystem"
+  ],
+  "commons": [
+   "food web diagram ecosystem",
+   "greenhouse effect diagram"
+  ],
+  "alt": "먹이 그물과 온실 효과",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sci-h1-energy",
+  "wiki": [
+   "en:Wind_turbine",
+   "en:Electric_generator",
+   "en:Solar_panel"
+  ],
+  "commons": [
+   "wind farm turbines",
+   "solar panels photovoltaic farm"
+  ],
+  "alt": "풍력 발전기와 태양광 패널",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-assembly",
+  "wiki": [
+   "en:National_Assembly_of_South_Korea",
+   "ko:국회의사당_(대한민국)",
+   "en:National_Assembly_Proceeding_Hall"
+  ],
+  "commons": [
+   "National Assembly Building Seoul Yeouido",
+   "National Assembly plenary chamber Korea"
+  ],
+  "alt": "여의도 국회 의사당과 본회의장",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-president",
+  "wiki": [
+   "en:Blue_House",
+   "ko:청와대",
+   "en:Office_of_the_President_(South_Korea)"
+  ],
+  "commons": [
+   "Cheong Wa Dae Blue House Seoul",
+   "Yongsan presidential office Korea"
+  ],
+  "alt": "청와대와 대통령실",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-court",
+  "wiki": [
+   "en:Constitutional_Court_of_Korea",
+   "ko:헌법재판소_(대한민국)",
+   "en:Supreme_Court_of_Korea"
+  ],
+  "commons": [
+   "Constitutional Court of Korea building",
+   "Supreme Court of Korea building Seocho"
+  ],
+  "alt": "헌법 재판소와 대법원 건물",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-choice",
+  "wiki": [
+   "en:Opportunity_cost",
+   "en:Production–possibility_frontier"
+  ],
+  "commons": [
+   "production possibility frontier diagram",
+   "opportunity cost graph"
+  ],
+  "alt": "생산 가능 곡선으로 본 기회비용",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "soc-market",
+  "wiki": [
+   "en:Supply_and_demand",
+   "ko:수요와_공급"
+  ],
+  "commons": [
+   "supply and demand curve equilibrium",
+   "demand curve shift diagram"
+  ],
+  "alt": "수요·공급 곡선과 균형 가격",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "soc-gdp",
+  "wiki": [
+   "en:Gross_domestic_product",
+   "en:South_Korean_won",
+   "en:Exchange_rate"
+  ],
+  "commons": [
+   "GDP nominal world map",
+   "South Korean won banknotes"
+  ],
+  "alt": "국가별 GDP 지도와 원화",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "soc-intl",
+  "wiki": [
+   "en:Headquarters_of_the_United_Nations",
+   "en:United_Nations",
+   "en:Greenpeace"
+  ],
+  "commons": [
+   "United Nations headquarters New York",
+   "UN General Assembly hall"
+  ],
+  "alt": "뉴욕 국제 연합(UN) 본부",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-territory",
+  "wiki": [
+   "ko:독도",
+   "en:Liancourt_Rocks",
+   "en:Exclusive_economic_zone"
+  ],
+  "commons": [
+   "Dokdo island aerial",
+   "territorial waters EEZ diagram"
+  ],
+  "alt": "독도 전경과 영해·배타적 경제 수역 구분",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-climate",
+  "wiki": [
+   "ko:태백산맥",
+   "en:Seoraksan",
+   "en:Taebaek_Mountains"
+  ],
+  "commons": [
+   "Seoraksan national park Korea mountains"
+  ],
+  "alt": "한반도 지형도(동고서저)와 태백산맥",
+  "want": 2,
+  "kind": "map"
+ },
+ {
+  "id": "soc-region",
+  "wiki": [
+   "en:Seoul_Capital_Area",
+   "ko:수도권_(대한민국)",
+   "en:Seoul"
+  ],
+  "commons": [
+   "Seoul Capital Area map",
+   "Seoul skyline Han River"
+  ],
+  "alt": "수도권 범위 지도와 서울 도심",
+  "want": 2,
+  "kind": "map"
+ },
+ {
+  "id": "soc-g3-politics",
+  "wiki": [
+   "en:Elections_in_South_Korea",
+   "ko:대한민국의_선거",
+   "en:Ballot_box"
+  ],
+  "commons": [
+   "South Korea election polling station ballot",
+   "National Election Commission Korea voting"
+  ],
+  "alt": "투표소에서 투표하는 장면",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g3-law",
+  "wiki": [
+   "ko:대법원_(대한민국)",
+   "en:Supreme_Court_of_Korea"
+  ],
+  "commons": [
+   "Supreme Court of Korea building Seoul"
+  ],
+  "alt": "대법원과 법정 내부",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g3-trend",
+  "wiki": [
+   "en:Population_pyramid",
+   "en:Aging_of_South_Korea",
+   "en:Globalization"
+  ],
+  "commons": [
+   "South Korea population pyramid",
+   "population pyramid aging society"
+  ],
+  "alt": "고령화를 보여 주는 인구 피라미드",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "soc-g3-problems",
+  "wiki": [
+   "en:Air_pollution",
+   "en:Climate_change",
+   "en:Unemployment"
+  ],
+  "commons": [
+   "air pollution smog city Seoul",
+   "climate change global temperature graph"
+  ],
+  "alt": "대기 오염 스모그와 기후 변화",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g3-yeongho",
+  "wiki": [
+   "en:Ulsan",
+   "en:POSCO",
+   "en:Hyundai_Heavy_Industries"
+  ],
+  "commons": [
+   "Ulsan shipyard Hyundai Heavy Industries",
+   "POSCO Pohang steelworks"
+  ],
+  "alt": "울산 조선소와 포항 제철소",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g3-jeju",
+  "wiki": [
+   "ko:제주도",
+   "en:Jeju_Island",
+   "en:Seongsan_Ilchulbong"
+  ],
+  "commons": [
+   "Jeju Island Hallasan aerial",
+   "Seongsan Ilchulbong tuff cone"
+  ],
+  "alt": "제주도 한라산과 성산 일출봉",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g3-nk",
+  "wiki": [
+   "en:Korean_Demilitarized_Zone",
+   "ko:한반도_비무장_지대",
+   "en:Joint_Security_Area"
+  ],
+  "commons": [
+   "Korean DMZ map",
+   "Joint Security Area Panmunjom"
+  ],
+  "alt": "비무장 지대(DMZ) 지도와 판문점",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-g3-peace-local",
+  "wiki": [
+   "en:2018_inter-Korean_summit",
+   "ko:판문점",
+   "en:Sustainable_Development_Goals"
+  ],
+  "commons": [
+   "2018 inter-Korean summit handshake",
+   "Sustainable Development Goals icons"
+  ],
+  "alt": "남북 정상 회담과 지속 가능 발전 목표(SDGs)",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-h1-perspectives",
+  "wiki": [
+   "en:Seoul",
+   "ko:서울특별시",
+   "en:Gwanghwamun"
+  ],
+  "commons": [
+   "Seoul Gwanghwamun square aerial",
+   "Seoul old and new city"
+  ],
+  "alt": "시간·공간·사회가 겹쳐 있는 도시 공간, 서울",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-h1-happiness",
+  "wiki": [
+   "en:World_Happiness_Report",
+   "en:Happiness",
+   "en:Bhutan"
+  ],
+  "commons": [
+   "World Happiness Report map",
+   "Gross National Happiness Bhutan"
+  ],
+  "alt": "세계 행복 보고서 국가별 지도",
+  "want": 1,
+  "kind": "map"
+ },
+ {
+  "id": "soc-h1-nature-human",
+  "wiki": [
+   "en:Köppen_climate_classification",
+   "en:Deforestation",
+   "en:Asian_dust"
+  ],
+  "commons": [
+   "Koppen climate classification world map",
+   "deforestation Amazon aerial"
+  ],
+  "alt": "세계 기후 구분 지도와 삼림 파괴",
+  "want": 2,
+  "kind": "map"
+ },
+ {
+  "id": "soc-h1-culture",
+  "wiki": [
+   "en:Major_religious_groups",
+   "en:Chinatown",
+   "en:Mosque"
+  ],
+  "commons": [
+   "world religions map",
+   "Chinatown gate street"
+  ],
+  "alt": "세계 종교 분포 지도와 다문화 공간(차이나타운)",
+  "want": 2,
+  "kind": "map"
+ },
+ {
+  "id": "soc-h1-living-space",
+  "wiki": [
+   "en:Urbanization",
+   "en:Korea_Train_Express",
+   "en:Gangnam_District"
+  ],
+  "commons": [
+   "urbanization skyline high rise apartments Korea",
+   "KTX high speed train"
+  ],
+  "alt": "도시화된 아파트 단지와 KTX",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-h1-human-rights",
+  "wiki": [
+   "en:Universal_Declaration_of_Human_Rights",
+   "ko:세계_인권_선언",
+   "en:Weimar_Constitution"
+  ],
+  "commons": [
+   "Universal Declaration of Human Rights Eleanor Roosevelt",
+   "Weimar Constitution 1919 document"
+  ],
+  "alt": "세계 인권 선언과 바이마르 헌법",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "soc-h1-justice",
+  "wiki": [
+   "en:John_Rawls",
+   "en:Robert_Nozick",
+   "en:Welfare_state"
+  ],
+  "commons": [
+   "John Rawls portrait",
+   "Robert Nozick portrait"
+  ],
+  "alt": "정의론의 롤스와 노직",
+  "want": 2,
+  "kind": "portrait"
+ },
+ {
+  "id": "soc-h1-capitalism-choice",
+  "wiki": [
+   "en:Great_Depression",
+   "en:John_Maynard_Keynes",
+   "en:Adam_Smith"
+  ],
+  "commons": [
+   "Great Depression unemployed men soup line",
+   "John Maynard Keynes portrait"
+  ],
+  "alt": "대공황 실업자 행렬과 케인스",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-h1-finance-trade",
+  "wiki": [
+   "en:Port_of_Busan",
+   "en:Container_ship",
+   "en:Foreign_exchange_market"
+  ],
+  "commons": [
+   "Busan port container terminal",
+   "container ship cargo"
+  ],
+  "alt": "부산항 컨테이너 터미널과 국제 무역",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "soc-h1-global-peace-future",
+  "wiki": [
+   "en:Sustainable_Development_Goals",
+   "en:Population_pyramid",
+   "en:Johan_Galtung"
+  ],
+  "commons": [
+   "Sustainable Development Goals 17 icons",
+   "world population pyramid"
+  ],
+  "alt": "지속 가능 발전 목표와 인구 피라미드",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "pythagoras",
+  "wiki": [
+   "en:Pythagorean_theorem",
+   "ko:피타고라스의_정리"
+  ],
+  "commons": [
+   "Pythagorean theorem squares diagram",
+   "Pythagorean theorem proof rearrangement"
+  ],
+  "alt": "직각삼각형 세 변 위의 정사각형 넓이 관계",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "pythagoras-apply",
+  "wiki": [
+   "en:Pythagorean_triple",
+   "en:Pythagoras",
+   "en:Spiral_of_Theodorus"
+  ],
+  "commons": [
+   "Pythagorean triple 3 4 5 diagram",
+   "spiral of Theodorus"
+  ],
+  "alt": "피타고라스 수와 테오도루스의 나선",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "isosceles",
+  "wiki": [
+   "en:Isosceles_triangle"
+  ],
+  "commons": [
+   "isosceles triangle diagram"
+  ],
+  "alt": "이등변삼각형의 두 밑각",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "circumcenter",
+  "wiki": [
+   "en:Circumscribed_circle",
+   "en:Circumcenter"
+  ],
+  "commons": [
+   "triangle circumcircle perpendicular bisectors diagram"
+  ],
+  "alt": "삼각형의 외접원과 수직이등분선",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "incenter",
+  "wiki": [
+   "en:Incircle_and_excircles",
+   "en:Incenter"
+  ],
+  "commons": [
+   "triangle incircle angle bisectors diagram"
+  ],
+  "alt": "삼각형의 내접원과 각의 이등분선",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "midsegment-centroid",
+  "wiki": [
+   "en:Centroid",
+   "en:Medial_triangle"
+  ],
+  "commons": [
+   "triangle centroid medians diagram",
+   "medial triangle midsegment"
+  ],
+  "alt": "삼각형의 중선과 무게중심",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "similar-apply",
+  "wiki": [
+   "en:Scale_(map)",
+   "en:Scale_model"
+  ],
+  "commons": [
+   "map scale bar",
+   "architectural scale model building"
+  ],
+  "alt": "지도의 축척과 축소 모형",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "counting",
+  "wiki": [
+   "en:Tree_diagram_(probability)",
+   "en:Dice"
+  ],
+  "commons": [
+   "probability tree diagram coin",
+   "two dice"
+  ],
+  "alt": "수형도와 주사위",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "probability",
+  "wiki": [
+   "en:Dice",
+   "en:Probability"
+  ],
+  "commons": [
+   "dice probability",
+   "coin toss"
+  ],
+  "alt": "주사위·동전 던지기와 확률",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "real-numbers",
+  "wiki": [
+   "en:Square_root_of_2",
+   "en:Hippasus"
+  ],
+  "commons": [
+   "square root of 2 unit square diagonal",
+   "irrational number number line"
+  ],
+  "alt": "한 변이 1인 정사각형의 대각선 √2",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "quad-func-basic",
+  "wiki": [
+   "en:Parabola",
+   "en:Projectile_motion"
+  ],
+  "commons": [
+   "parabola graph quadratic function",
+   "projectile motion parabola water fountain"
+  ],
+  "alt": "포물선 그래프와 분수의 물줄기",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "trig-ratio",
+  "wiki": [
+   "en:Trigonometric_functions",
+   "en:Trigonometry"
+  ],
+  "commons": [
+   "right triangle sine cosine tangent diagram"
+  ],
+  "alt": "직각삼각형에서 사인·코사인·탄젠트",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "special-angles",
+  "wiki": [
+   "en:Special_right_triangle"
+  ],
+  "commons": [
+   "30 60 90 and 45 45 90 triangles diagram"
+  ],
+  "alt": "30°·45°·60° 특수각 삼각형",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "trig-apply",
+  "wiki": [
+   "en:Theodolite",
+   "en:Clinometer",
+   "en:Great_Pyramid_of_Giza"
+  ],
+  "commons": [
+   "theodolite surveying",
+   "clinometer measuring tree height"
+  ],
+  "alt": "측량용 경위의(세오돌라이트)로 높이 재기",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "inscribed-angle",
+  "wiki": [
+   "en:Inscribed_angle",
+   "en:Thales's_theorem"
+  ],
+  "commons": [
+   "inscribed angle theorem diagram",
+   "Thales theorem semicircle"
+  ],
+  "alt": "원주각과 중심각, 탈레스의 정리",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "dispersion",
+  "wiki": [
+   "en:Standard_deviation"
+  ],
+  "commons": [
+   "standard deviation diagram normal curve"
+  ],
+  "alt": "표준편차가 다른 두 자료의 분포",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "boxplot-scatter",
+  "wiki": [
+   "en:Box_plot",
+   "en:Scatter_plot",
+   "en:Correlation"
+  ],
+  "commons": [
+   "box plot diagram quartiles",
+   "scatter plot correlation examples"
+  ],
+  "alt": "상자그림과 산점도의 상관관계",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "freq",
+  "wiki": [
+   "en:Histogram",
+   "en:Frequency_distribution"
+  ],
+  "commons": [
+   "histogram example",
+   "frequency polygon histogram"
+  ],
+  "alt": "히스토그램과 도수분포다각형",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "coord-graph",
+  "wiki": [
+   "en:Cartesian_coordinate_system",
+   "en:René_Descartes"
+  ],
+  "commons": [
+   "Cartesian coordinate system quadrants",
+   "Rene Descartes portrait"
+  ],
+  "alt": "좌표평면과 데카르트",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "angles",
+  "wiki": [
+   "en:Angle",
+   "en:Protractor"
+  ],
+  "commons": [
+   "protractor angle measuring"
+  ],
+  "alt": "평행선과 동위각·엇각",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "construction-congruence",
+  "wiki": [
+   "en:Straightedge_and_compass_construction",
+   "en:Compass_(drawing_tool)"
+  ],
+  "commons": [
+   "compass straightedge construction",
+   "drawing compass"
+  ],
+  "alt": "눈금 없는 자와 컴퍼스로 하는 작도",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "polygon",
+  "wiki": [
+   "en:Regular_polygon",
+   "en:Polygon"
+  ],
+  "commons": [
+   "regular polygons diagram",
+   "polygon diagonals diagram"
+  ],
+  "alt": "여러 가지 정다각형",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "circle-sector",
+  "wiki": [
+   "en:Circular_sector",
+   "en:Pizza"
+  ],
+  "commons": [
+   "circular sector arc diagram",
+   "pizza slices"
+  ],
+  "alt": "부채꼴의 중심각과 호",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "solids",
+  "wiki": [
+   "en:Platonic_solid",
+   "en:Polyhedron",
+   "en:Solid_of_revolution"
+  ],
+  "commons": [
+   "Platonic solids models",
+   "solid of revolution diagram"
+  ],
+  "alt": "정다면체 모형과 회전체",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "prime-factor",
+  "wiki": [
+   "en:Sieve_of_Eratosthenes",
+   "en:Prime_number"
+  ],
+  "commons": [
+   "sieve of Eratosthenes animation grid"
+  ],
+  "alt": "에라토스테네스의 체로 소수 찾기",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "sets",
+  "wiki": [
+   "en:Venn_diagram",
+   "en:John_Venn"
+  ],
+  "commons": [
+   "Venn diagram three sets"
+  ],
+  "alt": "집합의 포함 관계를 나타낸 벤 다이어그램",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "complex",
+  "wiki": [
+   "en:Complex_plane",
+   "en:Complex_number"
+  ],
+  "commons": [
+   "complex plane Argand diagram"
+  ],
+  "alt": "복소평면 위의 복소수",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "conics",
+  "wiki": [
+   "en:Conic_section",
+   "en:Ellipse",
+   "en:Hyperbola"
+  ],
+  "commons": [
+   "conic sections cone diagram",
+   "ellipse foci diagram"
+  ],
+  "alt": "원뿔을 잘라 얻는 이차곡선",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "exp-log-func",
+  "wiki": [
+   "en:Exponential_growth",
+   "en:Logarithmic_scale",
+   "en:Richter_scale"
+  ],
+  "commons": [
+   "exponential growth graph",
+   "logarithmic scale ruler"
+  ],
+  "alt": "지수적 증가 그래프와 로그 눈금",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "trig-func",
+  "wiki": [
+   "en:Unit_circle",
+   "en:Sine_wave"
+  ],
+  "commons": [
+   "unit circle sine cosine",
+   "sine wave graph"
+  ],
+  "alt": "단위원과 사인 곡선",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "sine-cosine-law",
+  "wiki": [
+   "en:Law_of_sines",
+   "en:Triangulation_(surveying)"
+  ],
+  "commons": [
+   "triangulation surveying network",
+   "law of sines triangle diagram"
+  ],
+  "alt": "삼각 측량으로 거리 재기",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "series",
+  "wiki": [
+   "en:Koch_snowflake",
+   "en:Geometric_series"
+  ],
+  "commons": [
+   "Koch snowflake iterations",
+   "geometric series square diagram"
+  ],
+  "alt": "코흐 눈송이와 등비급수",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "derivative",
+  "wiki": [
+   "en:Derivative",
+   "en:Tangent"
+  ],
+  "commons": [
+   "tangent line derivative graph",
+   "secant tangent limit diagram"
+  ],
+  "alt": "곡선의 접선과 미분계수",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "integral",
+  "wiki": [
+   "en:Integral",
+   "en:Riemann_sum"
+  ],
+  "commons": [
+   "Riemann sum rectangles area under curve",
+   "definite integral area graph"
+  ],
+  "alt": "구분구적법으로 곡선 아래 넓이 구하기",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "adv-counting",
+  "wiki": [
+   "en:Pascal's_triangle",
+   "en:Binomial_theorem"
+  ],
+  "commons": [
+   "Pascal's triangle diagram"
+  ],
+  "alt": "파스칼의 삼각형과 이항계수",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "distributions",
+  "wiki": [
+   "en:Normal_distribution",
+   "en:Galton_board"
+  ],
+  "commons": [
+   "normal distribution bell curve",
+   "Galton board quincunx"
+  ],
+  "alt": "정규분포 곡선과 골턴 보드",
+  "want": 2,
+  "kind": "diagram"
+ },
+ {
+  "id": "vectors",
+  "wiki": [
+   "en:Euclidean_vector",
+   "en:Dot_product"
+  ],
+  "commons": [
+   "vector addition parallelogram diagram"
+  ],
+  "alt": "벡터의 덧셈과 내적",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "kor-g22-cj-gram-phoneme-system",
+  "wiki": [
+   "ko:훈민정음",
+   "en:Hunminjeongeum",
+   "ko:훈민정음_해례본"
+  ],
+  "commons": [
+   "Hunminjeongeum Haerye",
+   "Hangul consonants articulation diagram"
+  ],
+  "alt": "훈민정음 해례본과 자음 발음 기관 상형",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "kor-g22-cj-lit-society",
+  "wiki": [
+   "ko:윤동주",
+   "en:Yun_Dong-ju",
+   "ko:이육사"
+  ],
+  "commons": [
+   "Yun Dong-ju photograph",
+   "Yi Yuksa poet"
+  ],
+  "alt": "일제 강점기 저항 시인 윤동주·이육사",
+  "want": 1,
+  "kind": "portrait"
+ },
+ {
+  "id": "kor-g22-cj-media-ad",
+  "wiki": [
+   "en:Advertising",
+   "en:Billboard"
+  ],
+  "commons": [
+   "billboard advertising city street",
+   "advertising poster vintage"
+  ],
+  "alt": "거리의 광고판 — 광고는 현실을 선택해 보여 준다",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "kor-write-debate",
+  "wiki": [
+   "en:Debate",
+   "ko:토론"
+  ],
+  "commons": [
+   "debate podium students competition"
+  ],
+  "alt": "토론 대회에서 발언하는 학생들",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "kor-g3-lit-classic",
+  "wiki": [
+   "ko:홍길동전",
+   "ko:춘향전",
+   "en:Hong_Gildong_jeon"
+  ],
+  "commons": [
+   "Hong Gildong jeon hangul manuscript",
+   "Chunhyangjeon woodblock print"
+  ],
+  "alt": "한글 고전 소설 홍길동전·춘향전 판본",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "kor-g3-gram-spelling",
+  "wiki": [
+   "en:Hangul",
+   "ko:한글"
+  ],
+  "commons": [
+   "Hangul alphabet chart",
+   "Hangul letters calligraphy"
+  ],
+  "alt": "한글 자모표",
+  "want": 1,
+  "kind": "artifact"
+ },
+ {
+  "id": "kor-h1-lit-genre",
+  "wiki": [
+   "ko:하회별신굿탈놀이",
+   "en:Talchum",
+   "ko:탈춤"
+  ],
+  "commons": [
+   "Hahoe mask dance drama",
+   "Korean talchum mask dance"
+  ],
+  "alt": "극 갈래의 예 — 하회 별신굿 탈놀이",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "kor-h1-lit-history",
+  "wiki": [
+   "ko:삼국유사",
+   "en:Samguk_yusa",
+   "ko:청구영언"
+  ],
+  "commons": [
+   "Samguk Yusa book",
+   "Cheonggu yeongeon sijo anthology"
+  ],
+  "alt": "향가가 실린 삼국유사와 시조집 청구영언",
+  "want": 2,
+  "kind": "artifact"
+ },
+ {
+  "id": "kor-h2-munhak-history",
+  "wiki": [
+   "ko:판소리",
+   "en:Pansori",
+   "ko:용비어천가"
+  ],
+  "commons": [
+   "pansori performance singer drummer",
+   "Yongbieocheonga manuscript"
+  ],
+  "alt": "판소리 공연과 용비어천가",
+  "want": 2,
+  "kind": "photo"
+ },
+ {
+  "id": "kor-h2-munhak-modern",
+  "wiki": [
+   "ko:김소월",
+   "en:Kim_Sowol",
+   "ko:이상_(작가)"
+  ],
+  "commons": [
+   "Kim Sowol poet portrait",
+   "Yi Sang writer portrait"
+  ],
+  "alt": "현대시의 김소월과 이상",
+  "want": 1,
+  "kind": "portrait"
+ },
+ {
+  "id": "eng-h2-read-topic",
+  "wiki": [
+   "en:Bar_chart",
+   "en:Infographic"
+  ],
+  "commons": [
+   "bar chart example statistics",
+   "infographic example"
+  ],
+  "alt": "도표 문제에 나오는 막대그래프",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "eng-h1-read-detail",
+  "wiki": [
+   "en:Poster",
+   "en:Bar_chart"
+  ],
+  "commons": [
+   "event poster announcement",
+   "bar chart example"
+  ],
+  "alt": "안내문 포스터와 도표",
+  "want": 1,
+  "kind": "photo"
+ }
 ]

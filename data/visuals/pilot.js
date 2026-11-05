@@ -1,5 +1,5 @@
 // 파일럿(과학 광합성·전기 에너지, 수학 외심) — 다른 파일과 겹치지 않는 차시만 남김
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
  "sci-photosyn": [
   {
    "type": "table",

@@ -1,5 +1,5 @@
 // 역사 중2·중3·한국사1·2 — 학습 시각 자료 (docs/VISUAL-SCHEMA.md). 주간 자동 조사가 새 차시에 맞춰 추가·정정한다.
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
  "his-mongol": [
   {
    "type": "table",

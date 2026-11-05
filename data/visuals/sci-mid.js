@@ -1,6 +1,6 @@
 // 과학 중2·중3 시각 자료 — 출처 차시: data/subjects/sci.js, sci-g22-mirae.js, sci-g3.js (각 차시의 concept/pitfalls/points 사실만 사용)
 // sci-photosyn · sci-g22-elec-energy 는 data/visuals/pilot.js 에 있으므로 제외.
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
 
  /* ===== 중2-2 V. 식물과 에너지 ===== */
  "sci-transp-resp": [

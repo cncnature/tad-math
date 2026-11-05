@@ -4,7 +4,7 @@
 
 파일 형식 (차시 id → 시각 자료 배열; 사이트·검사·브리핑이 자동 병합):
 ```js
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
  "sci-photosyn": [
   {type:"table", title:"광합성 vs 호흡 요약", head:["구분","광합성","호흡"], rows:[["장소","엽록체","미토콘드리아(모든 세포)"],["시간","빛 있을 때","항상"],["기체","CO₂ 흡수·O₂ 방출","O₂ 흡수·CO₂ 방출"]], note:"첫 열은 행 머리말로 굵게 표시"},
   {type:"flow", title:"광합성 과정", steps:[{t:"물 + CO₂",d:"재료"},{t:"빛에너지",d:"엽록체",hi:true},{t:"포도당 + O₂",d:"산물"},{t:"녹말로 저장"}], dir:"h"},

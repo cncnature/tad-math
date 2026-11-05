@@ -1,5 +1,5 @@
 // 수학 시각 자료 — 중3 (g31 u6~u9, g32 u10~u12) + 고1 (h11 공통수학1, h12 공통수학2). 각 차시: 요약정리표 + 공식/도식/그래프
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
  /* ===== u6 제곱근과 실수 ===== */
  "sqrt-basic": [
   {type:"table", title:"제곱근 표현 한눈 정리", head:["표현","뜻","예 (a = 9)"], rows:[["a 의 제곱근","$\\pm\\sqrt a$ (두 개)","±3"],["제곱근 a","$\\sqrt a$ (하나)","3"],["a 의 양의 제곱근","$\\sqrt a$","3"],["0 의 제곱근","0 하나뿐","0"],["음수의 제곱근","없음 (중학 범위)","—"]], note:"'a 의 제곱근' 은 둘, '제곱근 a' 는 하나."},

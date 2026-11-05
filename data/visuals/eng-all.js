@@ -1,6 +1,6 @@
 // 영어 시각 자료 (중2 eng.js · 중2 천재 보강 · 중3 · 고1 · 고2 — 36차시). 형식: docs/VISUAL-SCHEMA.md, 렌더러 js/visual.js
 // 내용은 각 차시 concept/pitfalls/points/pattern 범위 안의 사실만 쓰고, 영어 예문은 전부 자작(≤20자).
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
 
  /* ===================== 중2-2 eng.js ===================== */
  "eng-rel-subj": [

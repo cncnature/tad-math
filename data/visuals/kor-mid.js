@@ -1,6 +1,6 @@
 // 국어 중2·중3 시각 자료 — 소스: data/subjects/kor.js(중2 10차시)·kor-g22-chunjae.js(천재 2-2 7차시)·kor-g3.js(중3 8차시). 스키마: docs/VISUAL-SCHEMA.md
 // 각 차시의 concept/pitfalls/points/pattern 에 있는 사실만 사용. 교과서 그림·도표는 베끼지 않음.
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
 
  /* ===================== 중2 (kor.js) ===================== */
  "kor-lit-poem": [

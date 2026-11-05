@@ -1,5 +1,5 @@
 // 수학 고2(대수·미적분Ⅰ·확률과 통계)·고3(미적분Ⅱ·기하) 시각 자료 — 차시 데이터 data/curriculum-h23.js 의 사실만 사용. 렌더러 js/visual.js, 스키마 docs/VISUAL-SCHEMA.md
-window.DATA = window.DATA || {}; window.DATA.visuals = Object.assign(window.DATA.visuals || {}, {
+window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAdd || []).push({
 
  /* ===== 고2 대수 ===== */
  "exp-log": [
