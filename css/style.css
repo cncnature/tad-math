@@ -437,3 +437,23 @@ ul.check{list-style:none;padding:0}ul.check li{padding:6px 0;border-bottom:1px s
 .tl-dot{position:absolute;left:-26px;top:14px;width:12px;height:12px;border-radius:50%;background:var(--line);border:2px solid var(--bg)}
 .tl-item.now{border-color:var(--acc)}.tl-item.now .tl-dot{background:var(--acc)}.tl-item.done .tl-dot{background:var(--ok)}.tl-item.csat{border-color:var(--bad)}.tl-item.csat .tl-dot{background:var(--bad)}
 .tl-body{margin-top:8px;font-size:.92rem}
+
+/* 확신도(메타인지 보정) */
+.quiz .conf{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:8px 0 2px;font-size:.82rem;color:var(--muted)}
+.quiz .conf button{padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--muted);cursor:pointer;font-size:.8rem}
+.quiz .conf button.on{border-color:var(--acc);color:var(--acc);background:rgba(59,110,245,.1)}
+.quiz .conf button:disabled{cursor:default;opacity:.7}
+.quiz .cal-fb{margin-top:8px;padding:8px 10px;border-radius:10px;font-size:.9rem;background:var(--bg);border:1px solid var(--line)}
+.quiz .cal-fb.ill{border-color:var(--bad);background:rgba(214,69,69,.08)}
+.quiz .cal-fb.lucky{border-color:#d9a400;background:rgba(217,164,0,.1)}
+.quiz .cal-fb.sure{border-color:var(--ok);background:rgba(31,157,85,.08)}
+.calgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.calgrid div{padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+.calgrid b{font-size:1.4rem;display:block}
+.calgrid .ill{border-color:var(--bad)}.calgrid .lucky{border-color:#d9a400}.calgrid .sure{border-color:var(--ok)}
+/* 틀린 풀이 찾기 */
+.spot-steps li{cursor:pointer;border:1px solid transparent;border-radius:8px;padding:8px 8px 8px 44px}
+.spot-steps li::before{left:6px}
+.spot-steps li:hover{border-color:var(--acc)}
+.spot-steps li.bad{border-color:var(--bad);background:rgba(214,69,69,.1);text-decoration:line-through}
+.spot-steps li.pick{border-color:#d9a400;background:rgba(217,164,0,.1)}

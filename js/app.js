@@ -65,9 +65,15 @@
   function quizHtml(items, key, base){
     return items.map((q,i)=>`<div class="quiz ${base!=null?"gen":""}" data-key="${key}" data-i="${base!=null?base+"-"+i:i}" data-a="${q.a}" data-q="${esc(q.q.replace(/\*\*/g,""))}">
       <span class="qn">Q${i+1}${i>=2&&base==null?' <em>심화</em>':''}${q.tag?` <em>${q.tag}</em>`:''}${base==null&&key.startsWith("lesson:")&&byLesson(key.slice(7))?` <code class="tcode">${typeCode(byLesson(key.slice(7)),i)}</code>`:''}</span> ${md(q.q)}
+      <div class="conf" title="답을 고르기 전에 '얼마나 확신하는지' 를 먼저 표시하세요 — 찍어서 맞힌 것과 확신하고 틀린 것을 구분합니다"><span>확신</span>${[["3","😎 확실"],["2","🤔 반반"],["1","🎲 찍음"]].map(([c,n])=>`<button type="button" data-c="${c}">${n}</button>`).join("")}</div>
       <div class="opts">${q.opts.map((o,j)=>`<button data-j="${j}">${["①","②","③","④"][j]} ${md(o)}</button>`).join("")}</div>
       <div class="exp" hidden>${md(q.exp||"")}</div></div>`).join("");
   }
+  // 확신도: 답 고르기 전 선택(Koriat 2012 · Dunlosky & Rawson 2012 — 확신·정오 4분면으로 '착각' 과 '운' 을 가른다)
+  main.addEventListener("click", e=>{ const cb=e.target.closest(".quiz .conf button"); if(!cb) return; const q=cb.closest(".quiz"); if(q.dataset.done) return; q.querySelectorAll(".conf button").forEach(x=>x.classList.toggle("on",x===cb)); q.dataset.c=cb.dataset.c; });
+  const CAL_LABEL={ill:"착각(확신+오답)",lucky:"운(찍음·반반+정답)",sure:"안정(확실+정답)",miss:"미학습(찍음·반반+오답)"};
+  const calOf=(ok,c)=>c==null?null:(ok?(c===3?"sure":"lucky"):(c===3?"ill":"miss"));
+  function calStats(days){ const L=store.get("qlog",[]).filter(x=>x.c!=null&&(!days||Date.now()-x.t<days*864e5)); const n={sure:0,lucky:0,ill:0,miss:0}; const ill=[]; L.forEach(x=>{ const k=calOf(!!x.ok,x.c); if(!k) return; n[k]++; if(k==="ill") ill.push(x); }); const tot=L.length; return {n,tot,ill,rate:tot?Math.round(100*(n.sure+n.miss)/tot):null}; }
   main.addEventListener("click", e=>{
     const b = e.target.closest(".quiz .opts button"); if(!b) return;
     const q = b.closest(".quiz"); if(q.dataset.a===undefined||q.dataset.done) return; q.dataset.done=1;
@@ -76,7 +82,8 @@
     q.querySelector(".exp").hidden=false;
     if(!q.dataset.key.startsWith("gen:")){ const prog = store.get("quiz",{}); const first=!(q.dataset.key+"#"+q.dataset.i in prog); prog[q.dataset.key+"#"+q.dataset.i]=ok; store.set("quiz",prog); if(ok&&first&&q.dataset.key.startsWith("lesson:")){ earnTok(2,"퀴즈 정답"); const l=byLesson(q.dataset.key.slice(7)); if(l){ const m=mastery(l); const dn=store.get("tokDone",{}); if(m.pct>=100&&!dn[l.id]){ dn[l.id]=1; store.set("tokDone",dn); earnTok(10,l.title+" 목표 달성"); } } } }
     else if(ok) earnTok(1,"생성 문제 정답",{genCap:true});
-    logQ(q.dataset.key,q.dataset.i,ok);
+    const conf=q.dataset.c?+q.dataset.c:null; logQ(q.dataset.key,q.dataset.i,ok,conf); q.querySelectorAll(".conf button").forEach(x=>x.disabled=true);
+    { const ck=calOf(ok,conf); const msg={ill:"⚠️ <b>확신했는데 틀림</b> — 계산 실수가 아니라면 개념을 반대로 알고 있을 가능성이 큽니다. 이 소단원의 '오개념' 탭을 지금 읽고, 오답 노트에 '개념 오류' 로 태그하세요.",lucky:"🎲 <b>맞혔지만 확신이 없었음</b> — 점수는 받았지만 시험에서는 흔들립니다. 풀이를 읽고 '왜 이 답인지' 한 줄로 말해 보세요. 재출제 대상으로 기록됩니다.",miss:"📘 <b>몰라서 틀림</b> — 정상입니다. '핵심 개념 → 왜 그런지 → 예제' 순서로 돌아가면 됩니다.",sure:"✅ <b>확신하고 맞힘</b> — 안정 구간. 이런 문제는 복습 간격을 늘려도 됩니다."}[ck]; if(msg){ const d=document.createElement("p"); d.className="cal-fb "+ck; d.innerHTML=msg; q.querySelector(".exp").insertAdjacentElement("afterend",d); } }
     if(q.dataset.key.startsWith("gen:")){ const l=byLesson(q.dataset.key.slice(4)); const m=l?mastery(l):null; const fb=q.querySelector(".exp"); if(m&&fb) fb.insertAdjacentHTML("afterend",`<p class="muted small">${ok?"✅ 목표율 +5% → ":"목표율 "}<b>${m.pct}%</b></p>`); }
     if(!ok&&AI_OK){ const i=+b.dataset.j; const opts=[...q.querySelectorAll(".opts button")].map(x=>x.textContent.replace(/^[①②③④]\s*/,"")); const btn=document.createElement("button"); btn.className="btn sm ghost ai-why"; btn.textContent="🤖 왜 틀렸을까?"; q.appendChild(btn); btn.onclick=async()=>{ btn.disabled=true; btn.textContent="생각하는 중…"; try{ const t=await aiCall("/api/tad/why",{q:q.dataset.q,opts,chosen:i,answer:+q.dataset.a,exp:q.querySelector(".exp").textContent}); const d=document.createElement("div"); d.className="box ai-out"; d.innerHTML=md(t).replace(/\n/g,"<br>"); q.appendChild(d); typeset(); btn.remove(); }catch(e){ btn.textContent="연결 실패"; } }; }
     if(!ok){ const notes=store.get("notes",[]); const text=q.dataset.q; notes.unshift({key:q.dataset.key,i:q.dataset.i,q:text,when:Date.now()}); store.set("notes",notes.slice(0,200)); }
@@ -154,7 +161,7 @@
   // ---------- 개인 학습 시스템 (프로필 · 목표율 · 컨설팅 · 생성 문제) ----------
   const todayKey=d=>{ d=d||new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
   const profile=()=>store.get("me",null);
-  function logQ(key,i,ok){ const L=store.get("qlog",[]); L.push({k:key,i:String(i),ok:ok?1:0,t:Date.now()}); if(L.length>3000) L.splice(0,L.length-3000); store.set("qlog",L); }
+  function logQ(key,i,ok,c){ const L=store.get("qlog",[]); const e={k:key,i:String(i),ok:ok?1:0,t:Date.now()}; if(c!=null) e.c=c; L.push(e); if(L.length>3000) L.splice(0,L.length-3000); store.set("qlog",L); }
   const lessonOfKey=k=>{ const m=/^(lesson|gen|mix):(.+)$/.exec(k||""); return m?m[2]:null; };
   // 소단원 목표율: 퀴즈 60 · 개념 읽기 10 · 공식 카드 15 · 시험/서술형 15 (없는 항목은 퀴즈로 이관) + 생성 문제 정답당 +5 (최대 +50)
   function mastery(l){
@@ -176,6 +183,7 @@
   function consult(me,M){
     const out=[]; const g=me.grade; const ls=lessonsAll.filter(l=>l.grade===g); const diag=store.get("diag",[]); const last=diag[0];
     if(last&&Date.now()-last.when>90*864e5) out.push({pri:2,icon:"🧭",title:"분기 재진단 시기입니다",body:`마지막 진단이 ${Math.round((Date.now()-last.when)/864e5)}일 전. 학원처럼 분기마다 다시 재어 반 배정과 약점 목록을 갱신하세요.`,href:"#/diagnostic/"+(LV_OF[g]||"ALL"),label:"재진단"});
+    { const wd=new Date().getDay(); const rv=store.get("review",{})[weekKey()]; if((wd===0||wd===6||wd===1)&&!rv&&store.get("qlog",[]).length>=10) out.push({pri:3,icon:"🪞",title:"이번 주 돌아보기 3문장",body:"잘된 것·막힌 것·'만약 ~이면 ~한다' 다짐. 5분이면 다음 주 계획의 정확도가 달라집니다.",href:"#/review",label:"쓰기"}); }
     if(!last) out.push({pri:1,icon:"🧭",title:"먼저 끊긴 고리를 찾으세요",body:"학년이 아니라 개념으로 진단합니다. 10분이면 어디서부터 보강할지가 정해지고, 컨설팅이 그 결과를 반영합니다.",href:"#/diagnostic/"+(LV_OF[g]||"ALL"),label:"진단 시작"});
     else if(last.broken&&nodeOf(last.broken)){ const n=nodeOf(last.broken); const lsn=lessonsOfNode(last.broken); const weakM=lsn.length?Math.round(lsn.reduce((a,l)=>a+M[l.id].pct,0)/lsn.length):0; if(!lsn.length||weakM<100) out.push({pri:1,icon:"🔗",title:`끊긴 고리 「${n.label}」 부터`,body:`지난 진단(${new Date(last.when).toLocaleDateString("ko")})에서 처음 막힌 개념입니다. 이 위에 쌓이는 개념 ${[...descendants(last.broken)].length}개가 함께 흔들립니다.${lsn.length?` 관련 소단원 목표율 ${weakM}%.`:""}`,href:lsn.length?`#/study/${lsn[0].unit}/${lsn[0].id}`:`#/roadmap/${last.broken}`,label:lsn.length?"보강 학습":"지도에서 보기"}); }
     const weak=ls.map(l=>({l,m:M[l.id]})).filter(x=>x.m.attempts>=3&&x.m.acc<0.6).sort((a,b)=>a.m.acc-b.m.acc).slice(0,3);
@@ -384,17 +392,18 @@
     const fg=store.get("forge",{}); const fgW=Object.values(fg).filter(r=>Date.now()-r.when<7*864e5).length; const advice=consult(p,M).slice(0,3); const plan=weekPlan(p,M);
     const byLessonW={}; wk.forEach(x=>{ const id=lessonOfKey(x.k); if(!id) return; const r=byLessonW[id]||(byLessonW[id]={n:0,ok:0}); r.n++; if(x.ok) r.ok++; }); const weakW=Object.entries(byLessonW).filter(([id,r])=>r.n>=3&&r.ok/r.n<0.6).map(([id,r])=>({l:byLesson(id),r})).filter(x=>x.l);
     const [cn,cc]=CLASS_OF(avg);
-    render(`<div class="report"><div class="crumb noprint"><a href="#/me">내 학습</a> › 학부모 주간 리포트</div><div class="row" style="justify-content:space-between"><h1>📄 주간 학습 리포트</h1><button class="btn noprint" id="rp-print">🖨 인쇄 / PDF</button></div>
+    render(`<div class="report"><div class="crumb noprint"><a href="#/me">내 학습</a> › 학부모 주간 리포트</div><div class="row" style="justify-content:space-between"><h1>📄 주간 학습 리포트</h1><span class="row noprint"><button class="btn ghost" id="rp-share">📣 5줄 요약 보내기</button><a class="btn ghost" href="#/review">🪞 주간 돌아보기</a><button class="btn" id="rp-print">🖨 인쇄 / PDF</button></span></div>
     <p class="muted">${p.name?esc(p.name)+" · ":""}${G[g]} · ${new Date(Date.now()-6*864e5).toLocaleDateString("ko")} ~ ${new Date().toLocaleDateString("ko")} · 반 배정 <span class="st ${cc}">${cn}</span></p>
     <div class="stats"><div><b>${days}</b>학습일 / 7</div><div><b>${wk.length}</b>푼 문제</div><div><b>${acc!=null?acc+"%":"—"}</b>정답률</div><div><b>${avg}%</b>학기 목표율 ${prev!=null?`<small style="color:${avg>=prev?"var(--ok)":"var(--bad)"}">(${avg>=prev?"+":""}${avg-prev})</small>`:""}</div><div><b>${fgW}</b>유도 공방 통과</div><div><b>${earned}/${spent}</b>게임 시간 획득/사용(분)</div></div>
-    <div class="grid"><div class="card"><h3>🏫 주간 테스트</h3><p>${weekly&&Date.now()-weekly.when<8*864e5?`${weekly.score}/${weekly.n} · 추정 ${weekly.grade}등급`:"이번 주 미응시"}</p></div><div class="card"><h3>🔥 서바이벌 모의고사</h3><p>${sv?`${sv.score}점 · 추정 ${sv.grade}등급 (${new Date(sv.when).toLocaleDateString("ko")})`:"미응시"}</p></div><div class="card"><h3>🩺 오답 클리닉</h3><p>진행 ${clOpen}건 · 졸업 ${grad}건</p></div></div>
+    <div class="grid"><div class="card"><h3>🏫 주간 테스트</h3><p>${weekly&&Date.now()-weekly.when<8*864e5?`${weekly.score}/${weekly.n} · 추정 ${weekly.grade}등급`:"이번 주 미응시"}</p></div><div class="card"><h3>🔥 서바이벌 모의고사</h3><p>${sv?`${sv.score}점 · 추정 ${sv.grade}등급 (${new Date(sv.when).toLocaleDateString("ko")})`:"미응시"}</p></div><div class="card"><h3>🩺 오답 클리닉</h3><p>진행 ${clOpen}건 · 졸업 ${grad}건</p></div>${(()=>{ const c=calStats(7); return `<div class="card"><h3>🎯 확신도 보정</h3><p>${c.tot?`착각 ${c.n.ill} · 운 ${c.n.lucky} · 안정 ${c.n.sure} · 미학습 ${c.n.miss} (보정률 ${c.rate}%)`:"이번 주 확신 표시 없음"}</p></div>`; })()}${(()=>{ const sp=store.get("spot",{}); const w=Object.values(sp).filter(r=>Date.now()-r.when<7*864e5); return `<div class="card"><h3>🔍 틀린 풀이 찾기</h3><p>${w.length?`${w.length}편 · 오류 줄 적중 ${w.filter(r=>r.ok).length}편`:"이번 주 미실시"}</p></div>`; })()}</div>
     ${(()=>{ const ups=schedGet().exams.map(e=>({e,dd:dayDiff(e.date)})).filter(x=>x.dd>=0).sort((a,b)=>a.dd-b.dd).slice(0,3); return ups.length?`<h2>다가오는 시험</h2><div class="row">${ups.map(x=>`<span class="chip">${esc(x.e.name||EXAM_TYPES[x.e.type])} <b>D-${x.dd}</b> · ${D.studyMethods.phases[phaseOf(x.dd)]||""}</span>`).join("")}</div>`:""; })()}
     <h2>이번 주 약점</h2>${weakW.length?`<ul class="bul">${weakW.map(x=>`<li><b>${x.l.title}</b> — ${x.r.ok}/${x.r.n} 정답 (${G[x.l.grade]} ${byUnit(x.l.unit).title})</li>`).join("")}</ul>`:'<p class="muted">정답률 60% 미만(3문제 이상)인 소단원이 없습니다.</p>'}
+    ${(()=>{ const rv=store.get("review",{})[weekKey()]; return rv?`<h2>학생의 주간 돌아보기</h2><ul class="bul">${rv.good?`<li>잘된 것: ${esc(rv.good)}</li>`:""}${rv.stuck?`<li>막힌 것: ${esc(rv.stuck)}</li>`:""}${rv.ifc?`<li>다음 주 다짐: 만약 <b>${esc(rv.ifc)}</b> 이면 <b>${esc(rv.then||"")}</b></li>`:""}</ul>`:`<p class="muted small noprint">학생이 <a href="#/review">주간 돌아보기</a>를 쓰면 여기에 세 문장이 들어갑니다.</p>`; })()}
     <h2>컨설팅 요약</h2><ol class="steps">${advice.map(a=>`<li><b>${a.icon} ${a.title}</b> — ${a.body}</li>`).join("")}</ol>
     <h2>다음 주 계획</h2><div class="week">${plan.map(d=>`<div class="day"><div class="eyebrow">${d.label}</div>${d.items.map(it=>`<div>${it.t}</div>`).join("")}</div>`).join("")}</div>
     <h2>소단원별 목표율</h2><table class="mtable">${D.curriculum.units.filter(u=>u.grade===g).flatMap(u=>u.lessons.map(l=>{ const m=M[l.id]; const [sn2,sc]=STATUS(m.pct); return `<tr><td>${u.title} › ${l.title}</td><td class="bar"><div class="mbar"><i style="width:${Math.min(100,m.pct)}%"></i></div></td><td class="num">${m.pct}%</td><td><span class="st ${sc}">${sn2}</span></td></tr>`; })).join("")}</table>
     <p class="muted small">목표율 = 퀴즈 60 · 개념 10 · 공식(카드/유도) 15 · 시험/서술형 15 + 생성 문제 보너스. 추정 등급은 정답률 환산 참고값. TAD 수학 만지기 · cncnature.github.io/tad-math</p></div>`);
-    $("#rp-print").onclick=()=>window.print(); }
+    $("#rp-print").onclick=()=>window.print(); $("#rp-share").onclick=()=>shareNow($("#rp-share")); }
 
   // ---------- 시험 일정 · 자동 스케줄 · 과목별 공부법 컨설팅 ----------
   const schedGet=()=>{ const S=store.get("sched",{exams:[],hours:{wd:3,we:6}}); S.exams=S.exams||[]; S.hours=S.hours||{wd:3,we:6}; return S; };
@@ -416,7 +425,7 @@
       subjects.forEach(sub=>{ const share=sub==="수학"?mathShare:otherShare; let mins=Math.round(budget*share); if(mins<=0) return;
         if(sub==="수학"){ const ls=act?examLessons(act.e):lessonsAll.filter(l=>l.grade===(profile()||{}).grade); const sorted=[...ls].sort((a,b)=>M[a.id].pct-M[b.id].pct); const weak=sorted[i%Math.max(1,Math.min(3,sorted.length))]||sorted[0]; const due=Object.entries(cl).filter(([id,c])=>c.done<3&&new Date(date+"T23:59:59")>=c.next&&byLesson(id));
           const mt=[]; if(phase==="concept"){ if(weak) mt.push({t:`📘 ${weak.title} 개념→왜→퀴즈 (${M[weak.id].pct}%)`,m:30,h:`#/study/${weak.unit}/${weak.id}`}); const ff=weak?weak.formulas.find(f=>forgeOf(f)&&forgeLv(f)<2):null; if(ff) mt.push({t:`🔥 유도 공방: ${byFormula(ff).title}`,m:10,h:"#/forge/"+ff}); if(weak) mt.push({t:`➕ ${weak.title} 생성 5문제`,m:15,h:"#/practice/"+weak.id}); }
-          else if(phase==="pattern"){ const g=act?(byUnit((act.e.units||[])[0])||{}).grade||(profile()||{}).grade:(profile()||{}).grade; mt.push({t:`🏫 학교 시험 필수 문제 (${G[g]||""} ${act&&act.e.type==="final"?"기말":"중간"}) 4문제`,m:25,h:`#/schooltest?g=${g}&t=${act&&act.e.type==="final"?"final":"mid"}`}); if(weak) mt.push({t:`➕ ${weak.title} 생성 5문제`,m:15,h:"#/practice/"+weak.id}); const es=weak?D.essay.find(e=>e.lesson===weak.id):null; if(es) mt.push({t:`✍️ 서술형: ${es.title}`,m:15,h:"#/essay/"+es.id}); }
+          else if(phase==="pattern"){ const g=act?(byUnit((act.e.units||[])[0])||{}).grade||(profile()||{}).grade:(profile()||{}).grade; mt.push({t:`🏫 학교 시험 필수 문제 (${G[g]||""} ${act&&act.e.type==="final"?"기말":"중간"}) 4문제`,m:25,h:`#/schooltest?g=${g}&t=${act&&act.e.type==="final"?"final":"mid"}`}); if(weak) mt.push({t:`➕ ${weak.title} 생성 5문제`,m:15,h:"#/practice/"+weak.id}); const es=weak?D.essay.find(e=>e.lesson===weak.id):null; if(es) mt.push({t:`✍️ 서술형: ${es.title}`,m:15,h:"#/essay/"+es.id}); const spS=store.get("spot",{}); const sp=(D.spot||[]).find(x=>ls.some(l=>l.id===x.lesson)&&!(spS[x.id]&&spS[x.id].ok&&spS[x.id].why)); if(sp) mt.push({t:`🔍 틀린 풀이 찾기: ${sp.title}`,m:10,h:"#/spot/"+sp.id}); }
           else if(phase==="final"){ mt.push(i%2?{t:"🔥 서바이벌 모의고사 20문항",m:60,h:"#/survival"}:{t:"🏫 주간 테스트 10문항 (15분)",m:20,h:"#/weekly"}); if(due.length) mt.push({t:`🩺 클리닉: ${byLesson(due[0][0]).title}`,m:15,h:"#/clinic/"+due[0][0]}); mt.push({t:"🧠 공식 카드 + 시험 전 훑기",m:10,h:"#/recall/run"}); }
           else if(phase==="after"){ mt.push({t:"📒 시험 오답을 계산/개념/해석/시간 으로 분류",m:30,h:"#/notes"}); if(due.length) mt.push({t:`🩺 클리닉: ${byLesson(due[0][0]).title}`,m:15,h:"#/clinic/"+due[0][0]}); }
           else { const pat=(D.suneung.patterns||[])[(i*7)%D.suneung.patterns.length]; mt.push({t:`🧭 수능 패턴: ${pat.name}`,m:20,h:"#/patterns/"+pat.id}); if(wd===6) mt.push({t:"🔥 서바이벌 30문항 100분",m:100,h:"#/survival"}); else if(weak) mt.push({t:`➕ ${weak.title} 생성 5문제 + 오답 분류`,m:20,h:"#/practice/"+weak.id}); if(due.length) mt.push({t:`🩺 클리닉: ${byLesson(due[0][0]).title}`,m:15,h:"#/clinic/"+due[0][0]}); }
@@ -629,6 +638,7 @@
     <h2 id="why">왜 그런지</h2><div class="box">${md(l.why)}</div>
     ${l.story?`<h2 id="story">📖 공식이 태어나는 이야기</h2><p class="muted">외우기 전에 읽는 서너 문단. 어디서 왔고 왜 그 모양인지 알면 공식은 저절로 나옵니다.</p><div class="story">${l.story.map((st,i)=>`<div class="st"><div class="st-n">${i+1}</div><div><h4>${md(st.h)}</h4><p>${md(st.t)}</p></div></div>`).join("")}</div>`:""}
     ${l.pitfalls?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
+    ${(D.spot||[]).filter(x=>x.lesson===l.id).map(x=>{ const r=store.get("spot",{})[x.id]; return `<a class="card link" href="#/spot/${x.id}" style="display:block;margin:8px 0">🔍 <b>틀린 풀이 찾기</b> — ${x.title} ${r?`<span class="tag">${r.ok?"오류 찾음 ✓":"다시 도전"}</span>`:'<span class="tag">채점자 되기</span>'}</a>`; }).join("")}
     ${l.points?`<h2 id="pt">🎯 출제 포인트</h2><ul class="pt">${l.points.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${widgets.length?`<h2>만져 보기</h2>${widgets.map(([k,w])=>`<div class="widget" id="w-${k}"><b>${MF(w.title)}</b><p class="muted">${MF(w.desc)}</p></div>`).join("")}`:""}
     ${l.formulas.length?`<h2 id="f">이 단원의 공식</h2><div class="grid">${l.formulas.map(f=>byFormula(f)).filter(Boolean).map(f=>`<a class="card link" href="#/formulas/${f.id}"><h3>${f.title} ${f.core?'<span class="tag">외울 것</span>':'<span class="tag">되살릴 것</span>'}</h3><div class="formula">$${texCard(f.tex)}$</div>${forgeOf(f.id)?`<div class="muted small">🔥 유도 공방 ${forgeLv(f.id)}/4</div>`:""}</a>`).join("")}</div>`:""}
@@ -1101,7 +1111,13 @@
   // ---------- 오답 노트 ----------
   function notes(){ const n=store.get("notes",[]); const TAGS=["계산 실수","개념 오류","문제 해석","풀이 못함"]; const tags=store.get("notetags",{});
     const key=x=>x.key+"#"+x.i+"#"+x.when; const cnt={}; n.forEach(x=>{const t=tags[key(x)]; if(t) cnt[t]=(cnt[t]||0)+1;}); const byUnitC={}; n.forEach(x=>{const l=byLesson(x.key.replace("lesson:","")); if(l){ byUnitC[l.unitTitle]=(byUnitC[l.unitTitle]||0)+1; }});
+    const cal=calStats(30); const illTop=(()=>{ const m={}; cal.ill.forEach(x=>{ const id=lessonOfKey(x.k); if(!id) return; m[id]=(m[id]||0)+1; }); return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([id,c])=>({l:byLesson(id),c})).filter(x=>x.l); })();
     render(`<div class="crumb"><a href="#/">홈</a> › 오답 노트</div><h1>📒 내 오답 노트</h1><p class="lead">퀴즈·섞어 풀기에서 틀린 문제가 자동으로 모입니다. 각 문제에 <b>틀린 이유</b>를 붙이세요 — 어떤 유형의 실수가 반복되는지 아는 것이 점수를 가장 빨리 올립니다.</p>
+    <div class="card"><h3>🎯 확신도 보정 — 최근 30일 ${cal.tot?`<span class="muted" style="font-weight:400;font-size:.85rem">(확신 표시한 ${cal.tot}문제 · 보정률 ${cal.rate}%)</span>`:""}</h3>
+    ${cal.tot?`<div class="calgrid"><div class="ill"><b>${cal.n.ill}</b>😎→✗ 착각 — 확신했는데 틀림. <b style="font-size:.9rem;display:inline">최우선</b> 복습</div><div class="lucky"><b>${cal.n.lucky}</b>🎲→✓ 운 — 맞혔지만 확신 없음. 재출제 대상</div><div class="sure"><b>${cal.n.sure}</b>😎→✓ 안정 — 복습 간격 늘려도 됨</div><div><b>${cal.n.miss}</b>🎲→✗ 미학습 — 개념부터</div></div>
+    ${illTop.length?`<p class="muted small">착각이 몰린 소단원: ${illTop.map(x=>`<a href="#/study/${x.l.unit}/${x.l.id}">${x.l.title}</a> ${x.c}건`).join(" · ")} — '오개념' 탭을 먼저 읽고 생성 문제 3개로 확인하세요.</p>`:""}
+    <p class="muted small">보정률 = (확신하고 맞힘 + 찍고 틀림) ÷ 전체. 자신의 앎을 정확히 아는 학생이 같은 공부 시간으로 더 오릅니다(Koriat 2012; Dunlosky & Rawson 2012). 시험장에서 '확신+오답' 유형이 가장 비싼 실수입니다.</p>`
+    :`<p class="muted">퀴즈에서 답을 고르기 전에 <b>😎 확실 · 🤔 반반 · 🎲 찍음</b> 중 하나를 누르면 여기에 '착각'과 '운'이 나뉘어 쌓입니다. <a href="#/study">소단원 퀴즈</a>에서 시작하세요.</p>`}</div>
     ${n.length?`<div class="grid"><div class="card"><h3>틀린 이유 분포</h3>${TAGS.map(t=>`<div class="row" style="justify-content:space-between"><span>${t}</span><b>${cnt[t]||0}</b></div><div class="progress"><i style="width:${n.length?(cnt[t]||0)/n.length*100:0}%"></i></div>`).join("")}<p class="muted" style="font-size:.85rem">미분류 ${n.length-Object.values(cnt).reduce((a,b)=>a+b,0)}</p></div><div class="card"><h3>단원별</h3>${Object.entries(byUnitC).sort((a,b)=>b[1]-a[1]).map(([u,c])=>`<div class="row" style="justify-content:space-between"><span>${u}</span><b>${c}</b></div>`).join("")}</div><div class="card"><h3>처방</h3><p class="muted">계산 실수 → 검산 습관(답을 식에 대입)<br>개념 오류 → 그 소단원 '오개념' 다시 읽기<br>문제 해석 → 문제를 그림·표로 옮기기<br>풀이 못함 → '왜 그런지'와 예제부터</p></div></div>`:""}
     <div class="row" style="margin:12px 0"><button class="btn ghost" id="exp">내보내기</button><button class="btn ghost" id="clr">모두 지우기</button></div>
     ${n.length?`<table><tr><th>날짜</th><th>문제</th><th>소단원</th><th>틀린 이유</th></tr>${n.map(x=>{const l=byLesson(x.key.replace("lesson:","")); const k=key(x); return `<tr><td>${new Date(x.when).toLocaleDateString("ko")}</td><td>${esc(x.q)}</td><td>${l?`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`:""}</td><td><select data-k="${k}"><option value="">—</option>${TAGS.map(t=>`<option ${tags[k]===t?"selected":""}>${t}</option>`).join("")}</select></td></tr>`;}).join("")}</table>`:`<p class="muted">아직 비어 있습니다. <a href="#/study">소단원 퀴즈</a>나 <a href="#/mix">섞어 풀기</a>를 해 보세요.</p>`}`);
@@ -1109,6 +1125,62 @@
     $("#exp").onclick=()=>{ const blob=new Blob([JSON.stringify({notes:n,notetags:tags,quiz:store.get("quiz",{}),diag:store.get("diag",[]),srs:store.get("srs",{}),exam:store.get("exam",{}),essay:store.get("essay",{}),daily:store.get("daily",{})},null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="my-math-record.json"; a.click(); };
     $("#clr").onclick=()=>{ if(confirm("오답 노트를 비울까요?")){store.set("notes",[]);notes();} }; }
 
+
+  // ---------- 틀린 풀이 찾기 (오류 예시 학습 — Booth 외 2013) ----------
+  function spot(id){
+    const S=store.get("spot",{}); const items=D.spot||[];
+    if(!id){ const done=Object.keys(S).length; return render(`<div class="crumb"><a href="#/">홈</a> › 틀린 풀이 찾기</div><h1>🔍 틀린 풀이 찾기 — 채점자 되기</h1>
+      <p class="lead">풀이 한 편에 <b>틀린 줄이 하나</b> 숨어 있습니다. 그 줄을 찾고, 왜 틀렸는지 고르고, 바른 줄을 자기 말로 설명하세요. 남의 오류를 잡는 연습이 자기 오류를 막는 가장 빠른 길이라는 것이 실험으로 확인된 학습법입니다(Booth 외 2013; Große & Renkl 2007). 내신 서술형에서 <b>어느 줄에서 점수가 깎이는지</b> 를 채점자의 눈으로 익힙니다.</p>
+      <p class="muted small">진행 ${done}/${items.length} · 오류 줄 적중 ${Object.values(S).filter(r=>r.ok).length} · 이유 적중 ${Object.values(S).filter(r=>r.why).length}</p>
+      ${GORDER.filter(g=>items.some(e=>e.grade===g)).map(g=>`<h2>${G[g]}</h2><div class="grid wide">${items.filter(e=>e.grade===g).map(e=>{ const r=S[e.id]; const l=byLesson(e.lesson); return `<a class="card link ${GCOL(g)}" href="#/spot/${e.id}">${tag(g)}${r?`<span class="tag">${r.ok?"✅ 오류 찾음":"❌ 다시"}${r.why?" · 이유 ✓":""}</span>`:""}<h3>${e.title}</h3><p class="muted">${l?l.title:""}</p></a>`; }).join("")}</div>`).join("")}`); }
+    const e=items.find(x=>x.id===id); if(!e) return notFound(); const r=S[id]||null; const l=byLesson(e.lesson); const idx=items.indexOf(e); const nx=items[idx+1];
+    render(`<div class="lhead ${GCOL(e.grade)}"><div class="crumb"><a href="#/spot">틀린 풀이 찾기</a> › ${e.title}</div>${tag(e.grade)}<h1>🔍 ${e.title}</h1>${l?`<p class="muted">소단원: <a href="#/study/${l.unit}/${l.id}">${l.title}</a></p>`:""}</div>
+    <div class="card"><p style="font-size:1.05rem"><b>문제.</b> ${md(e.q)}</p>
+    <h3>1단계 · 틀린 줄을 누르세요</h3><ol class="steps spot-steps">${e.steps.map((st,i)=>`<li data-i="${i}" tabindex="0">${md(st)}</li>`).join("")}</ol><div id="sp-1"></div>
+    <div id="sp-2" hidden><h3>2단계 · 왜 틀렸을까요?</h3><div class="quiz" style="margin:0"><div class="opts">${e.why.map((w,j)=>`<button type="button" data-j="${j}">${["①","②","③","④"][j]} ${md(w)}</button>`).join("")}</div></div><div id="sp-2fb"></div></div>
+    <div id="sp-3" hidden><h3>3단계 · 바른 줄과 설명</h3><div class="box ok"><b>바른 줄:</b> ${md(e.fix)}</div><p>${md(e.exp)}</p><div class="box warn"><b>🧑‍🏫 채점자 시선:</b> ${md(e.grader)}</div>
+      <h3>4단계 · 내 말로 한 줄</h3><p class="muted small">바른 줄이 '왜' 그렇게 되는지 자기 말로 쓰세요. 설명할 수 있어야 시험장에서 같은 자리에서 멈추지 않습니다(자기설명, Chi 외 1994).</p><textarea id="sp-text" rows="3" placeholder="예: 합동에는 세 조건이 필요한데 공통변 AD 가 세 번째 조건이라서…">${esc(r&&r.text||"")}</textarea>
+      <div class="row" style="margin-top:8px"><button class="btn" id="sp-save">저장</button>${l?`<a class="btn ghost" href="#/study/${l.unit}/${l.id}#pit">이 소단원 오개념 보기</a>`:""}${nx?`<a class="btn ghost" href="#/spot/${nx.id}">다음 편 →</a>`:`<a class="btn ghost" href="#/spot">목록으로</a>`}</div></div></div>`);
+    const st={ok:r?r.ok:false,why:r?!!r.why:false}; let picked=r?true:false;
+    const fin=()=>{ $("#sp-2").hidden=false; };
+    main.querySelectorAll(".spot-steps li").forEach(li=>{ const go=()=>{ if(picked) return; picked=true; const i=+li.dataset.i; const ok=i===e.wrong; st.ok=ok; main.querySelectorAll(".spot-steps li").forEach(x=>{ x.classList.toggle("bad",+x.dataset.i===e.wrong); x.classList.toggle("pick",x===li&&!ok); }); $("#sp-1").innerHTML=`<p class="${ok?"box ok":"box warn"}">${ok?"✅ 맞습니다. 이 줄이 틀렸습니다.":`❌ 틀린 줄은 <b>${e.wrong+1}번</b> 입니다. 고른 줄은 사실 옳은 줄 — 왜 옳은지도 말할 수 있어야 합니다.`}</p>`; fin(); logQ("spot:"+e.id,"line",ok); }; li.onclick=go; li.onkeydown=ev=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); go(); } }; });
+    if(r){ main.querySelectorAll(".spot-steps li").forEach(x=>x.classList.toggle("bad",+x.dataset.i===e.wrong)); $("#sp-2").hidden=false; $("#sp-3").hidden=false; }
+    main.querySelectorAll("#sp-2 .opts button").forEach(b=>b.onclick=()=>{ if(main.querySelector("#sp-2 .opts button:disabled")) return; const ok=+b.dataset.j===e.whyA; st.why=ok; main.querySelectorAll("#sp-2 .opts button").forEach(x=>{ x.disabled=true; if(+x.dataset.j===e.whyA) x.classList.add("ok"); }); if(!ok) b.classList.add("bad"); $("#sp-2fb").innerHTML=`<p class="muted">${ok?"✅ 정확한 이유입니다.":"❌ 이유가 다릅니다 — 초록색이 바른 이유입니다."}</p>`; $("#sp-3").hidden=false; logQ("spot:"+e.id,"why",ok); const rec={ok:st.ok,why:ok,when:Date.now(),text:(r&&r.text)||""}; S[id]=rec; store.set("spot",S); if(st.ok&&ok&&!(r&&r.ok&&r.why)) earnTok(3,"틀린 풀이 찾기: "+e.title); typeset(); });
+    const sv=$("#sp-save"); if(sv) sv.onclick=()=>{ const rec=S[id]||{ok:st.ok,why:st.why,when:Date.now()}; rec.text=$("#sp-text").value; rec.when=Date.now(); S[id]=rec; store.set("spot",S); sv.textContent="저장됨 ✓"; };
+  }
+
+  // ---------- 주간 돌아보기 (자기조절학습 — Zimmerman 2002; 실행 의도 if-then — Gollwitzer & Sheeran 2006) + 학부모 공유 요약 ----------
+  const weekKey=d=>{ const x=new Date(d||Date.now()); const wd=(x.getDay()+6)%7; x.setDate(x.getDate()-wd); return todayKey(x); };
+  function weekStats(){ const p=profile()||{}; const M={}; lessonsAll.forEach(l=>M[l.id]=mastery(l)); const ls=lessonsAll.filter(l=>l.grade===p.grade); const avg=Math.round(ls.reduce((a,l)=>a+M[l.id].pct,0)/Math.max(1,ls.length));
+    const L=store.get("qlog",[]); const wk=L.filter(x=>Date.now()-x.t<7*864e5); const days=new Set(wk.map(x=>todayKey(new Date(x.t)))).size; const acc=wk.length?Math.round(100*wk.filter(x=>x.ok).length/wk.length):null;
+    const sn=store.get("snap",{}); const ago=Object.keys(sn).sort().filter(k=>k<=todayKey(new Date(Date.now()-7*864e5))).pop(); const prev=ago?sn[ago]:null;
+    const weekly=store.get("weekly",[])[0]; const cal=calStats(7); const byL={}; wk.forEach(x=>{ const id=lessonOfKey(x.k); if(!id) return; const r=byL[id]||(byL[id]={n:0,ok:0}); r.n++; if(x.ok) r.ok++; }); const weak=Object.entries(byL).filter(([id,r])=>r.n>=3&&r.ok/r.n<0.6).map(([id])=>byLesson(id)).filter(Boolean);
+    return {p,avg,prev,days,n:wk.length,acc,weekly:weekly&&Date.now()-weekly.when<8*864e5?weekly:null,cal,weak,M}; }
+  function shareText(){ const w=weekStats(); const rv=store.get("review",{})[weekKey()]; const d=new Date(); const lines=[`📘 TAD 수학 주간 요약 (${d.getMonth()+1}/${d.getDate()})${w.p.name?" · "+w.p.name:""}${w.p.grade?" · "+G[w.p.grade]:""}`,
+      `학습일 ${w.days}/7 · 푼 문제 ${w.n} · 정답률 ${w.acc!=null?w.acc+"%":"—"} · 학기 목표율 ${w.avg}%${w.prev!=null?`(${w.avg>=w.prev?"+":""}${w.avg-w.prev})`:""}`,
+      `주간 테스트 ${w.weekly?`${w.weekly.score}/${w.weekly.n} (추정 ${w.weekly.grade}등급)`:"미응시"} · 확신 보정: 착각 ${w.cal.n.ill}·운 ${w.cal.n.lucky}·안정 ${w.cal.n.sure}`,
+      `약점: ${w.weak.length?w.weak.slice(0,3).map(l=>l.title).join(", "):"없음"}`];
+    if(rv){ if(rv.good) lines.push(`잘된 것: ${rv.good}`); if(rv.stuck) lines.push(`막힌 것: ${rv.stuck}`); if(rv.ifc&&rv.then) lines.push(`다음 주 다짐: 만약 ${rv.ifc} 이면 ${rv.then}`); }
+    lines.push("— cncnature.github.io/tad-math"); return lines.join("\n"); }
+  async function shareNow(btn){ const t=shareText(); try{ if(navigator.share){ await navigator.share({title:"TAD 수학 주간 요약",text:t}); btn.textContent="공유됨 ✓"; return; } }catch(e){} try{ await navigator.clipboard.writeText(t); btn.textContent="복사됨 ✓ (카톡·문자에 붙여넣기)"; }catch(e){ prompt("아래 내용을 복사하세요", t); } }
+  function review(){ const p=profile(); if(!p) return setup(); const R=store.get("review",{}); const k=weekKey(); const cur=R[k]||{}; const w=weekStats(); const hist=Object.keys(R).sort().reverse().filter(x=>x!==k).slice(0,4);
+    const IFS=["학교에서 돌아와 책상에 앉으면","문제를 틀리면","확신 없이 맞히면(🎲→✓)","시험 범위 소단원이 60% 아래면","주말 아침이면"]; const THENS=["그 소단원 생성 문제 3개를 푼다","'오개념' 탭을 읽고 오답 노트에 이유를 단다","클리닉 1건을 끝낸다","하루 10분 코스를 먼저 한다","서바이벌 20문항을 친다"];
+    render(`<div class="crumb"><a href="#/me">내 학습</a> › 주간 돌아보기</div><h1>🪞 주간 돌아보기</h1>
+    <p class="lead">일요일 저녁 5분. 숫자는 사이트가 세었으니, 학생은 <b>세 문장</b>만 씁니다. 세 번째 문장은 '만약 ~이면 ~한다' 꼴 — 목표를 상황에 묶어 두면 실행률이 2~3배 오른다는 것이 94개 연구의 메타분석 결과입니다(Gollwitzer & Sheeran 2006).</p>
+    <div class="stats"><div><b>${w.days}</b>학습일 / 7</div><div><b>${w.n}</b>푼 문제</div><div><b>${w.acc!=null?w.acc+"%":"—"}</b>정답률</div><div><b>${w.avg}%</b>목표율 ${w.prev!=null?`<small style="color:${w.avg>=w.prev?"var(--ok)":"var(--bad)"}">(${w.avg>=w.prev?"+":""}${w.avg-w.prev})</small>`:""}</div><div><b>${w.cal.n.ill}</b>착각(😎→✗)</div><div><b>${w.cal.n.lucky}</b>운(🎲→✓)</div></div>
+    ${w.weak.length?`<p class="muted small">이번 주 정답률 60% 미만: ${w.weak.map(l=>`<a href="#/study/${l.unit}/${l.id}">${l.title}</a>`).join(" · ")}</p>`:""}
+    <div class="card"><h3>1. 이번 주 잘된 것 하나</h3><input id="rv-good" placeholder="예: 닮음비 넓이비를 더 이상 헷갈리지 않는다" value="${esc(cur.good||"")}">
+    <h3>2. 막힌 것 하나 (어느 소단원의 어떤 줄에서?)</h3><input id="rv-stuck" placeholder="예: 이차함수 완전제곱에서 더한 수를 빼는 걸 자꾸 잊음" value="${esc(cur.stuck||"")}">
+    <h3>3. 다음 주 다짐 — 만약 ___ 이면 ___ 한다</h3>
+    <div class="row" style="gap:6px;flex-wrap:wrap">${IFS.map(x=>`<button type="button" class="chip rv-if">${x}</button>`).join("")}</div><input id="rv-if" placeholder="만약 (상황)" value="${esc(cur.ifc||"")}" style="margin-top:6px">
+    <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px">${THENS.map(x=>`<button type="button" class="chip rv-then">${x}</button>`).join("")}</div><input id="rv-then" placeholder="이면 (행동)" value="${esc(cur.then||"")}" style="margin-top:6px">
+    <div class="row" style="margin-top:12px"><button class="btn" id="rv-save">저장</button><button class="btn ghost" id="rv-share">📣 학부모에게 5줄 요약 보내기</button><a class="btn ghost" href="#/report">📄 리포트</a></div>
+    <p class="muted small" id="rv-msg">${cur.when?`마지막 저장 ${new Date(cur.when).toLocaleString("ko")}`:"이번 주 아직 쓰지 않았습니다."}</p></div>
+    ${hist.length?`<h2>지난 다짐</h2><table><tr><th>주</th><th>잘된 것</th><th>막힌 것</th><th>다짐</th></tr>${hist.map(x=>{ const r=R[x]; return `<tr><td>${x.slice(5)}~</td><td>${esc(r.good||"")}</td><td>${esc(r.stuck||"")}</td><td>${r.ifc?`만약 ${esc(r.ifc)} 이면 ${esc(r.then||"")}`:""}</td></tr>`; }).join("")}</table>`:""}
+    <div class="card"><h3>📣 보낼 내용 미리보기</h3><pre class="muted small" id="rv-pre" style="white-space:pre-wrap">${esc(shareText())}</pre></div>`);
+    main.querySelectorAll(".rv-if").forEach(b=>b.onclick=()=>{ $("#rv-if").value=b.textContent; }); main.querySelectorAll(".rv-then").forEach(b=>b.onclick=()=>{ $("#rv-then").value=b.textContent; });
+    $("#rv-save").onclick=()=>{ R[k]={good:$("#rv-good").value.trim(),stuck:$("#rv-stuck").value.trim(),ifc:$("#rv-if").value.trim(),then:$("#rv-then").value.trim(),when:Date.now()}; store.set("review",R); $("#rv-msg").textContent="저장됨 ✓ "+new Date().toLocaleString("ko"); $("#rv-pre").textContent=shareText(); if(R[k].ifc&&R[k].then) earnTok(2,"주간 돌아보기"); };
+    $("#rv-share").onclick=()=>shareNow($("#rv-share")); }
   // ---------- 검색 ----------
   function search(q){ q=(q||"").trim().toLowerCase(); if(!q) return render(`<h1>검색</h1>`);
     const L=lessonsAll.filter(l=>(l.title+l.concept.join(" ")).toLowerCase().includes(q)); const F=D.formulas.filter(f=>(f.title+f.tex).toLowerCase().includes(q)); const Cc=D.concepts.filter(c=>(c.term+c.def+c.en).toLowerCase().includes(q)); const Lf=D.life.filter(x=>(x.title+x.body).toLowerCase().includes(q)); const P=D.people.filter(p=>(p.name+p.body).toLowerCase().includes(q));
@@ -1152,6 +1224,8 @@
     if(r==="play") return play(p[1]);
     if(r==="bridge") return bridge(p[1]);
     if(r==="essay") return essay(p[1]);
+    if(r==="spot") return spot(p[1]);
+    if(r==="review") return review();
     if(r==="daily") return daily();
     if(r==="teacher") return teacher();
     if(r==="mix") return mix(qs);
