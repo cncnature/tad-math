@@ -4,6 +4,8 @@ window.DATA = window.DATA || {};
 window.DATA.dailyConfig = {
  "grade": "g22",
  "name": "",
+ "school": "인천초은중학교",
+ "textbooks": {"국어":"천재교육","영어":"천재교육","과학":"미래엔","역사":"비상교육"},
  "daily": [
   "수학",
   "국어",
