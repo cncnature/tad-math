@@ -2,7 +2,7 @@
   "name": "tad-math-app",
   "version": "1.0.0",
   "private": true,
-  "description": "TAD 수학 만지기 안드로이드 앱 (GitHub Pages 최신 사이트를 불러오는 래퍼)",
+  "description": "TAD 공부방 안드로이드 앱 (GitHub Pages 최신 사이트를 불러오는 래퍼)",
   "scripts": {
     "add": "cap add android",
     "sync": "cap sync android",

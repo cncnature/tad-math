@@ -1,6 +1,6 @@
 {
   "appId": "com.medihealthtech.tadmath",
-  "appName": "TAD 수학 만지기",
+  "appName": "TAD 공부방",
   "webDir": "www",
   "server": {
     "url": "https://cncnature.github.io/tad-math/",

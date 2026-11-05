@@ -1,4 +1,4 @@
-/* TAD 수학 만지기 — 오프라인 캐시. 앱 셸·데이터는 네트워크 우선(최신 배포 반영), 폰트·아이콘·KaTeX 는 캐시 우선 */
+/* TAD 공부방 — 오프라인 캐시. 앱 셸·데이터는 네트워크 우선(최신 배포 반영), 폰트·아이콘·KaTeX 는 캐시 우선 */
 const CACHE="tad-v1";
 const SHELL=["./","./index.html","./css/style.css","./manifest.webmanifest"];
 self.addEventListener("install",e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())); });

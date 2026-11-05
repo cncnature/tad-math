@@ -1,4 +1,4 @@
-name: TAD 수학 만지기 APK 빌드
+name: TAD 공부방 APK 빌드
 
 on:
   push:
@@ -56,7 +56,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: apk-latest
-          name: TAD 수학 만지기 최신 APK
+          name: TAD 공부방 최신 APK
           body: "안드로이드 설치 파일. 사이트가 바뀌어도 앱은 그대로 최신 내용을 불러옵니다 (빌드 #${{ github.run_number }})."
           files: app/out/*.apk
           prerelease: true

@@ -33,7 +33,7 @@
       blocks.push({subject:s.name,title:l.title,href:`#/sub/${s.id}/${l.id}`,need:cut(l.memo||l.concept[0],110),trap:cut((l.pitfalls||[])[0]||"",110),pattern:cut((l.pattern||[])[0]||(l.points||[])[0]||"",110),quiz:l.quiz&&l.quiz[0]?{q:cut(l.quiz[0].q,120),opts:l.quiz[0].opts.map(o=>cut(o,28))}:null,std:l.std||[]}); });
     // 오늘 할 일: 과목별 공부법(단계별) 첫 과제
     const SM=D.studyMethods; const todo=[]; ["수학",...pick].forEach(sn=>{ if(sn==="수학"){ const b=blocks[0]; if(b) todo.push(`수학 ${b.title} ${phase==="final"?"주간 테스트 10문항 15분":phase==="pattern"?"학교 시험 필수 문제 4개 + 생성 5문제":"개념→왜→퀴즈 30분"}`); return; } const sm=SM&&SM.subjects[sn==="역사"?"한국사":sn]; const list=sm&&(sm[phase]||sm.csat||sm.concept); if(list&&list[0]) todo.push(`${sn} ${strip(list[0].t)} ${list[0].m}분`); });
-    const head=`📘 TAD 오늘의 5줄 · ${+date.slice(5,7)}/${+date.slice(8,10)}(${WD[wd]})${opt.name?" · "+opt.name:""}`;
+    const head=`📘 TAD 공부방 오늘의 5줄 · ${+date.slice(5,7)}/${+date.slice(8,10)}(${WD[wd]})${opt.name?" · "+opt.name:""}`;
     const exam=act?`${act.e.name||act.e.type} ${act.dd>=0?"D-"+act.dd:"D+"+(-act.dd)} · ${PHASE[phase]||phase}`:"등록된 시험 없음 · 수능 트랙";
     const L=["①","②","③","④"];
     const text=[head,exam,"",...blocks.flatMap(b=>[`[${b.subject} · ${b.title}]`,`✅ 꼭: ${b.need}`,b.trap?`⚠️ 함정: ${b.trap}`:null,b.pattern?`🎯 출제·풀이: ${b.pattern}`:null,b.quiz?`❓ ${b.quiz.q} ${b.quiz.opts.map((o,i)=>L[i]+" "+o).join(" ")}`:null,""].filter(x=>x!==null)),`📌 오늘 할 일: ${todo.join(" / ")}`,`🔗 답·풀이: https://cncnature.github.io/tad-math/#/today?d=${date}`].join("\n");

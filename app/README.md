@@ -1,4 +1,4 @@
-# TAD 수학 만지기 — 안드로이드 앱
+# TAD 공부방 — 안드로이드 앱
 
 `capacitor.config.json` 의 `server.url` 이 GitHub Pages(https://cncnature.github.io/tad-math/)를 가리키는 **얇은 래퍼**입니다.
 사이트를 GitHub 에 푸시하면 앱을 다시 설치하지 않아도 항상 최신 버전이 열리고, 사이트의 서비스 워커가 오프라인 캐시를 맡습니다.

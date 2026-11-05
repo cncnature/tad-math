@@ -1,6 +1,6 @@
 {
-  "name": "TAD 수학 만지기",
-  "short_name": "TAD수학",
+  "name": "TAD 공부방",
+  "short_name": "TAD공부방",
   "description": "중1~고3 개인 수학 학습 시스템 — 목표율·컨설팅·주간 테스트·서바이벌·일정 관리",
   "start_url": "./#/me",
   "scope": "./",

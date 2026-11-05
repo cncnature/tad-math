@@ -1,4 +1,4 @@
-/* TAD 수학 만지기 — 단일 페이지 앱 (해시 라우터). 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. */
+/* TAD 공부방 — 단일 페이지 앱 (해시 라우터). 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. */
 (function(){
   const D = window.DATA, $ = s=>document.querySelector(s), main = $("#main");
   // 학년 체계 (2022 개정): 중1 ~ 고3. 순서가 곧 학습 순서.
@@ -215,7 +215,7 @@
       plan.push({label:`${d.getMonth()+1}/${d.getDate()} (${DN[wd]})`,items,today:i===0}); }
     return plan; }
   function setup(){ const p=profile()||{};
-    render(`<section class="hero"><div class="hero-art">${["1F4D0","2B55","1F4C8","1F3B2","1F9EE","1F53A"].map(c=>ico(c,"ico float")).join("")}</div><div class="eyebrow">TAD 수학 만지기 · 개인 학습 시스템</div><h1>어느 학기부터 시작할까요?</h1><p class="lead">학기를 고르면 소단원마다 <b>목표율</b>이 생기고, 퀴즈·공식 카드·시험 문제를 풀 때마다 채워집니다. 컨설팅은 진단 결과·정답률·오답 유형을 읽고 <b>지금 무엇을 더 해야 하는지</b>를 매일 다시 계산합니다. 어떤 문제든 '추가 생성' 을 누르면 같은 유형의 새 문제가 나오고, 맞히면 목표율이 100% 를 넘어 120%, 150% 까지 올라갑니다.</p></section>
+    render(`<section class="hero"><div class="hero-art">${["1F4D0","2B55","1F4C8","1F3B2","1F9EE","1F53A"].map(c=>ico(c,"ico float")).join("")}</div><div class="eyebrow">TAD 공부방 · 개인 학습 시스템</div><h1>어느 학기부터 시작할까요?</h1><p class="lead">학기를 고르면 소단원마다 <b>목표율</b>이 생기고, 퀴즈·공식 카드·시험 문제를 풀 때마다 채워집니다. 컨설팅은 진단 결과·정답률·오답 유형을 읽고 <b>지금 무엇을 더 해야 하는지</b>를 매일 다시 계산합니다. 어떤 문제든 '추가 생성' 을 누르면 같은 유형의 새 문제가 나오고, 맞히면 목표율이 100% 를 넘어 120%, 150% 까지 올라갑니다.</p></section>
     <div class="grid">${GORDER.map(g=>`<button class="card link gsel ${GCOL(g)} ${p.grade===g?"on":""}" data-g="${g}">${tag(g)}<h3>${G[g]}</h3><p class="muted">${D.curriculum.units.filter(u=>u.grade===g).length}단원 · ${lessonsAll.filter(l=>l.grade===g).length}소단원</p></button>`).join("")}</div>
     <div class="card" style="margin-top:12px"><div class="row"><label>이름(선택) <input id="me-name" value="${esc(p.name||"")}" placeholder="예: 민준" style="width:120px"></label><label>시험일(선택) <input id="me-exam" type="date" value="${p.examDate||""}"></label><label>로컬 AI 주소(선택) <input id="me-ai" value="${esc(aiCfg().url)}" placeholder="http://localhost:5100" style="width:200px"></label></div><p class="muted small">🤖 같은 PC 에서 STUDYGOD(공부의신)을 켜고 <code>studygod_tad.py</code> 를 등록하면 소단원 AI 튜터·서술형/논술 첨삭·오답 설명이 자동으로 켜집니다. 현재: <b id="ai-state">${AI_OK===true?"연결됨":AI_OK===false?"연결 안 됨":"확인 중"}</b> <a href="https://github.com/cncnature/tad-math/blob/main/integrations/studygod_tad.py" target="_blank" rel="noopener">설치 파일</a></p><p class="install-row"><button class="btn sm" id="pwa-install">📲 태블릿·폰에 앱으로 설치</button> <span class="muted small">설치하면 홈 화면 아이콘으로 열리고 오프라인에서도 동작합니다. 안드로이드 APK: <a href="https://github.com/cncnature/tad-math/releases/tag/apk-latest" target="_blank" rel="noopener">최신 APK</a></span></p><p class="muted">학기를 누르면 바로 시작됩니다. 기록은 이 브라우저(로그인하면 계정)에만 저장됩니다. <a href="#/intro">사이트 소개 · $x^2-x-6=0$ 이야기 보기</a></p></div>`);
     const pi=$("#pwa-install"); if(pi) pi.onclick=async()=>{ const e=window.__pwaPrompt; if(!e){ alert("브라우저 메뉴(⋮) → '홈 화면에 추가' 또는 '앱 설치' 를 누르세요. 이미 설치되어 있으면 이 버튼은 동작하지 않습니다."); return; } e.prompt(); await e.userChoice; window.__pwaPrompt=null; };
@@ -402,7 +402,7 @@
     <h2>컨설팅 요약</h2><ol class="steps">${advice.map(a=>`<li><b>${a.icon} ${a.title}</b> — ${a.body}</li>`).join("")}</ol>
     <h2>다음 주 계획</h2><div class="week">${plan.map(d=>`<div class="day"><div class="eyebrow">${d.label}</div>${d.items.map(it=>`<div>${it.t}</div>`).join("")}</div>`).join("")}</div>
     <h2>소단원별 목표율</h2><table class="mtable">${D.curriculum.units.filter(u=>u.grade===g).flatMap(u=>u.lessons.map(l=>{ const m=M[l.id]; const [sn2,sc]=STATUS(m.pct); return `<tr><td>${u.title} › ${l.title}</td><td class="bar"><div class="mbar"><i style="width:${Math.min(100,m.pct)}%"></i></div></td><td class="num">${m.pct}%</td><td><span class="st ${sc}">${sn2}</span></td></tr>`; })).join("")}</table>
-    <p class="muted small">목표율 = 퀴즈 60 · 개념 10 · 공식(카드/유도) 15 · 시험/서술형 15 + 생성 문제 보너스. 추정 등급은 정답률 환산 참고값. TAD 수학 만지기 · cncnature.github.io/tad-math</p></div>`);
+    <p class="muted small">목표율 = 퀴즈 60 · 개념 10 · 공식(카드/유도) 15 · 시험/서술형 15 + 생성 문제 보너스. 추정 등급은 정답률 환산 참고값. TAD 공부방 · cncnature.github.io/tad-math</p></div>`);
     $("#rp-print").onclick=()=>window.print(); $("#rp-share").onclick=()=>shareNow($("#rp-share")); }
 
   // ---------- 시험 일정 · 자동 스케줄 · 과목별 공부법 컨설팅 ----------
@@ -1101,7 +1101,7 @@
     render(`<div class="crumb noprint"><a href="#/">홈</a> › <a href="#/schooltest?g=${grade}&t=${term}">학교 시험 필수 문제</a> › 시험지</div>
     <div class="row noprint" style="margin-bottom:10px"><button class="btn" id="print">🖨 인쇄 / PDF 저장</button><button class="btn ghost" id="toggle-ans">정답·풀이 숨기기</button><a class="btn ghost" href="#/schooltest?g=${grade}&t=${term}">← 문제 풀기 화면</a></div>
     <div class="paper" id="paper">
-      <div class="paper-head"><div class="paper-top"><span>TAD 수학 만지기</span><span>${G[grade]} · ${TN[set.term]}</span></div><h1>${set.title} 대비 필수 문제</h1><div class="paper-sub">[ 수 학 ] · 시험 범위: ${set.range}</div><div class="paper-info"><span>학년 &nbsp; 반 &nbsp; 번호</span><span>이름:</span><span>점수: &nbsp; / ${total}</span></div><ul class="paper-notes"><li>각 문항의 배점은 문제 끝에 표시되어 있습니다.</li><li>선택형은 ①~⑤ 중 하나를 고르고, 서술형은 풀이 과정을 씁니다.</li></ul></div>
+      <div class="paper-head"><div class="paper-top"><span>TAD 공부방</span><span>${G[grade]} · ${TN[set.term]}</span></div><h1>${set.title} 대비 필수 문제</h1><div class="paper-sub">[ 수 학 ] · 시험 범위: ${set.range}</div><div class="paper-info"><span>학년 &nbsp; 반 &nbsp; 번호</span><span>이름:</span><span>점수: &nbsp; / ${total}</span></div><ul class="paper-notes"><li>각 문항의 배점은 문제 끝에 표시되어 있습니다.</li><li>선택형은 ①~⑤ 중 하나를 고르고, 서술형은 풀이 과정을 씁니다.</li></ul></div>
       <div class="paper-body">${set.items.map((it,i)=>`<div class="pq"><div class="pq-q"><b>${i+1}.</b> ${it.kind?`<b>[${it.kind}]</b> `:""}${md(it.q)} <b>[${it.pts}점]</b></div>${figAny(it,"pfig")}${it.opts?`<div class="pq-opts">${it.opts.map((o,j)=>`<span>${["①","②","③","④","⑤"][j]} ${md(o)}</span>`).join("")}</div>`:'<div class="pq-blank"></div>'}</div>`).join("")}</div>
       <div class="paper-ans" id="ans"><h2>정답 및 풀이</h2><ol>${set.items.map(it=>`<li>${it.opts?`<b>${["①","②","③","④","⑤"][it.a]}</b> — `:""}${it.steps.map(s=>md(s)).join(" ")} <b>답: ${md(it.ans)}</b></li>`).join("")}</ol></div>
     </div>`);
@@ -1156,13 +1156,13 @@
     const sn=store.get("snap",{}); const ago=Object.keys(sn).sort().filter(k=>k<=todayKey(new Date(Date.now()-7*864e5))).pop(); const prev=ago?sn[ago]:null;
     const weekly=store.get("weekly",[])[0]; const cal=calStats(7); const byL={}; wk.forEach(x=>{ const id=lessonOfKey(x.k); if(!id) return; const r=byL[id]||(byL[id]={n:0,ok:0}); r.n++; if(x.ok) r.ok++; }); const weak=Object.entries(byL).filter(([id,r])=>r.n>=3&&r.ok/r.n<0.6).map(([id])=>byLesson(id)).filter(Boolean);
     return {p,avg,prev,days,n:wk.length,acc,weekly:weekly&&Date.now()-weekly.when<8*864e5?weekly:null,cal,weak,M}; }
-  function shareText(){ const w=weekStats(); const rv=store.get("review",{})[weekKey()]; const d=new Date(); const lines=[`📘 TAD 수학 주간 요약 (${d.getMonth()+1}/${d.getDate()})${w.p.name?" · "+w.p.name:""}${w.p.grade?" · "+G[w.p.grade]:""}`,
+  function shareText(){ const w=weekStats(); const rv=store.get("review",{})[weekKey()]; const d=new Date(); const lines=[`📘 TAD 공부방 주간 요약 (${d.getMonth()+1}/${d.getDate()})${w.p.name?" · "+w.p.name:""}${w.p.grade?" · "+G[w.p.grade]:""}`,
       `학습일 ${w.days}/7 · 푼 문제 ${w.n} · 정답률 ${w.acc!=null?w.acc+"%":"—"} · 학기 목표율 ${w.avg}%${w.prev!=null?`(${w.avg>=w.prev?"+":""}${w.avg-w.prev})`:""}`,
       `주간 테스트 ${w.weekly?`${w.weekly.score}/${w.weekly.n} (추정 ${w.weekly.grade}등급)`:"미응시"} · 확신 보정: 착각 ${w.cal.n.ill}·운 ${w.cal.n.lucky}·안정 ${w.cal.n.sure}`,
       `약점: ${w.weak.length?w.weak.slice(0,3).map(l=>l.title).join(", "):"없음"}`];
     if(rv){ if(rv.good) lines.push(`잘된 것: ${rv.good}`); if(rv.stuck) lines.push(`막힌 것: ${rv.stuck}`); if(rv.ifc&&rv.then) lines.push(`다음 주 다짐: 만약 ${rv.ifc} 이면 ${rv.then}`); }
     lines.push("— cncnature.github.io/tad-math"); return lines.join("\n"); }
-  async function shareNow(btn){ const t=shareText(); try{ if(navigator.share){ await navigator.share({title:"TAD 수학 주간 요약",text:t}); btn.textContent="공유됨 ✓"; return; } }catch(e){} try{ await navigator.clipboard.writeText(t); btn.textContent="복사됨 ✓ (카톡·문자에 붙여넣기)"; }catch(e){ prompt("아래 내용을 복사하세요", t); } }
+  async function shareNow(btn){ const t=shareText(); try{ if(navigator.share){ await navigator.share({title:"TAD 공부방 주간 요약",text:t}); btn.textContent="공유됨 ✓"; return; } }catch(e){} try{ await navigator.clipboard.writeText(t); btn.textContent="복사됨 ✓ (카톡·문자에 붙여넣기)"; }catch(e){ prompt("아래 내용을 복사하세요", t); } }
   function review(){ const p=profile(); if(!p) return setup(); const R=store.get("review",{}); const k=weekKey(); const cur=R[k]||{}; const w=weekStats(); const hist=Object.keys(R).sort().reverse().filter(x=>x!==k).slice(0,4);
     const IFS=["학교에서 돌아와 책상에 앉으면","문제를 틀리면","확신 없이 맞히면(🎲→✓)","시험 범위 소단원이 60% 아래면","주말 아침이면"]; const THENS=["그 소단원 생성 문제 3개를 푼다","'오개념' 탭을 읽고 오답 노트에 이유를 단다","클리닉 1건을 끝낸다","하루 10분 코스를 먼저 한다","서바이벌 20문항을 친다"];
     render(`<div class="crumb"><a href="#/me">내 학습</a> › 주간 돌아보기</div><h1>🪞 주간 돌아보기</h1>
@@ -1225,7 +1225,7 @@
     render(`<h1>🔍 "${esc(q)}" 검색 결과</h1>${L.length?`<h2>소단원</h2><ul>${L.map(l=>`<li><a href="#/study/${l.unit}/${l.id}">${l.title}</a> <span class="muted">${l.unitTitle}</span></li>`).join("")}</ul>`:""}${F.length?`<h2>공식</h2><ul>${F.map(f=>`<li><a href="#/formulas/${f.id}">${f.title}</a></li>`).join("")}</ul>`:""}${Cc.length?`<h2>개념</h2><ul>${Cc.map(c=>`<li><b>${c.term}</b> — ${md(c.def)}</li>`).join("")}</ul>`:""}${Lf.length?`<h2>생활 속 수학</h2><ul>${Lf.map(x=>`<li><a href="#/life">${x.title}</a></li>`).join("")}</ul>`:""}${P.length?`<h2>인물</h2><ul>${P.map(p=>`<li><a href="#/people">${p.name}</a></li>`).join("")}</ul>`:""}${!(L.length+F.length+Cc.length+Lf.length+P.length)?`<p class="muted">결과가 없습니다.</p>`:""}`); }
   $("#q").addEventListener("keydown",e=>{ if(e.key==="Enter"){ location.hash="#/search?q="+encodeURIComponent(e.target.value); } });
 
-  function about(){ render(`<h1>사이트 소개</h1><div class="card"><p><b>TAD 수학 만지기</b>는 중1부터 고3까지의 수학(중2-2~중3-2 를 가장 깊게)을 "외우기 전에 먼저 만져 보는" 방식으로 익히는 무료·오픈소스 학습 사이트입니다. 로그인·결제가 없고, 학습 기록은 사용자의 브라우저(localStorage)에만 저장됩니다.</p>
+  function about(){ render(`<h1>사이트 소개</h1><div class="card"><p><b>TAD 공부방</b>는 중1부터 고3까지의 수학(중2-2~중3-2 를 가장 깊게)을 "외우기 전에 먼저 만져 보는" 방식으로 익히는 무료·오픈소스 학습 사이트입니다. 로그인·결제가 없고, 학습 기록은 사용자의 브라우저(localStorage)에만 저장됩니다.</p>
     <h3>단원 체계의 근거</h3><p>교육부 고시 2022 개정 수학과 교육과정(중학교 2·3학년 영역: 수와 연산, 변화와 관계, 도형과 측정, 자료와 가능성)의 성취기준을 따르며, 2015 개정 교육과정과 공통인 범위(이등변삼각형·사각형·닮음·피타고라스·확률 / 제곱근·인수분해·이차방정식·이차함수 / 삼각비·원·통계)를 다룹니다. 상자그림은 2022 개정에서 중3 통계에 추가된 내용입니다. 학교별 진도·범위는 교과서 차례로 확인하세요.</p>
     <h3>기술</h3><p>정적 HTML/CSS/JS, 수식 렌더링은 KaTeX(MIT), 위젯은 순수 Canvas 2D. 빌드 도구 없이 GitHub Pages 에서 그대로 동작합니다. 콘텐츠는 <code>data/*.js</code> 파일을 고치면 바로 반영됩니다.</p>
     <h3>저작권</h3><p>본문·문항·위젯 코드는 이 저장소의 저작자가 작성했으며 MIT 라이선스로 공개합니다. 사이트 구조(개념 지도·공식 되살리기·끊긴 고리 진단 등)는 공개된 수학 학습 사이트들의 접근 방식을 참고하되 텍스트·코드·이미지를 복제하지 않았습니다. 인물 정보는 일반적으로 알려진 수학사 사실에 근거합니다.</p>

@@ -1,4 +1,4 @@
-# TAD 수학 만지기 — 중1 ~ 고3 개념 연결 학습 사이트
+# TAD 공부방 — 중1 ~ 고3 개념 연결 학습 사이트
 
 > 외우기 전에 먼저 만져 보는 수학. 중1 소인수분해부터 고3 미적분·기하까지 한 장의 개념 지도. 결제 없음, 빌드 도구 없음.
 >
@@ -51,7 +51,7 @@
    cd tad-math
    git init
    git add .
-   git commit -m "중등수학 만지기 최초 커밋"
+   git commit -m "중등공부방 최초 커밋"
    git branch -M main
    git remote add origin https://github.com/cncnature/tad-math.git
    git push -u origin main

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-STUDYGOD ↔ TAD 수학 만지기 연동 (2단계: 로컬 LLM 첨삭·튜터)
+STUDYGOD ↔ TAD 공부방 연동 (2단계: 로컬 LLM 첨삭·튜터)
 설치: 이 파일을 STUDYGOD 폴더(app.py 옆)에 복사하고, app.py 맨 아래 `app.run(...)` 바로 위에 두 줄 추가:
 
     from studygod_tad import register_tad
