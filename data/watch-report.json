@@ -1,19 +1,19 @@
 {
- "date": "2026-11-05",
+ "date": "2026-11-06",
  "sources": [
   {
    "id": "kice-suneung",
    "name": "한국교육과정평가원 수능 공지",
    "ok": true,
    "found": 9,
-   "fresh": 9
+   "fresh": 0
   },
   {
    "id": "moe-press",
    "name": "교육부 보도자료",
    "ok": true,
    "found": 11,
-   "fresh": 11
+   "fresh": 0
   },
   {
    "id": "adiga",
@@ -27,7 +27,7 @@
    "name": "한국대학교육협의회 보도자료",
    "ok": true,
    "found": 1,
-   "fresh": 1
+   "fresh": 0
   },
   {
    "id": "sen-exam",
@@ -41,13 +41,27 @@
    "name": "국가교육과정정보센터",
    "ok": true,
    "found": 26,
-   "fresh": 26
+   "fresh": 0
   },
   {
    "id": "npm-standards",
    "name": "성취기준 원문 데이터셋(npm)",
    "ok": true,
    "version": "0.3.0"
+  },
+  {
+   "id": "yes24-g3",
+   "name": "예스24 — 2022 개정 중3 교재 출간 감시",
+   "ok": true,
+   "found": 48,
+   "fresh": 48
+  },
+  {
+   "id": "yes24-h3",
+   "name": "예스24 — 2022 개정 고3 교재 출간 감시",
+   "ok": true,
+   "found": 0,
+   "fresh": 0
   }
  ],
  "changes": []
