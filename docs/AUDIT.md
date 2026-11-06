@@ -41,6 +41,7 @@
 - [ ] data/subjects/his-g22-visang.js
 - [ ] data/subjects/his-g3.js
 - [ ] data/subjects/his-h1.js
+- [ ] data/subjects/his-h2.js
 - [ ] data/subjects/his-h3.js
 - [ ] data/subjects/kor-g1.js
 - [ ] data/subjects/kor-g22-chunjae.js
@@ -52,12 +53,14 @@
 - [ ] data/subjects/sci-g22-mirae.js
 - [ ] data/subjects/sci-g3.js
 - [ ] data/subjects/sci-h1.js
+- [ ] data/subjects/sci-h2.js
 - [ ] data/subjects/sci-h3.js
 - [ ] data/subjects/sci.js
 - [ ] data/subjects/soc-g1.js
 - [ ] data/subjects/soc-g22-visang.js
 - [ ] data/subjects/soc-g3.js
 - [ ] data/subjects/soc-h1.js
+- [ ] data/subjects/soc-h2.js
 - [ ] data/subjects/soc-h3.js
 
 ## 지난 시험 일정 (data/daily-config.js 에서 지울 것)
@@ -66,15 +69,21 @@
 
 ## 시각 자료(표·도식·그래프) 없는 차시
 
-- 과목 차시 0개 · 수학 소단원 0개 (매주 10개 이상 채운다: docs/VISUAL-SCHEMA.md)
+- 과목 차시 14개 · 수학 소단원 0개 (매주 10개 이상 채운다: docs/VISUAL-SCHEMA.md)
 
 ## 3단계 문제(② 실력·③ 1등급) 없는 과목 차시
 
-- 80개 (docs/AGENT-BRIEF-PROBLEMS.md · 매주 과목당 5차시 이상): eng-g1-verb-be, eng-g1-verb-do, eng-g1-ask-wh, eng-g1-ask-imp, eng-g1-tense-prog, eng-g1-tense-past, eng-g1-tense-fut, eng-g1-descread-adj, eng-g1-descread-comp, eng-g1-descread-read, eng-h3-listen-1to5, eng-h3-listen-6to10 …
+- 88개 (docs/AGENT-BRIEF-PROBLEMS.md · 매주 과목당 5차시 이상): eng-g1-verb-be, eng-g1-verb-do, eng-g1-ask-wh, eng-g1-ask-imp, eng-g1-tense-prog, eng-g1-tense-past, eng-g1-tense-fut, eng-g1-descread-adj, eng-g1-descread-comp, eng-g1-descread-read, eng-h3-listen-1to5, eng-h3-listen-6to10 …
 
 ## 단원 노트 없는 단원
 
-- 없음
+- [ ] sci:sci-h2-phy-force
+- [ ] sci:sci-h2-chem-language
+- [ ] sci:sci-h2-bio-metabolism
+- [ ] sci:sci-h2-earth-ocean
+- [ ] soc:soc-h2-sm-inquiry
+- [ ] soc:soc-h2-gg-global
+- [ ] soc:soc-h2-ce-applied
 
 ## 빈 필드 차시
 
