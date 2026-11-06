@@ -2325,5 +2325,53 @@
   "alt": "직렬 회로와 병렬 회로 구성",
   "want": 1,
   "kind": "diagram"
+ },
+ {
+  "id": "his-h2-ea-heritage",
+  "wiki": [
+   "en:Mogao_Caves"
+  ],
+  "commons": [
+   "Mogao Caves Dunhuang"
+  ],
+  "alt": "둔황 막고굴",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "his-h2-civ-asia",
+  "wiki": [
+   "en:Greco-Buddhist_art"
+  ],
+  "commons": [
+   "Gandhara Buddha statue"
+  ],
+  "alt": "간다라 양식 불상",
+  "want": 1,
+  "kind": "photo"
+ },
+ {
+  "id": "sci-h2-earth-circulation",
+  "wiki": [
+   "en:Thermohaline_circulation"
+  ],
+  "commons": [
+   "Thermohaline circulation"
+  ],
+  "alt": "전 지구 해수 순환(열염분 순환) 모식도",
+  "want": 1,
+  "kind": "diagram"
+ },
+ {
+  "id": "soc-h2-gg-geotech",
+  "wiki": [
+   "en:Geographic_information_system"
+  ],
+  "commons": [
+   "GIS data layers overlay diagram"
+  ],
+  "alt": "지리 정보 시스템의 중첩 분석",
+  "want": 1,
+  "kind": "diagram"
  }
 ]

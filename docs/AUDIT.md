@@ -77,10 +77,7 @@
 
 ## 단원 노트 없는 단원
 
-- [ ] sci:sci-h2-phy-force
-- [ ] sci:sci-h2-chem-language
-- [ ] sci:sci-h2-bio-metabolism
-- [ ] sci:sci-h2-earth-ocean
+- 없음
 
 ## 빈 필드 차시
 

@@ -372,10 +372,5 @@
   "soc-h3-market",
   "soc-h3-global"
  ],
- "noNotes": [
-  "sci:sci-h2-phy-force",
-  "sci:sci-h2-chem-language",
-  "sci:sci-h2-bio-metabolism",
-  "sci:sci-h2-earth-ocean"
- ]
+ "noNotes": []
 }
