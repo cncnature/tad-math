@@ -258,6 +258,7 @@
   "his-g22-visang.js",
   "his-g3.js",
   "his-h1.js",
+  "his-h2.js",
   "his-h3.js",
   "kor-g1.js",
   "kor-g22-chunjae.js",
@@ -269,12 +270,14 @@
   "sci-g22-mirae.js",
   "sci-g3.js",
   "sci-h1.js",
+  "sci-h2.js",
   "sci-h3.js",
   "sci.js",
   "soc-g1.js",
   "soc-g22-visang.js",
   "soc-g3.js",
   "soc-h1.js",
+  "soc-h2.js",
   "soc-h3.js"
  ],
  "pastExams": [],
@@ -369,5 +372,10 @@
   "soc-h3-market",
   "soc-h3-global"
  ],
- "noNotes": []
+ "noNotes": [
+  "sci:sci-h2-phy-force",
+  "sci:sci-h2-chem-language",
+  "sci:sci-h2-bio-metabolism",
+  "sci:sci-h2-earth-ocean"
+ ]
 }
