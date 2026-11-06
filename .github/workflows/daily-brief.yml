@@ -9,6 +9,7 @@ on:
         required: false
 permissions:
   contents: read
+  actions: read
 jobs:
   send:
     runs-on: ubuntu-latest
@@ -25,11 +26,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      # 예약 실행이 늦게 시작됐을 때, 오늘(KST) 이미 성공한 전송이 있으면 중복 발송하지 않는다
+      - name: 오늘 전송 여부 확인
+        id: guard
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          since=$(TZ=Asia/Seoul date +%Y-%m-%dT00:00:00%:z)
+          n=$(gh run list -R "$GITHUB_REPOSITORY" --workflow daily-brief.yml --status success --created ">=$since" --json databaseId -q 'length')
+          echo "오늘 성공 $n 건"
+          if [ "$n" -gt 0 ]; then echo "skip=1" >> "$GITHUB_OUTPUT"; fi
       - name: Telegram
-        if: ${{ env.TELEGRAM_BOT_TOKEN != '' }}
+        id: telegram
+        continue-on-error: true
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && steps.guard.outputs.skip != '1' }}
         run: |
           if [ -n "${{ github.event.inputs.date }}" ]; then node scripts/send-telegram.js --date "${{ github.event.inputs.date }}"; else node scripts/send-telegram.js; fi
       - name: KakaoTalk (나에게 보내기, 설정된 경우만)
-        if: ${{ env.KAKAO_REFRESH_TOKEN != '' }}
+        id: kakao
+        continue-on-error: true
+        if: ${{ env.KAKAO_REFRESH_TOKEN != '' && steps.guard.outputs.skip != '1' }}
         run: |
           if [ -n "${{ github.event.inputs.date }}" ]; then node scripts/send-kakao.js --date "${{ github.event.inputs.date }}"; else node scripts/send-kakao.js; fi
+      - name: 전송 결과 확인
+        if: ${{ steps.telegram.outcome == 'failure' || steps.kakao.outcome == 'failure' }}
+        run: |
+          echo "telegram=${{ steps.telegram.outcome }} kakao=${{ steps.kakao.outcome }}"
+          exit 1

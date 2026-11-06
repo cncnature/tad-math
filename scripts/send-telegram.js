@@ -13,5 +13,9 @@ const cfg=D.dailyConfig||{}; const b=BRIEF.build({D,date,grade:cfg.grade||"g22",
 if(dry){ console.log(b.text); process.exit(0); }
 const token=process.env.TELEGRAM_BOT_TOKEN, chat=process.env.TELEGRAM_CHAT_ID; if(!token||!chat){ console.error("TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID 가 없습니다"); process.exit(1); }
 const body=JSON.stringify({chat_id:chat,text:b.html,parse_mode:"HTML",disable_web_page_preview:true});
-const req=https.request({hostname:"api.telegram.org",path:`/bot${token}/sendMessage`,method:"POST",headers:{"Content-Type":"application/json","Content-Length":Buffer.byteLength(body)}},res=>{ let s=""; res.on("data",c=>s+=c); res.on("end",()=>{ const ok=res.statusCode===200; console.log(ok?"sent":"failed", s.slice(0,300)); process.exit(ok?0:1); }); });
-req.on("error",e=>{ console.error(e); process.exit(1); }); req.write(body); req.end();
+// 일시 오류(429·5xx·네트워크)는 5·15·30초 뒤 재시도, 그 밖의 오류(토큰·형식 등)는 바로 실패
+const WAIT=[5000,15000,30000];
+function send(n){ const retry=why=>{ if(n<WAIT.length){ console.error(`재시도 ${n+1}/${WAIT.length}: ${why}`); setTimeout(()=>send(n+1),WAIT[n]); } else { console.error("failed",why); process.exit(1); } };
+  const req=https.request({hostname:"api.telegram.org",path:`/bot${token}/sendMessage`,method:"POST",timeout:30000,headers:{"Content-Type":"application/json","Content-Length":Buffer.byteLength(body)}},res=>{ let s=""; res.on("data",c=>s+=c); res.on("end",()=>{ if(res.statusCode===200){ console.log("sent",s.slice(0,300)); process.exit(0); } if(res.statusCode===429||res.statusCode>=500) return retry(`HTTP ${res.statusCode}`); console.error("failed",s.slice(0,300)); process.exit(1); }); });
+  req.on("timeout",()=>req.destroy(new Error("timeout"))); req.on("error",e=>retry(e.message)); req.write(body); req.end(); }
+send(0);
