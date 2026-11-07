@@ -1,5 +1,5 @@
 {
- "date": "2026-11-06",
+ "date": "2026-11-07",
  "sources": [
   {
    "id": "kice-suneung",
@@ -54,7 +54,7 @@
    "name": "예스24 — 2022 개정 중3 교재 출간 감시",
    "ok": true,
    "found": 48,
-   "fresh": 48
+   "fresh": 0
   },
   {
    "id": "yes24-h3",
