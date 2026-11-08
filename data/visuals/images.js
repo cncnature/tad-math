@@ -2421,5 +2421,73 @@ window.DATA = window.DATA || {}; (window.DATA.visualsAdd = window.DATA.visualsAd
    "credit": "kees torn · CC BY-SA 2.0 · Wikimedia Commons",
    "link": "https://commons.wikimedia.org/wiki/File:MAERSK_MC_KINNEY_M%C3%96LLER_%26_MARSEILLE_MAERSK_(48694054418).jpg"
   }
+ ],
+ "sci-g22-galaxy-nebula": [
+  {
+   "type": "img",
+   "title": "오리온 대성운과 플레이아데스 성단, 구상 성단",
+   "src": "assets/img/sci-g22-galaxy-nebula-1.jpg",
+   "alt": "오리온 대성운과 플레이아데스 성단, 구상 성단",
+   "credit": "NASA, ESA, M. Robberto (Space Telescope Science Institute/ESA) and the Hubble Sp · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Orion_Nebula_-_Hubble_2006_mosaic_18000.jpg"
+  },
+  {
+   "type": "img",
+   "title": "오리온 대성운과 플레이아데스 성단, 구상 성단",
+   "src": "assets/img/sci-g22-galaxy-nebula-2.jpg",
+   "alt": "오리온 대성운과 플레이아데스 성단, 구상 성단",
+   "credit": "NASA, ESA, AURA/Caltech, Palomar Observatory The science team consists of: D. So · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Pleiades_large.jpg"
+  }
+ ],
+ "sci-g22-series-parallel": [
+  {
+   "type": "img",
+   "title": "직렬 회로와 병렬 회로 구성",
+   "src": "assets/img/sci-g22-series-parallel-1.jpg",
+   "alt": "직렬 회로와 병렬 회로 구성",
+   "credit": "Brightyellowjeans · CC BY-SA 4.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Series_and_Parallel_Circuit.jpg"
+  }
+ ],
+ "his-h2-ea-heritage": [
+  {
+   "type": "img",
+   "title": "둔황 막고굴",
+   "src": "assets/img/his-h2-ea-heritage-1.jpg",
+   "alt": "둔황 막고굴",
+   "credit": "慕尼黑啤酒 · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Jiucenglou_of_Mogao_Caves.jpg"
+  }
+ ],
+ "his-h2-civ-asia": [
+  {
+   "type": "img",
+   "title": "간다라 양식 불상",
+   "src": "assets/img/his-h2-civ-asia-1.jpg",
+   "alt": "간다라 양식 불상",
+   "credit": "World Imaging · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Gandhara_Buddha_(tnm).jpeg"
+  }
+ ],
+ "sci-h2-earth-circulation": [
+  {
+   "type": "img",
+   "title": "전 지구 해수 순환(열염분 순환) 모식도",
+   "src": "assets/img/sci-h2-earth-circulation-1.jpg",
+   "alt": "전 지구 해수 순환(열염분 순환) 모식도",
+   "credit": "Robert Simmon, NASA. Minor modifications by Robert A. Rohde also released to the · Public domain · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Thermohaline_Circulation_2.png"
+  }
+ ],
+ "soc-h2-gg-geotech": [
+  {
+   "type": "img",
+   "title": "지리 정보 시스템의 중첩 분석",
+   "src": "assets/img/soc-h2-gg-geotech-1.jpg",
+   "alt": "지리 정보 시스템의 중첩 분석",
+   "credit": "original image: Geo arbo vectorization: Own work · CC BY-SA 3.0 · Wikimedia Commons",
+   "link": "https://commons.wikimedia.org/wiki/File:Fig_4.4.svg"
+  }
  ]
 });

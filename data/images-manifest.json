@@ -2422,5 +2422,73 @@
    "artist": "kees torn",
    "alt": "컨테이너선과 유럽 의회 — 세계화와 지역 통합"
   }
+ ],
+ "sci-g22-galaxy-nebula": [
+  {
+   "file": "Orion Nebula - Hubble 2006 mosaic 18000.jpg",
+   "src": "assets/img/sci-g22-galaxy-nebula-1.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Orion_Nebula_-_Hubble_2006_mosaic_18000.jpg",
+   "lic": "Public domain",
+   "artist": "NASA, ESA, M. Robberto (Space Telescope Science Institute/ESA) and the Hubble Sp",
+   "alt": "오리온 대성운과 플레이아데스 성단, 구상 성단"
+  },
+  {
+   "file": "Pleiades large.jpg",
+   "src": "assets/img/sci-g22-galaxy-nebula-2.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Pleiades_large.jpg",
+   "lic": "Public domain",
+   "artist": "NASA, ESA, AURA/Caltech, Palomar Observatory The science team consists of: D. So",
+   "alt": "오리온 대성운과 플레이아데스 성단, 구상 성단"
+  }
+ ],
+ "sci-g22-series-parallel": [
+  {
+   "file": "Series and Parallel Circuit.jpg",
+   "src": "assets/img/sci-g22-series-parallel-1.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Series_and_Parallel_Circuit.jpg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Brightyellowjeans",
+   "alt": "직렬 회로와 병렬 회로 구성"
+  }
+ ],
+ "his-h2-ea-heritage": [
+  {
+   "file": "Jiucenglou of Mogao Caves.jpg",
+   "src": "assets/img/his-h2-ea-heritage-1.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Jiucenglou_of_Mogao_Caves.jpg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "慕尼黑啤酒",
+   "alt": "둔황 막고굴"
+  }
+ ],
+ "his-h2-civ-asia": [
+  {
+   "file": "Gandhara Buddha (tnm).jpeg",
+   "src": "assets/img/his-h2-civ-asia-1.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Gandhara_Buddha_(tnm).jpeg",
+   "lic": "Public domain",
+   "artist": "World Imaging",
+   "alt": "간다라 양식 불상"
+  }
+ ],
+ "sci-h2-earth-circulation": [
+  {
+   "file": "Thermohaline Circulation 2.png",
+   "src": "assets/img/sci-h2-earth-circulation-1.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Thermohaline_Circulation_2.png",
+   "lic": "Public domain",
+   "artist": "Robert Simmon, NASA. Minor modifications by Robert A. Rohde also released to the",
+   "alt": "전 지구 해수 순환(열염분 순환) 모식도"
+  }
+ ],
+ "soc-h2-gg-geotech": [
+  {
+   "file": "Fig 4.4.svg",
+   "src": "assets/img/soc-h2-gg-geotech-1.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Fig_4.4.svg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "original image: Geo arbo vectorization: Own work",
+   "alt": "지리 정보 시스템의 중첩 분석"
+  }
  ]
 }
