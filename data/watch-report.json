@@ -1,5 +1,5 @@
 {
- "date": "2026-11-07",
+ "date": "2026-11-08",
  "sources": [
   {
    "id": "kice-suneung",
@@ -12,7 +12,7 @@
    "id": "moe-press",
    "name": "교육부 보도자료",
    "ok": true,
-   "found": 11,
+   "found": 5,
    "fresh": 0
   },
   {
