@@ -1,5 +1,5 @@
 {
- "date": "2026-11-08",
+ "date": "2026-11-09",
  "sources": [
   {
    "id": "kice-suneung",
@@ -12,7 +12,7 @@
    "id": "moe-press",
    "name": "교육부 보도자료",
    "ok": true,
-   "found": 5,
+   "found": 11,
    "fresh": 0
   },
   {
@@ -54,7 +54,7 @@
    "name": "예스24 — 2022 개정 중3 교재 출간 감시",
    "ok": true,
    "found": 48,
-   "fresh": 0
+   "fresh": 2
   },
   {
    "id": "yes24-h3",
@@ -64,5 +64,24 @@
    "fresh": 0
   }
  ],
- "changes": []
+ "changes": [
+  {
+   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
+   "title": "최고득점 수학 중등 3-1 (2027년)",
+   "href": "https://www.yes24.com/product/goods/200662866",
+   "affects": [
+    "data/subjects/*-g3.js",
+    "data/overrides.js"
+   ]
+  },
+  {
+   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
+   "title": "최고득점 수학 중등 3-1 (2027년) 새창이동",
+   "href": "https://www.yes24.com/product/goods/200662866",
+   "affects": [
+    "data/subjects/*-g3.js",
+    "data/overrides.js"
+   ]
+  }
+ ]
 }
