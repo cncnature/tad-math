@@ -56,6 +56,7 @@
 - [ ] 학부모 5줄 요약에 과목별 정답률 포함
 
 ## 자동 감지 (scripts/watch.js — 주간 조사가 내용을 읽고 반영한 뒤 [x])
+- [ ] 2026-11-10 교육부 보도자료: 스마트 안경 관련 내신평가 부정행위 전수조사 결과 — https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe# (영향: data/edu-timeline.js, data/advisory.js, data/subjects/*)
 - [ ] 2026-11-09 예스24 — 2022 개정 중3 교재 출간 감시: 최고득점 수학 중등 3-1 (2027년) — https://www.yes24.com/product/goods/200662866 (영향: data/subjects/*-g3.js, data/overrides.js)
 
 - [x] 2026-11-06 고2 선택과목 최소 세트: 과학 8(물리학·화학·생명과학·지구과학), 사회 6(사회와 문화·세계시민과 지리·현대사회와 윤리), 역사 6(세계사·동아시아 역사 기행). 교과서 목차 원문은 미확인(파일 머리말 '추정') — 2027 이후 교과서 차례로 대조
