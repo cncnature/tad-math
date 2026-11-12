@@ -1,11 +1,11 @@
 {
- "date": "2026-11-11",
+ "date": "2026-11-12",
  "sources": [
   {
    "id": "kice-suneung",
    "name": "한국교육과정평가원 수능 공지",
    "ok": true,
-   "found": 9,
+   "found": 3,
    "fresh": 0
   },
   {
@@ -67,8 +67,8 @@
  "changes": [
   {
    "source": "예스24 — 2022 개정 중3 교재 출간 감시",
-   "title": "쎈 중등 수학 3-1 (2027년)",
-   "href": "https://www.yes24.com/product/goods/141316833",
+   "title": "개념풀 중학 과학 3-1 (2027년)",
+   "href": "https://www.yes24.com/product/goods/200776824",
    "affects": [
     "data/subjects/*-g3.js",
     "data/overrides.js"
@@ -76,8 +76,8 @@
   },
   {
    "source": "예스24 — 2022 개정 중3 교재 출간 감시",
-   "title": "쎈 중등 수학 3-1 (2027년) 새창이동",
-   "href": "https://www.yes24.com/product/goods/141316833",
+   "title": "개념풀 중학 과학 3-1 (2027년) 새창이동",
+   "href": "https://www.yes24.com/product/goods/200776824",
    "affects": [
     "data/subjects/*-g3.js",
     "data/overrides.js"
