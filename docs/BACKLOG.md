@@ -56,6 +56,8 @@
 - [ ] 학부모 5줄 요약에 과목별 정답률 포함
 
 ## 자동 감지 (scripts/watch.js — 주간 조사가 내용을 읽고 반영한 뒤 [x])
+- [ ] 2026-11-14 예스24 — 2022 개정 중3 교재 출간 감시: 수학의 바이블 개념ON 중학수학 3-1 (2027년) — https://www.yes24.com/product/goods/191546842 (영향: data/subjects/*-g3.js, data/overrides.js)
+- [ ] 2026-11-14 예스24 — 2022 개정 중3 교재 출간 감시: 100발100중 중등 짱 시험유형 3-1 (2027년) — https://www.yes24.com/product/goods/200929196 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-12 예스24 — 2022 개정 중3 교재 출간 감시: 개념풀 중학 과학 3-1 (2027년) — https://www.yes24.com/product/goods/200776824 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-11 예스24 — 2022 개정 중3 교재 출간 감시: 쎈 중등 수학 3-1 (2027년) — https://www.yes24.com/product/goods/141316833 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-10 교육부 보도자료: 스마트 안경 관련 내신평가 부정행위 전수조사 결과 — https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe# (영향: data/edu-timeline.js, data/advisory.js, data/subjects/*)
