@@ -56,11 +56,11 @@
 - [ ] 학부모 5줄 요약에 과목별 정답률 포함
 
 ## 자동 감지 (scripts/watch.js — 주간 조사가 내용을 읽고 반영한 뒤 [x])
-- [ ] 2026-11-14 예스24 — 2022 개정 중3 교재 출간 감시: 수학의 바이블 개념ON 중학수학 3-1 (2027년) — https://www.yes24.com/product/goods/191546842 (영향: data/subjects/*-g3.js, data/overrides.js)
+- [ ] 2026-11-14 예스24 — 2022 개정 중3 교재 출간 감시(2026-11-15 조사: 쎈 3-1 목차로 수학 3-1 순서 확인 완료, 과학 3-1(개념풀)은 페이지 접근 실패 — 다음 주 재시도): 수학의 바이블 개념ON 중학수학 3-1 (2027년) — https://www.yes24.com/product/goods/191546842 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-14 예스24 — 2022 개정 중3 교재 출간 감시: 100발100중 중등 짱 시험유형 3-1 (2027년) — https://www.yes24.com/product/goods/200929196 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-12 예스24 — 2022 개정 중3 교재 출간 감시: 개념풀 중학 과학 3-1 (2027년) — https://www.yes24.com/product/goods/200776824 (영향: data/subjects/*-g3.js, data/overrides.js)
-- [ ] 2026-11-11 예스24 — 2022 개정 중3 교재 출간 감시: 쎈 중등 수학 3-1 (2027년) — https://www.yes24.com/product/goods/141316833 (영향: data/subjects/*-g3.js, data/overrides.js)
-- [ ] 2026-11-10 교육부 보도자료: 스마트 안경 관련 내신평가 부정행위 전수조사 결과 — https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe# (영향: data/edu-timeline.js, data/advisory.js, data/subjects/*)
+- [x] (2026-11-15) 2026-11-11 예스24 — 2022 개정 중3 교재 출간 감시: 쎈 중등 수학 3-1 (2027년) — https://www.yes24.com/product/goods/141316833 — 목차 확인: Ⅰ 제곱근과 실수 → Ⅱ 다항식의 곱셈과 인수분해 → Ⅲ 이차방정식 → Ⅳ 함수(이차함수 그래프·활용). 사이트 수학 u6~u9(g31) 순서·학기 배치와 일치, 정정 없음(overrides.log 기록)
+- [x] (2026-11-15) 2026-11-10 교육부 보도자료: 스마트 안경 관련 내신평가 부정행위 전수조사 결과 — https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe# — 5,679개교 전수조사 4건(중1·고3) 0점 처리 → advisory '시험 규정' 게시글(수능 반입금지·가채점표 규정과 묶음)로 반영. 제도·일정 변경 없음
 - [ ] 2026-11-09 예스24 — 2022 개정 중3 교재 출간 감시: 최고득점 수학 중등 3-1 (2027년) — https://www.yes24.com/product/goods/200662866 (영향: data/subjects/*-g3.js, data/overrides.js)
 
 - [x] 2026-11-06 고2 선택과목 최소 세트: 과학 8(물리학·화학·생명과학·지구과학), 사회 6(사회와 문화·세계시민과 지리·현대사회와 윤리), 역사 6(세계사·동아시아 역사 기행). 교과서 목차 원문은 미확인(파일 머리말 '추정') — 2027 이후 교과서 차례로 대조
