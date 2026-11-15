@@ -1,5 +1,5 @@
 {
- "date": "2026-11-14",
+ "date": "2026-11-15",
  "sources": [
   {
    "id": "kice-suneung",
@@ -12,7 +12,7 @@
    "id": "moe-press",
    "name": "교육부 보도자료",
    "ok": true,
-   "found": 13,
+   "found": 11,
    "fresh": 0
   },
   {
@@ -54,7 +54,7 @@
    "name": "예스24 — 2022 개정 중3 교재 출간 감시",
    "ok": true,
    "found": 48,
-   "fresh": 4
+   "fresh": 0
   },
   {
    "id": "yes24-h3",
@@ -64,42 +64,5 @@
    "fresh": 0
   }
  ],
- "changes": [
-  {
-   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
-   "title": "100발100중 중등 짱 시험유형 3-1 (2027년)",
-   "href": "https://www.yes24.com/product/goods/200929196",
-   "affects": [
-    "data/subjects/*-g3.js",
-    "data/overrides.js"
-   ]
-  },
-  {
-   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
-   "title": "100발100중 중등 짱 시험유형 3-1 (2027년) 새창이동",
-   "href": "https://www.yes24.com/product/goods/200929196",
-   "affects": [
-    "data/subjects/*-g3.js",
-    "data/overrides.js"
-   ]
-  },
-  {
-   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
-   "title": "수학의 바이블 개념ON 중학수학 3-1 (2027년)",
-   "href": "https://www.yes24.com/product/goods/191546842",
-   "affects": [
-    "data/subjects/*-g3.js",
-    "data/overrides.js"
-   ]
-  },
-  {
-   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
-   "title": "수학의 바이블 개념ON 중학수학 3-1 (2027년) 새창이동",
-   "href": "https://www.yes24.com/product/goods/191546842",
-   "affects": [
-    "data/subjects/*-g3.js",
-    "data/overrides.js"
-   ]
-  }
- ]
+ "changes": []
 }
