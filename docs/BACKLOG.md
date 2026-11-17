@@ -56,6 +56,7 @@
 - [ ] 학부모 5줄 요약에 과목별 정답률 포함
 
 ## 자동 감지 (scripts/watch.js — 주간 조사가 내용을 읽고 반영한 뒤 [x])
+- [ ] 2026-11-17 예스24 — 2022 개정 중3 교재 출간 감시: EBS 중학 뉴런 백점기출 수학 3-1 (2027년) — https://www.yes24.com/product/goods/201103126 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-14 예스24 — 2022 개정 중3 교재 출간 감시(2026-11-15 조사: 쎈 3-1 목차로 수학 3-1 순서 확인 완료, 과학 3-1(개념풀)은 페이지 접근 실패 — 다음 주 재시도): 수학의 바이블 개념ON 중학수학 3-1 (2027년) — https://www.yes24.com/product/goods/191546842 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-14 예스24 — 2022 개정 중3 교재 출간 감시: 100발100중 중등 짱 시험유형 3-1 (2027년) — https://www.yes24.com/product/goods/200929196 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-12 예스24 — 2022 개정 중3 교재 출간 감시: 개념풀 중학 과학 3-1 (2027년) — https://www.yes24.com/product/goods/200776824 (영향: data/subjects/*-g3.js, data/overrides.js)
