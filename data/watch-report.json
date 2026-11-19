@@ -1,5 +1,5 @@
 {
- "date": "2026-11-18",
+ "date": "2026-11-19",
  "sources": [
   {
    "id": "kice-suneung",
@@ -12,8 +12,8 @@
    "id": "moe-press",
    "name": "교육부 보도자료",
    "ok": true,
-   "found": 15,
-   "fresh": 2
+   "found": 16,
+   "fresh": 1
   },
   {
    "id": "adiga",
@@ -54,7 +54,7 @@
    "name": "예스24 — 2022 개정 중3 교재 출간 감시",
    "ok": true,
    "found": 48,
-   "fresh": 0
+   "fresh": 2
   },
   {
    "id": "yes24-h3",
@@ -67,7 +67,7 @@
  "changes": [
   {
    "source": "교육부 보도자료",
-   "title": "2027 수능 강화된 부정행위 예방조치에 따른 수험생 유의사항 추가 안내",
+   "title": "수능 부정행위 결코 용납하지 않겠습니다",
    "href": "https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe#",
    "affects": [
     "data/edu-timeline.js",
@@ -76,13 +76,21 @@
    ]
   },
   {
-   "source": "교육부 보도자료",
-   "title": "수능시험일 위급재난문자가 발송됩니다",
-   "href": "https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe#",
+   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
+   "title": "백신 중학 과학 3-1 (2027년)",
+   "href": "https://www.yes24.com/product/goods/201268376",
    "affects": [
-    "data/edu-timeline.js",
-    "data/advisory.js",
-    "data/subjects/*"
+    "data/subjects/*-g3.js",
+    "data/overrides.js"
+   ]
+  },
+  {
+   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
+   "title": "백신 중학 과학 3-1 (2027년) 새창이동",
+   "href": "https://www.yes24.com/product/goods/201268376",
+   "affects": [
+    "data/subjects/*-g3.js",
+    "data/overrides.js"
    ]
   }
  ]
