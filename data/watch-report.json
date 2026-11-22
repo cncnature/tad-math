@@ -1,5 +1,5 @@
 {
- "date": "2026-11-21",
+ "date": "2026-11-22",
  "sources": [
   {
    "id": "kice-suneung",
@@ -12,7 +12,7 @@
    "id": "moe-press",
    "name": "교육부 보도자료",
    "ok": true,
-   "found": 15,
+   "found": 14,
    "fresh": 0
   },
   {
@@ -25,8 +25,9 @@
   {
    "id": "kcue",
    "name": "한국대학교육협의회 보도자료",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true,
+   "found": 1,
+   "fresh": 0
   },
   {
    "id": "sen-exam",
