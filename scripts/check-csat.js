@@ -14,7 +14,7 @@ for(const f of fs.readdirSync(path.join(root,"data/subjects"))){ const s=fs.read
 try{ run("data/suneung.js"); (w.DATA.suneung.patterns||[]).forEach(p=>pats.add(p.id)); }catch(e){}
 for(const f of fs.readdirSync(path.join(root,"data")).filter(f=>/^curriculum.*\.js$/.test(f))){ const s=fs.readFileSync(path.join(root,"data",f),"utf8"); for(const m of s.matchAll(/\bid:\s*"([a-zA-Z0-9-]+)"/g)) study.add(m[1]); }
 const okLink=h=>{ let m; if((m=h.match(/^#\/sub\/(kor|eng|sci|soc|his|math)\/([a-z0-9-]+)$/))) return subs.has(m[2]); if((m=h.match(/^#\/patterns\/([a-z0-9-]+)$/))) return pats.has(m[1]); if((m=h.match(/^#\/study\/([a-zA-Z0-9-]+)\/([a-zA-Z0-9-]+)$/))) return study.has(m[1])&&study.has(m[2]); if((m=h.match(/^#\/s\/(kor|eng|sci|soc|his|math)(\/[a-z0-9-]+)?(\?b=[a-z0-9]+)?$/))) return !m[2]||subs.has(m[2].slice(1)); return /^#\/(csat|mix|mathme|rq|exam-prep|patterns)(\/|\?|$)/.test(h); };
-const areas=new Set((C&&C.areas||[]).map(a=>a.id)); const ids=new Set(); const pos={};
+const byP=new Set((w.DATA.csatPatterns||[]).map(p=>p.id)); const areas=new Set((C&&C.areas||[]).map(a=>a.id)); const ids=new Set(); const pos={};
 P.forEach(p=>{ const t=p.id||"(id 없음)";
   if(ids.has(p.id)) err.push("중복 id "+t); ids.add(p.id);
   if(!areas.has(p.area)) err.push("area "+t);
@@ -26,6 +26,10 @@ P.forEach(p=>{ const t=p.id||"(id 없음)";
   if(!(p.src||[]).length) err.push("출처 없음 "+t);
   (p.links||[]).forEach(l=>{ if(!okLink(l.h)) err.push("깨진 링크 "+t+" → "+l.h); });
 });
+const qok=(q,t)=>{ if(!q.q||!q.exp) err.push("문제 필드 "+t); if(q.opts){ if(q.opts.length!==5) err.push("opts 5개 아님 "+t); if(!(q.a>=0&&q.a<5)) err.push("정답 a "+t); } else if(q.ans==null||q.ans==="") err.push("단답 ans 없음 "+t); };
+P.forEach(p=>{ (p.more||[]).forEach((q,i)=>qok(q,p.id+" more"+i)); (p.refs||[]).forEach((r,i)=>{ if(!r.exam||!r.no||!r.type) err.push("refs 필드 "+p.id+" #"+i); }); if(p.key&&p.key.length!==3) err.push("key 3개 아님 "+p.id); });
+const H=w.DATA.csatHard||[]; const hid=new Set();
+H.forEach(h=>{ const t=h.id||"(hard id 없음)"; if(hid.has(h.id)) err.push("hard 중복 "+t); hid.add(h.id); if(!byP.has(h.pattern)) err.push("hard pattern "+t+" → "+h.pattern); if(!["킬러","준킬러"].includes(h.era)) err.push("hard era "+t); if(!(h.why||[]).length||!(h.plan||[]).length||!(h.src||[]).length) err.push("hard 필수 "+t); if((h.ladder||[]).length!==3) err.push("hard ladder 3단계 아님 "+t); (h.ladder||[]).forEach((q,i)=>qok(q,t+" ladder"+i)); (h.tools||[]).forEach(x=>{ if(x.h&&!okLink(x.h)) err.push("hard 링크 "+t+" → "+x.h); }); });
 (C&&C.stages||[]).forEach(s=>Object.values(s.tasks||{}).flat().forEach(x=>{ if(!okLink(x.h)) err.push("stage 링크 "+s.id+" → "+x.h); }));
 if(err.length){ console.error("CSAT 오류\n"+err.join("\n")); process.exit(1); }
-console.log("OK csat — 파일",files.length,"패턴",P.length,"갈래",Object.values(T).flat().length,"정답 위치",JSON.stringify(pos));
+console.log("OK csat — 파일",files.length,"패턴",P.length,"고난도",(w.DATA.csatHard||[]).length,"갈래",Object.values(T).flat().length,"정답 위치",JSON.stringify(pos));
