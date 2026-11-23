@@ -10,12 +10,17 @@
     "모의평가",
     "시행",
     "기본계획",
-    "예시문항"
+    "예시문항",
+    "출제",
+    "절대평가",
+    "서술형",
+    "논술형"
    ],
    "affects": [
     "data/edu-timeline.js",
     "data/daily-config.js",
-    "data/advisory.js"
+    "data/advisory.js",
+    "data/csat/system.js"
    ]
   },
   {
@@ -33,7 +38,8 @@
    "affects": [
     "data/edu-timeline.js",
     "data/advisory.js",
-    "data/subjects/*"
+    "data/subjects/*",
+    "data/csat/system.js"
    ]
   },
   {

@@ -1240,6 +1240,7 @@
   function route(){
     const h=location.hash.replace(/^#\/?/,""); const [path,qs]=h.split("?"); const p=path.split("/").filter(Boolean);
     const r=p[0]||"";
+    if(window.CSAT&&window.CSAT.route(r,p,qs)) return;
     if(window.ROOM&&window.ROOM.route(r,p,qs)) return;
     if(r==="") return home();
     if(r==="me") return me(qs);
@@ -1304,5 +1305,6 @@
   // 전 과목 공부방(js/room.js)에 공통 도구를 넘기고 라우터에 끼운다
   window.APP={D,main,store,render,esc,md,tag,G,quizHtml,mastery,STATUS,profile,setup,lessonsAll,byLesson,byUnit,subLesson,subScore,SUBJ,todayKey,dayDiff,nextExam,schedGet,earnTok,logQ,calStats,typeset,aiPanel,aiBind,aiCall,notFound,activeDays};
   if(window.ROOM_INIT) try{ window.ROOM_INIT(window.APP); }catch(e){ console.error("ROOM init",e); }
+  if(window.CSAT_INIT) try{ window.CSAT_INIT(window.APP); }catch(e){ console.error("CSAT init",e); }
   route();
 })();

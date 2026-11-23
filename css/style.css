@@ -554,3 +554,13 @@ mark.hl.g{background:linear-gradient(104deg,transparent 2%,var(--hl2) 3%,var(--h
 .paper-break{break-before:page}
 .paper .ans-key{display:grid;grid-template-columns:repeat(5,1fr);gap:4px 10px;font-size:.85rem;margin:6px 0 10px}
 @media print{.paper .pq-data{background:#fff}.paper .note{page-break-inside:auto}}
+
+/* 수능 전략 센터 */
+.cbar{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin:8px 0 2px}.cbar i{display:block;height:100%;background:var(--acc)}
+.csat-p{border-top:3px solid var(--c,var(--acc))}.csat-p h3{margin:.3em 0 .1em;font-size:1.02rem}.csat-p.later{opacity:.62}
+.csat-strand>summary{cursor:pointer;list-style:none}.csat-strand>summary::-webkit-details-marker{display:none}
+.csat-stage.now{border:2px solid var(--acc)}
+.tbl td,.tbl th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}.tbl tr.hl td{background:rgba(47,111,237,.08)}
+.tag.warn{background:rgba(224,138,30,.16);color:#a85d00}.tag.ok{background:rgba(31,157,85,.14);color:#167a41}
+.pill.cf.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+#cq .q{white-space:pre-line;line-height:1.7}#cq .opts button:disabled{cursor:default;opacity:.85}#cq .opts button.ok,#cq .opts button.bad{opacity:1}
