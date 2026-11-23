@@ -633,10 +633,11 @@
     const lifeItems=D.life.filter(x=>x.node===l.node).slice(0,3); const ppl=D.people.filter(p=>p.link===l.id||p.node===l.node).slice(0,2);
     { const v=store.get("visit",{}); v[l.id]={n:(v[l.id]?v[l.id].n:0)+1,last:Date.now()}; store.set("visit",v); } const mst=mastery(l); const [stn,stc]=STATUS(mst.pct);
     render(`<div class="lhead ${GCOL(u.grade)}"><div class="crumb"><a href="#/">홈</a> › <a href="#/study">수학 학습</a> › <a href="#/study/${u.id}">${u.title}</a></div>${tag(u.grade)} <span class="tag">소단원 ${idx+1}/${u.lessons.length}</span> <span class="st ${stc}">목표율 ${mst.pct}% · ${stn}</span><h1>${l.title}</h1><p class="lead">${teaser(l.concept[0],90)}</p>${(D.standards&&D.standards.lessons[l.id])?`<p class="muted small" title="2022 개정 수학과 교육과정(교육부 고시 제2022-33호 별책 8)">성취기준 ${D.standards.lessons[l.id].map(c=>`<code>[${c}]</code> ${esc(D.standards.codes[c]||"")}`).join(" · ")}</p>`:""}</div>
-    <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["story","이야기"],["pit","오개념"],["pt","출제 포인트"],["f","공식"],["ex","예제"],["quiz","퀴즈"],["bridge","개념 연결"],["place","개념의 자리"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
+    <div class="pill-row">${[["c","핵심 개념"],["why","왜 그런지"],["story","이야기"],["pit","오개념"],["pt","출제 포인트"],["f","공식"],["ex","예제"],["quiz","퀴즈"],["bridge","개념 연결"],["place","개념의 자리"],["wb","🖊 판서"]].map(([k,n])=>`<button class="pill" data-to="${k}">${n}</button>`).join("")}</div>
     <h2 id="c">핵심 개념</h2><div class="concept-row"><ul>${l.concept.map(c=>`<li>${md(c)}</li>`).join("")}</ul>${figOf(l.id)}</div>
     <h2 id="why">왜 그런지</h2><div class="box">${md(l.why)}</div>
     ${l.story?`<h2 id="story">📖 공식이 태어나는 이야기</h2><p class="muted">외우기 전에 읽는 서너 문단. 어디서 왔고 왜 그 모양인지 알면 공식은 저절로 나옵니다.</p><div class="story">${l.story.map((st,i)=>`<div class="st"><div class="st-n">${i+1}</div><div><h4>${md(st.h)}</h4><p>${md(st.t)}</p></div></div>`).join("")}</div>`:""}
+    ${window.BOARD_AUTO&&window.BOARD_AUTO.section?window.BOARD_AUTO.section(l):""}
     ${l.visuals&&l.visuals.length?`<h2 id="vis">🖼 한눈에 보기</h2>${window.VIS.renderAll(l.visuals)}`:""}
     ${l.pitfalls?`<h2 id="pit">⚠️ 흔한 오개념 · 함정</h2><ul class="pit">${l.pitfalls.map(c=>`<li>${md(c)}</li>`).join("")}</ul>`:""}
     ${(D.spot||[]).filter(x=>x.lesson===l.id).map(x=>{ const r=store.get("spot",{})[x.id]; return `<a class="card link" href="#/spot/${x.id}" style="display:block;margin:8px 0">🔍 <b>틀린 풀이 찾기</b> — ${x.title} ${r?`<span class="tag">${r.ok?"오류 찾음 ✓":"다시 도전"}</span>`:'<span class="tag">채점자 되기</span>'}</a>`; }).join("")}
@@ -655,6 +656,7 @@
     <div class="row" style="margin-top:24px">${prev?`<a class="btn ghost" href="#/study/${u.id}/${prev.id}">← ${prev.title}</a>`:""}${next?`<a class="btn" href="#/study/${u.id}/${next.id}">${next.title} →</a>`:`<a class="btn" href="#/study">다음 단원 고르기 →</a>`}</div>`);
     widgets.forEach(([k,w])=>w.render($("#w-"+k)));
     aiBind("ai-lesson",msg=>aiCall("/api/tad/chat",{message:msg,context:{title:l.title,concept:l.concept,why:l.why,pitfalls:l.pitfalls||[],pct:mst.pct,acc:mst.acc!=null?Math.round(mst.acc*100)+"%":"-"}}));
+    if(window.BOARD_AUTO&&window.BOARD_AUTO.bind) window.BOARD_AUTO.bind(l);
     const gb=$("#gen-more"); if(gb) gb.onclick=()=>{ const items=window.GEN?window.GEN.make(l.id,l.node,3):[]; if(!items.length){ gb.textContent="이 소단원은 생성기가 없습니다"; return; } $("#gen-box").insertAdjacentHTML("beforeend",quizHtml(items,"gen:"+l.id,Date.now())); typeset(); };
     main.querySelectorAll("[data-to]").forEach(b=>b.onclick=()=>{ const t=document.getElementById(b.dataset.to); if(t) t.scrollIntoView({behavior:"smooth",block:"start"}); });
   }

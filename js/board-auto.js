@@ -24,10 +24,15 @@
       pushStep(steps.length?"핵심 개념 이어서":"핵심 개념"); }
     else steps.push({title:"",say:strip(l.title),ops:[title]});
     // 2. 시각 자료 한 장씩
-    (l.visuals||[]).forEach(v=>{ const f=visOf(v.type); if(!f) return; let ops; try{ ops=f(v); }catch(e){ return; } if(!ops||!ops.length) return; const head=W(X0,TOP-12,strip(v.title||""),42,"green");
-      const note=v.note?block(X0,BOT-70,v.note,28,XW,"gray"):null; const all=[...wipe(),head,...ops]; if(note&&note.h<=80) all.push(...note.ops);
+    (l.visuals||[]).forEach(v=>{ const f=visOf(v.type); if(!f) return; const saved=live.slice(), n0=n; const er=wipe(); let ops; try{ ops=f(v); }catch(e){ ops=null; } if(!ops||!ops.length){ live=saved; n=n0; return; } const head=W(X0,TOP-12,strip(v.title||""),42,"green");
+      const nh=v.note?wrap(strip(v.note),28,XW).length*28*1.3:0; const note=v.note&&nh<=80?block(X0,BOT-70,v.note,28,XW,"gray"):null; const all=[...er,head,...ops]; if(note) all.push(...note.ops);
       steps.push({title:strip(v.title||""),say:strip(v.title||"")+(v.note?" — "+strip(v.note).slice(0,90):""),ops:all}); });
-    // 3. 한 문장 정리
+    // 3. 예제 — 단계별 풀이(문제 → 풀이 한 줄씩 → 답 상자)
+    const ex=l.example; if(ex&&ex.q&&(ex.sol||[]).length){ const NUM="①②③④⑤⑥⑦⑧⑨⑩"; let y=TOP+50; let ops=[...wipe(),W(X0,TOP-12,"예제 — 단계별 풀이",42,"green")];
+      const q=block(X0,y,"문제. "+ex.q,38,XW,"ink",1.32); ops.push(...q.ops); y+=q.h+16; ops.push(line(X0,y,X0+XW,y,"gray",false,true)); y+=34; steps.push({title:"예제",say:"예제 문제: "+strip(ex.q).slice(0,110),ops});
+      ex.sol.forEach((sx,i)=>{ const ls=wrap(strip(sx),40,XW-90); const h=ls.length*53+18; ops=[]; if(y+h>BOT-100){ ops.push(...wipe(),W(X0,TOP-12,"예제 풀이 이어서",42,"green")); y=TOP+50; } ops.push(W(X0,y,NUM[i]||String(i+1)+".",40,"red")); ops.push(W(X0+64,y,ls.join("\n"),40,"ink")); y+=h; steps.push({title:"풀이 "+(i+1),say:strip(sx).slice(0,130),ops}); });
+      if(ex.ans){ const a="답: "+strip(ex.ans); const ls=wrap(a,46,XW-160); const h=ls.length*60+30; ops=[]; if(y+h+20>BOT){ ops.push(...wipe()); y=TOP+50; } y+=12; const w=Math.min(XW-40,Math.max(...ls.map(t=>width(t,46)))+70); ops.push(W(X0+64+35,y+14,ls.join("\n"),46,"red")); ops.push(box(X0+64,y,w,h,"red")); steps.push({title:"답",say:a,ops}); } }
+    // 4. 한 문장 정리
     if(l.memo){ const ops=[...wipe(),W(X0,TOP+40,"한 문장 정리",44,"blue")]; const b=block(X0+20,TOP+130,l.memo,52,XW-40,"red",1.35); ops.push(...b.ops); ops.push(put({op:"path",id:id("u"),d:`M ${X0} ${R(TOP+150+b.h)} Q ${X0+700} ${R(TOP+170+b.h)} ${X0+1400} ${R(TOP+146+b.h)}`,color:"red",width:6})); steps.push({title:"한 문장 정리",say:"한 문장으로 정리하면: "+strip(l.memo),ops}); }
     return steps.length?{title:strip(l.title),steps}:null;
 
@@ -61,5 +66,14 @@
     if(l.why) out.push({q:"왜 그래요?",steps:[{say:strip(l.why).slice(0,160),ops:card("왜 그럴까",[l.why])}]});
     if((l.pattern||[]).length) out.push({q:"풀이 순서는?",steps:[{say:"풀이 순서: "+strip(l.pattern[0]),ops:card("풀이 순서",l.pattern,"blue")}]});
     return out; }
-  window.BOARD_AUTO={fromLesson,asksOf,wrap};
+  // 페이지 섹션(수학 소단원·과목 차시 공용): lessonMotion 이 있으면 단계별 풀이 판서·모션 탭, 아래에 접힌 자동 판서
+  const esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  function section(l){ if(!window.BOARD||!l) return ""; const D=window.DATA||{}; const mo=(D.lessonMotion||{})[l.id]; const auto=fromLesson(l); const ask=asksOf(l);
+    const step=mo&&window.MOTION?`<h2 id="wb">🖊 선생님 판서 — 단계별 풀이</h2><div class="pill-row noprint"><button class="pill wbt on" data-v="b">🖊 판서</button><button class="pill wbt" data-v="m">🎬 모션</button><span class="muted small">▶ 판서 시작 · 🔊 음성 · ✏️ 내가 써 보기 · 🙋 질문</span></div><div class="wbp" data-v="b">${window.BOARD.render(window.BOARD.fromMotion(mo),{ask})}</div><div class="wbp" data-v="m" hidden>${window.MOTION.render(mo)}</div>`:"";
+    const au=auto?`<details class="card wbwrap" ${step?"":"id=\"wb\""}><summary><b>🖊 ${step?"개념·예제 판서":"판서로 보기"}</b> <span class="muted small">— 핵심 개념·한눈에 보기${l.example?"·예제 단계별 풀이":""}를 선생님이 손글씨로 (${auto.steps.length}장) · 음성 · 내가 써 보기 · 질문</span></summary><div class="wbslot"></div></details>`:"";
+    return step+au; }
+  function bind(l){ document.querySelectorAll(".wbt").forEach(t=>t.onclick=()=>{ document.querySelectorAll(".wbt").forEach(x=>x.classList.toggle("on",x===t)); document.querySelectorAll(".wbp").forEach(p=>p.hidden=p.dataset.v!==t.dataset.v); });
+    document.querySelectorAll(".wbwrap").forEach(d=>d.addEventListener("toggle",()=>{ const slot=d.querySelector(".wbslot"); if(d.open&&!slot.childElementCount){ slot.innerHTML=window.BOARD.render(fromLesson(l),{ask:asksOf(l)}); window.BOARD.mount(slot); } }));
+    if(window.BOARD) window.BOARD.mount(); if(window.MOTION) window.MOTION.mount(); }
+  window.BOARD_AUTO={fromLesson,asksOf,wrap,section,bind};
 })();

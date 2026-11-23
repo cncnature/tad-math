@@ -17,11 +17,11 @@
   const SUP={"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","n":"ⁿ","+":"⁺","-":"⁻","(":"⁽",")":"⁾","x":"ˣ"};
   function plain(t){ let s=String(t??"").replace(/\$+([^$]*)\$+/g,(m,x)=>x);
     for(let k=0;k<3;k++) s=s.replace(/\\(?:text|mathrm|mathbf|operatorname)\{([^{}]*)\}/g,"$1");
-    s=s.replace(/_\{([^{}]*)\}/g,"$1").replace(/\\(?:d|t)?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g,(m,a,b)=>(a.length>1?"("+a+")":a)+"/"+(b.length>1?"("+b+")":b)).replace(/\\(?:d|t)?frac\s*([^\s{}\\])\s*([^\s{}\\])/g,"$1/$2")
+    s=s.replace(/_\{([^{}]*)\}/g,"$1").replace(/\\(?:d|t)?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g,(m,a,b)=>{ const q=x=>/^[0-9A-Za-z가-힣.′″]+$/.test(x)?x:"("+x+")"; return q(a)+"/"+q(b); }).replace(/\\(?:d|t)?frac\s*([^\s{}\\])\s*([^\s{}\\])/g,"$1/$2")
      .replace(/\\sqrt\{([^{}]*)\}/g,"√($1)").replace(/\\sqrt\s*([^\s{}\\])/g,"√$1")
      .replace(/\^\{([^{}]*)\}/g,(m,x)=>/^[0-9n+\-()x]+$/.test(x)?[...x].map(c=>SUP[c]).join(""):"^("+x+")").replace(/\^([0-9nx])/g,(m,x)=>SUP[x])
      .replace(/_\{([^{}]*)\}/g,"$1").replace(/_([A-Za-z0-9가-힣])/g,"$1")
-     .replace(/\\(times|cdot)/g,"×").replace(/\\div/g,"÷").replace(/\\(le|leq)(?![a-zA-Z])/g,"≤").replace(/\\(ge|geq)(?![a-zA-Z])/g,"≥").replace(/\\(ne|neq)(?![a-zA-Z])/g,"≠").replace(/\\(to|rightarrow|longrightarrow|arrow)(?![a-zA-Z])/g,"→").replace(/\\leftrightarrow(?![a-zA-Z])/g,"↔").replace(/\\infty/g,"∞").replace(/\\sim(?![a-zA-Z])/g,"~").replace(/\\approx(?![a-zA-Z])/g,"≈").replace(/\\pm(?![a-zA-Z])/g,"±")
+     .replace(/\\(times|cdot)/g,"×").replace(/\\div/g,"÷").replace(/\\(le|leq)(?![a-zA-Z])/g,"≤").replace(/\\(ge|geq)(?![a-zA-Z])/g,"≥").replace(/\\(ne|neq)(?![a-zA-Z])/g,"≠").replace(/\\(to|rightarrow|longrightarrow|arrow)(?![a-zA-Z])/g,"→").replace(/\\(Rightarrow|implies)(?![a-zA-Z])/g,"⇒").replace(/\\(Leftrightarrow|iff)(?![a-zA-Z])/g,"⇔").replace(/\\leftrightarrow(?![a-zA-Z])/g,"↔").replace(/\\infty/g,"∞").replace(/\\sim(?![a-zA-Z])/g,"~").replace(/\\approx(?![a-zA-Z])/g,"≈").replace(/\\pm(?![a-zA-Z])/g,"±")
      .replace(/\\pi/g,"π").replace(/\\theta/g,"θ").replace(/\\alpha/g,"α").replace(/\\beta/g,"β").replace(/\\sigma/g,"σ").replace(/\\mu/g,"μ").replace(/\\Delta/g,"Δ").replace(/\\lambda/g,"λ").replace(/\\omega/g,"ω").replace(/\\sum/g,"Σ").replace(/\\int/g,"∫").replace(/\\lim/g,"lim").replace(/\\circ/g,"°")
      .replace(/\\(qquad|quad)/g,"   ").replace(/\\(left|right|displaystyle|,|;|!)/g,"").replace(/[{}]/g,"").replace(/\\/g,"").replace(/[ \t]{4,}/g,"   ").trim(); return s; }
 

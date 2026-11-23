@@ -138,13 +138,8 @@ window.ROOM_INIT=function(A){
 
   // ---------- 4. 차시 페이지 (과목, #/sub/:sid/:lid) — 수학 소단원과 같은 설계 + 3단계 ----------
   // 🖊 판서로 보기: 단계별 풀이 판서(data/lesson-motion)가 있으면 펼쳐 보여 주고, 없으면 자동 판서(개념·시각 자료)를 접어 둔다.
-  function wbSection(sid,l){ if(!window.BOARD||!window.BOARD_AUTO) return ""; const mo=(D.lessonMotion||{})[l.id]; const auto=window.BOARD_AUTO.fromLesson(l); const ask=window.BOARD_AUTO.asksOf(l);
-    const step=mo&&window.MOTION?`<h2 id="wb">🖊 선생님 판서 — 단계별 풀이</h2><div class="pill-row noprint"><button class="pill wbt on" data-v="b">🖊 판서</button><button class="pill wbt" data-v="m">🎬 모션</button><span class="muted small">▶ 판서 시작 · 🔊 음성 · ✏️ 내가 써 보기 · 🙋 질문</span></div><div class="wbp" data-v="b">${window.BOARD.render(window.BOARD.fromMotion(mo),{ask})}</div><div class="wbp" data-v="m" hidden>${window.MOTION.render(mo)}</div>`:"";
-    const au=auto?`<details class="card wbwrap" ${step?"":"id=\"wb\""}><summary><b>🖊 ${step?"개념 정리 판서":"판서로 보기"}</b> <span class="muted small">— 핵심 개념·한눈에 보기를 선생님이 손글씨로 (${auto.steps.length}장) · 음성 · 내가 써 보기 · 질문</span></summary><div class="wbslot" data-l="${esc(l.id)}"></div></details>`:"";
-    return step+au; }
-  function wbBind(l){ document.querySelectorAll(".wbt").forEach(t=>t.onclick=()=>{ document.querySelectorAll(".wbt").forEach(x=>x.classList.toggle("on",x===t)); document.querySelectorAll(".wbp").forEach(p=>p.hidden=p.dataset.v!==t.dataset.v); });
-    document.querySelectorAll(".wbwrap").forEach(d=>d.addEventListener("toggle",()=>{ const slot=d.querySelector(".wbslot"); if(d.open&&!slot.childElementCount){ slot.innerHTML=window.BOARD.render(window.BOARD_AUTO.fromLesson(l),{ask:window.BOARD_AUTO.asksOf(l)}); window.BOARD.mount(slot); } }));
-    if(window.BOARD) window.BOARD.mount(); if(window.MOTION) window.MOTION.mount(); }
+  function wbSection(sid,l){ return window.BOARD_AUTO&&window.BOARD_AUTO.section?window.BOARD_AUTO.section(l):""; }
+  function wbBind(l){ if(window.BOARD_AUTO&&window.BOARD_AUTO.bind) window.BOARD_AUTO.bind(l); }
   function lessonPage(sid,lid){ const p=profile(); if(!p) return setup(); const s=D.subjects[sid]; if(!s) return notFound(); const hit=subLesson(lid); if(!hit||hit.s.id!==sid) return notFound(); const {u,l}=hit; const sb=SB(sid); const idx=u.lessons.findIndex(x=>x.id===lid); const prev=u.lessons[idx-1], next=u.lessons[idx+1];
     { const v=store.get("visit",{}); v[l.id]={n:(v[l.id]?v[l.id].n:0)+1,last:Date.now()}; store.set("visit",v); }
     const m=subMastery(l); const [sn,sc]=STATUS(m.pct); const p2=P2(l), p3=P3(l), pe=PE(l); const es=store.get("sess",{}); const selfx=store.get("selfx",{})[l.id]||""; const spots=(D.spot||[]).filter(x=>x.lesson===l.id);

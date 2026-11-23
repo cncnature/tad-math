@@ -2,6 +2,10 @@
 
 모션은 영역별 파일 `data/csat/motion-<영역>.js` 에 `(window.DATA.csatMotion = window.DATA.csatMotion || {})["<패턴 또는 고난도 id>"] = { ... };` 형식으로 등록한다(index.html 에 실림). 이렇게 등록하면 수능 전략 패턴이나 고난도 해부의 해당 페이지에 '🎬 모션으로 이해하기'가 나타난다. 그리는 쪽은 js/motion.js 다. 무대는 640×360 SVG이고, 단계(steps)마다 요소가 그려지거나 나타나고 강조된다. 화면 아래에는 그 단계의 설명이 함께 나온다.
 
+## 차시 단계별 풀이 판서 (data/lesson-motion)
+
+같은 형식을 `data/lesson-motion/<과목>-<학년>.js` 에 `(window.DATA.lessonMotion = window.DATA.lessonMotion || {})["<차시 또는 수학 소단원 id>"] = { ... }` 로 등록하면, 그 차시 페이지(#/sub/과목/차시 또는 #/study/단원/소단원) 맨 위에 '🖊 선생님 판서 — 단계별 풀이'(판서·모션 탭)가 나온다. 판서는 js/board.js 의 fromMotion 이 모션을 2.5배 키워 손글씨로 바꾼 것이다. 등록하지 않은 차시도 js/board-auto.js 가 핵심 개념·한눈에 보기·예제(문제→풀이 한 줄씩→답 상자)·한 문장 정리를 자동 판서로 만든다. 새 파일은 index.html 에 script 로 넣어야 하고, check-csat.js 가 대상 차시와 형식을 검사한다.
+
 ## 설계 원칙 (Mayer 멀티미디어 학습 원리)
 
 - **한 단계, 한 생각:** 한 단계에서는 새 요소를 1~3개만 보여 준다(분절).

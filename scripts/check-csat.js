@@ -37,6 +37,9 @@ const motionOk=(m,t)=>{ if(!m) return; const ids=new Set(); (m.els||[]).forEach(
   const n=(m.steps||[]).length; if(n<3||n>10) err.push("motion 단계 수 "+t+" ("+n+")"); (m.steps||[]).forEach((s,i)=>{ if(!s.say) err.push("motion say 없음 "+t+" #"+i); [...(s.show||[]),...(s.hi||[]),...(s.hide||[])].forEach(id=>{ if(!ids.has(id)) err.push("motion 없는 id "+t+" #"+i+" → "+id); }); }); };
 const MO=w.DATA.csatMotion||{}; const allIds=new Set([...P.map(p=>p.id),...(w.DATA.csatHard||[]).map(h=>h.id)]); Object.keys(MO).forEach(k=>{ if(!allIds.has(k)) err.push("motion 대상 없음 "+k); }); P.forEach(p=>{ if(!p.motion&&MO[p.id]) p.motion=MO[p.id]; }); (w.DATA.csatHard||[]).forEach(h=>{ if(!h.motion&&MO[h.id]) h.motion=MO[h.id]; });
 P.forEach(p=>motionOk(p.motion,p.id)); (w.DATA.csatHard||[]).forEach(h=>motionOk(h.motion,h.id));
+// 차시 단계별 풀이 판서(data/lesson-motion/*.js): 대상 차시(과목 차시 또는 수학 소단원)가 있는지와 모션 형식
+const lmFiles=[...html.matchAll(/<script src="(data\/lesson-motion\/[^"]+\.js)"><\/script>/g)].map(m=>m[1]); lmFiles.forEach(run); fs.readdirSync(path.join(root,"data/lesson-motion")).forEach(f=>{ if(!lmFiles.includes("data/lesson-motion/"+f)) err.push("index.html 에 없는 lesson-motion "+f); });
+const LM=w.DATA.lessonMotion||{}; Object.entries(LM).forEach(([k,m])=>{ if(!subs.has(k)&&!study.has(k)) err.push("lessonMotion 대상 없음 "+k); motionOk(m,"lesson:"+k); });
 (C&&C.stages||[]).forEach(s=>Object.values(s.tasks||{}).flat().forEach(x=>{ if(!okLink(x.h)) err.push("stage 링크 "+s.id+" → "+x.h); }));
 if(err.length){ console.error("CSAT 오류\n"+err.join("\n")); process.exit(1); }
-console.log("OK csat — 파일",files.length,"패턴",P.length,"모션",P.filter(p=>p.motion).length+(w.DATA.csatHard||[]).filter(h=>h.motion).length,"고난도",(w.DATA.csatHard||[]).length,"갈래",Object.values(T).flat().length,"정답 위치",JSON.stringify(pos));
+console.log("OK csat — 파일",files.length,"패턴",P.length,"모션",P.filter(p=>p.motion).length+(w.DATA.csatHard||[]).filter(h=>h.motion).length,"고난도",(w.DATA.csatHard||[]).length,"갈래",Object.values(T).flat().length,"차시 판서",Object.keys(w.DATA.lessonMotion||{}).length,"정답 위치",JSON.stringify(pos));
