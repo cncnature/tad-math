@@ -15,11 +15,15 @@
   const mk=(tag,attrs,parent)=>{ const e=document.createElementNS(NS,tag); for(const k in attrs) if(attrs[k]!=null) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; };
   // 판서용 수식 단순화: $…$ 안의 흔한 LaTeX 를 손글씨로 쓸 수 있는 글자로
   const SUP={"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","n":"ⁿ","+":"⁺","-":"⁻","(":"⁽",")":"⁾","x":"ˣ"};
-  function plain(t){ return String(t??"").replace(/\$+([^$]*)\$+/g,(m,x)=>x).replace(/\\(?:d|t)?frac\{([^{}]*)\}\{([^{}]*)\}/g,"($1)/($2)").replace(/\\sqrt\{([^{}]*)\}/g,"√($1)")
-      .replace(/\^\{([^{}]*)\}/g,(m,x)=>/^[0-9n+\-()x]+$/.test(x)?[...x].map(c=>SUP[c]).join(""):"^("+x+")").replace(/\^([0-9nx])/g,(m,x)=>SUP[x])
-      .replace(/_\{([^{}]*)\}/g,"$1").replace(/\\(times|cdot)/g,"×").replace(/\\div/g,"÷").replace(/\\le(q)?/g,"≤").replace(/\\ge(q)?/g,"≥").replace(/\\ne(q)?/g,"≠").replace(/\\to/g,"→").replace(/\\infty/g,"∞")
-      .replace(/\\pi/g,"π").replace(/\\theta/g,"θ").replace(/\\alpha/g,"α").replace(/\\beta/g,"β").replace(/\\sigma/g,"σ").replace(/\\mu/g,"μ").replace(/\\Delta/g,"Δ").replace(/\\sum/g,"Σ").replace(/\\int/g,"∫").replace(/\\lim/g,"lim")
-      .replace(/\\(left|right|displaystyle|,|;|!|quad)/g," ").replace(/\\text\{([^{}]*)\}/g,"$1").replace(/[{}]/g,"").replace(/\\/g,"").replace(/\s{2,}/g," ").trim(); }
+  function plain(t){ let s=String(t??"").replace(/\$+([^$]*)\$+/g,(m,x)=>x);
+    for(let k=0;k<3;k++) s=s.replace(/\\(?:text|mathrm|mathbf|operatorname)\{([^{}]*)\}/g,"$1");
+    s=s.replace(/_\{([^{}]*)\}/g,"$1").replace(/\\(?:d|t)?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g,(m,a,b)=>(a.length>1?"("+a+")":a)+"/"+(b.length>1?"("+b+")":b)).replace(/\\(?:d|t)?frac\s*([^\s{}\\])\s*([^\s{}\\])/g,"$1/$2")
+     .replace(/\\sqrt\{([^{}]*)\}/g,"√($1)").replace(/\\sqrt\s*([^\s{}\\])/g,"√$1")
+     .replace(/\^\{([^{}]*)\}/g,(m,x)=>/^[0-9n+\-()x]+$/.test(x)?[...x].map(c=>SUP[c]).join(""):"^("+x+")").replace(/\^([0-9nx])/g,(m,x)=>SUP[x])
+     .replace(/_\{([^{}]*)\}/g,"$1").replace(/_([A-Za-z0-9가-힣])/g,"$1")
+     .replace(/\\(times|cdot)/g,"×").replace(/\\div/g,"÷").replace(/\\(le|leq)(?![a-zA-Z])/g,"≤").replace(/\\(ge|geq)(?![a-zA-Z])/g,"≥").replace(/\\(ne|neq)(?![a-zA-Z])/g,"≠").replace(/\\(to|rightarrow|longrightarrow|arrow)(?![a-zA-Z])/g,"→").replace(/\\leftrightarrow(?![a-zA-Z])/g,"↔").replace(/\\infty/g,"∞").replace(/\\sim(?![a-zA-Z])/g,"~").replace(/\\approx(?![a-zA-Z])/g,"≈").replace(/\\pm(?![a-zA-Z])/g,"±")
+     .replace(/\\pi/g,"π").replace(/\\theta/g,"θ").replace(/\\alpha/g,"α").replace(/\\beta/g,"β").replace(/\\sigma/g,"σ").replace(/\\mu/g,"μ").replace(/\\Delta/g,"Δ").replace(/\\lambda/g,"λ").replace(/\\omega/g,"ω").replace(/\\sum/g,"Σ").replace(/\\int/g,"∫").replace(/\\lim/g,"lim").replace(/\\circ/g,"°")
+     .replace(/\\(qquad|quad)/g,"   ").replace(/\\(left|right|displaystyle|,|;|!)/g,"").replace(/[{}]/g,"").replace(/\\/g,"").replace(/[ \t]{4,}/g,"   ").trim(); return s; }
 
   // ---------- 모션 → 판서 변환 ----------
   function fromMotion(sp){ const M=window.MOTION; if(!M||!sp) return null; const F=M.frameOf(sp); const P=p=>[F.X(p[0])*S,F.Y(p[1])*S];
@@ -85,6 +89,7 @@
     const hidePen=()=>{ penG.style.display="none"; };
     function build(op,hide){ const g=mk("g",{"data-id":op.id,"clip-path":op.clip&&L.clip?`url(#${fid}-frame)`:null},layer); const c=COL[op.color]||COL.ink; const o={op,g,texts:[],strokes:[]};
       if(op.op==="write"){ const size=op.size||40; String(op.text).split("\n").forEach((ln,i)=>{ const t=mk("text",{x:op.x,y:op.y+size*0.82+i*size*1.3,"font-size":size,fill:c,"text-anchor":op.anchor==="middle"?"middle":"start","font-family":FONT,style:"white-space:pre"},g); t.textContent=ln; o.texts.push(t); });
+        { const mw=Math.max(...o.texts.map(t=>t.getBBox().width)); if(mw>BW-40){ const k=(BW-40)/mw; o.texts.forEach((t,i)=>{ const sz=+t.getAttribute("font-size")*k; t.setAttribute("font-size",sz); t.setAttribute("y",op.y+sz*0.82+i*sz*1.3); }); } }  // 보드보다 넓은 글은 글자 크기를 줄인다
         { let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9; o.texts.forEach(t=>{ const q=t.getBBox(); x0=Math.min(x0,q.x); x1=Math.max(x1,q.x+q.width); y0=Math.min(y0,q.y); y1=Math.max(y1,q.y+q.height); }); const dx=x1>BW-12?BW-12-x1:(x0<12?12-x0:0), dy=y1>BH-8?BH-8-y1:(y0<8?8-y0:0); if(dx||dy) o.texts.forEach(t=>{ t.setAttribute("x",+t.getAttribute("x")+dx); t.setAttribute("y",+t.getAttribute("y")+dy); }); }  // 보드 밖으로 나가는 글자는 안쪽으로 밀어 넣는다
         o.texts.forEach(t=>{ t._bb=t.getBBox(); if(hide){ const cid=`${fid}-c${++clipN}`; const cp=mk("clipPath",{id:cid},defs); t._cp=cp; t._cr=mk("rect",{x:t._bb.x-4,y:t._bb.y-6,width:0,height:t._bb.height+12},cp); t.setAttribute("clip-path",`url(#${cid})`); } }); }
       else { let d; if(op.op==="line") d=`M ${op.x1} ${op.y1} L ${op.x2} ${op.y2}`; else if(op.op==="rect") d=`M ${op.x} ${op.y} L ${op.x+op.w} ${op.y} L ${op.x+op.w} ${op.y+op.h} L ${op.x} ${op.y+op.h} Z`;
