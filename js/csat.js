@@ -50,6 +50,22 @@ window.CSAT_INIT=function(A){
   const card=p=>{ const a=AREA[p.area]||{}; return `<a class="card link csat-p ${ready(p)?"":"later"}" href="#/csat/p/${p.id}" style="--c:${a.col||"#888"}"><div class="row" style="justify-content:space-between;gap:6px"><span class="muted small">${a.icon||""} ${esc(a.name||p.area)} · ${esc((T[p.area]||[]).find(t=>t.id===p.strand)?.name||"")}</span><span class="small" title="중요도">${stars(p.weight)}</span></div><h3>${esc(p.name)}</h3><p class="muted small">${esc(p.slot||"")}</p><div class="row" style="gap:4px;flex-wrap:wrap">${stTag(p.status)}${lvTag(p.id)}${ready(p)?"":`<span class="tag">${STAGE_NAME[p.start]}부터</span>`}${(p.refs||[]).length?`<span class="tag">기출 ${p.refs.length}</span>`:""}${hardOf(p.id).length?`<span class="tag warn">🔥 ${hardOf(p.id).length}</span>`:""}</div>${(p.key||[])[0]?`<p class="small" style="margin:6px 0 0">🔑 ${M(p.key[0])}</p>`:""}${bar(mastery(p.id),a.col)}</a>`; };
   const srcHtml=src=>(src||[]).length?`<p class="muted small">출처: ${src.map(s=>Array.isArray(s)?`<a href="${esc(s[1])}" target="_blank" rel="noopener">${esc(s[0])}</a>`:esc(s)).join(" · ")}</p>`:"";
 
+  // ---------- 판서·모션 보기(탭) ----------
+  // 준비된 질문(끼어들기): 패턴의 응용(apply)·함정(trap)·키포인트(key)로 만든다. 답할 때는 선생님이 보드를 지우고 새로 쓴다.
+  const wrap=(t,n)=>{ const out=[]; let line=""; String(BOARD_PLAIN(t)).split(/\s+/).forEach(w=>{ if((line+" "+w).trim().length>n){ if(line) out.push(line); line=w; } else line=(line+" "+w).trim(); }); if(line) out.push(line); return out.join("\n"); };
+  const BOARD_PLAIN=t=>window.BOARD?window.BOARD.plain(String(t).replace(/\*\*|==/g,"")):String(t);
+  const qcard=(q,a,col)=>[{op:"erase",all:true},{op:"write",id:"_q",x:80,y:70,text:"🙋 "+BOARD_PLAIN(q),size:52,color:"blue"},{op:"line",id:"_qu",x1:80,y1:150,x2:1520,y2:150,color:"blue",width:4},{op:"write",id:"_a",x:100,y:210,text:wrap(a,30),size:46,color:col||"ink"}];
+  function asksOf(x){ const out=[]; (x.apply||[]).forEach(ap=>out.push({q:"이렇게 바뀌면? "+BOARD_PLAIN(ap.v).slice(0,26),steps:[{say:ap.how,ops:qcard("이렇게 바뀌면? — "+ap.v,ap.how)}]}));
+    if(x.trap) out.push({q:"자주 하는 실수는?",steps:[{say:x.trap,ops:qcard("자주 하는 실수",x.trap,"red")}]});
+    if((x.key||[]).length) out.push({q:"핵심만 다시 정리",steps:[{say:"키포인트 세 가지를 다시 씁니다.",ops:qcard("키포인트",x.key.map((k,i)=>(i+1)+". "+BOARD_PLAIN(k)).join("\n"))}]});
+    if((x.why||[]).length) out.push({q:"왜 어려웠어요?",steps:[{say:x.why.join(" "),ops:qcard("왜 어려웠나",x.why.map(w=>"• "+BOARD_PLAIN(w)).join("\n"))}]});
+    return out; }
+  function viewer(m,x,key){ if(!m) return ""; const hasB=window.BOARD&&window.MOTION; const pref=(()=>{ try{ return localStorage.getItem("imm:vmode")||"board"; }catch(e){ return "board"; } })();
+    const b=hasB?window.BOARD.render(window.BOARD.fromMotion(m),{ask:asksOf(x)}):""; const mo=window.MOTION?window.MOTION.render(m):"";
+    return `<div class="vbox" data-k="${esc(key)}"><div class="vtabs pill-row noprint">${hasB?`<button class="pill vtab ${pref==="board"?"on":""}" data-v="board">🖊 선생님 판서</button>`:""}<button class="pill vtab ${pref!=="board"||!hasB?"on":""}" data-v="motion">🎬 모션</button><span class="muted small">판서: ▶ 판서 시작 · 🔊 음성 · ✏️ 내가 써 보기 · 🙋 질문으로 끼어들기 / 모션: 단계 클릭·←→</span></div><div class="vpane" data-v="board" ${pref==="board"&&hasB?"":"hidden"}>${b}</div><div class="vpane" data-v="motion" ${pref==="board"&&hasB?"hidden":""}>${mo}</div></div>`; }
+  function bindViewer(){ document.querySelectorAll(".vbox").forEach(v=>v.querySelectorAll(".vtab").forEach(t=>t.onclick=()=>{ v.querySelectorAll(".vtab").forEach(x=>x.classList.toggle("on",x===t)); v.querySelectorAll(".vpane").forEach(p=>p.hidden=p.dataset.v!==t.dataset.v); try{ localStorage.setItem("imm:vmode",t.dataset.v); }catch(e){} }));
+    if(window.MOTION) window.MOTION.mount(); if(window.BOARD) window.BOARD.mount(); }
+
   // ---------- 작은 문제 블록(추가 연습·연습 사다리) ----------
   function mini(q,key,label){ return `<div class="card mini" data-k="${esc(key)}">${label?`<div class="eyebrow">${esc(label)}</div>`:""}<div class="q">${M(q.q)}</div>${q.opts?`<div class="opts">${q.opts.map((o,j)=>`<button data-j="${j}">${"①②③④⑤"[j]} ${M(o)}</button>`).join("")}</div>`:`<div class="row"><input class="sa" placeholder="답 입력" style="max-width:200px"><button class="btn sm sab">제출</button></div>`}<div class="fb"></div></div>`; }
   function bindMini(list){ document.querySelectorAll(".mini").forEach((el,i)=>{ const q=list[i]; if(!q) return; let done=false; const fin=ok=>{ done=true; logQ("csatx:"+el.dataset.k,0,ok); if(ok) earnTok(1,"수능 연습"); el.querySelector(".fb").innerHTML=`<div class="box ${ok?"ok":"warn"}"><b>${ok?"정답":"오답"}</b> · 정답 ${q.opts?"①②③④⑤"[q.a]:M(q.ans)}<br>${M(q.exp)}</div>`; typeset(); };
@@ -87,7 +103,7 @@ window.CSAT_INIT=function(A){
     render(`<div class="lhead"><div class="eyebrow"><a href="#/csat">수능 전략</a> › <a href="#/csat/tree?a=${p.area}">${a.icon||""} ${esc(a.name||"")}</a> › ${esc(sn.name||"")}</div><h1>${esc(p.name)}</h1><p class="lead">${esc(p.slot||"")} · 중요도 ${stars(p.weight)} · ${stTag(p.status)} ${lvTag(id)}</p><p class="muted small">${(p.years||[]).length?`대표 출제: ${esc(p.years.map(y=>y==="예시"?"2028 예시문항":y+"학년도").join(", "))}`:""}${r?` · 푼 횟수 ${r.n} · 정답 ${r.ok}`:""}</p></div>${nav("")}
     ${(p.key||[]).length?`<div class="card csat-key"><h3>🔑 키포인트 — 이것만 기억하세요</h3><ol>${p.key.map(x=>`<li>${M(x)}</li>`).join("")}</ol></div>`:""}
     <div class="grid wide"><div class="card"><h3>🔎 이런 신호가 보이면</h3><ul class="bul">${(p.signal||[]).map(x=>`<li>${M(x)}</li>`).join("")}</ul></div><div class="card"><h3>👉 첫 수</h3><p>${M(p.first)}</p></div></div>
-    ${p.motion&&window.MOTION?`<h2>🎬 모션으로 이해하기 <span class="muted" style="font-weight:400;font-size:.9rem">— ▶ 재생, 단계 클릭, ←→ 키</span></h2>${window.MOTION.render(p.motion)}`:""}
+    ${p.motion?`<h2>🖊 선생님 판서로 이해하기</h2>${viewer(p.motion,p,p.id)}`:""}
     <h2>✍️ 먼저 풀어 보기 <span class="muted" style="font-weight:400;font-size:.9rem">— 해설은 답한 뒤에 열립니다</span></h2>
     <div class="card" id="cq"><div class="q">${M(p.q)}</div>
       <div class="row noprint" style="margin:8px 0;gap:6px"><span class="muted small">답하기 전에 확신도:</span>${[["sure","확신"],["maybe","애매"],["guess","찍음"]].map(([k,t])=>`<button class="pill cf" data-c="${k}">${t}</button>`).join("")}</div>
@@ -102,7 +118,7 @@ window.CSAT_INIT=function(A){
     ${(p.links||[]).length?`<h2>🔗 이 사이트에서 연습</h2><div class="pill-row">${p.links.map(l=>`<a class="pill" href="${esc(l.h)}">${esc(l.t)}</a>`).join("")}</div>`:""}
     ${srcHtml(p.src)}
     <div class="row" style="margin-top:12px">${sib[i-1]?`<a class="btn ghost" href="#/csat/p/${sib[i-1].id}">← ${esc(sib[i-1].name)}</a>`:""}${sib[i+1]?`<a class="btn" href="#/csat/p/${sib[i+1].id}">${esc(sib[i+1].name)} →</a>`:`<a class="btn" href="#/csat/drill?a=${p.area}">이 영역 섞어 풀기 →</a>`}</div>`);
-    bindQ(p,()=>{}); bindMini(p.more||[]); if(window.MOTION) window.MOTION.mount(); }
+    bindQ(p,()=>{}); bindMini(p.more||[]); bindViewer(); }
   // 확신도 → 답 → 채점 → 기록. onDone(ok) 콜백.
   function bindQ(p,onDone){ const root=document.getElementById("cq"); if(!root) return; let conf=null; let doneQ=false;
     root.querySelectorAll(".cf").forEach(b=>b.onclick=()=>{ if(doneQ) return; conf=b.dataset.c; root.querySelectorAll(".cf").forEach(x=>x.classList.toggle("on",x===b)); root.querySelectorAll(".opt,#sa,#sab").forEach(x=>x.disabled=false); });
@@ -123,12 +139,12 @@ window.CSAT_INIT=function(A){
     <div class="grid wide"><div class="card"><h3>🧱 왜 어려웠나</h3><ul class="bul">${(h.why||[]).map(x=>`<li>${M(x)}</li>`).join("")}</ul></div><div class="card"><h3>🧰 필요한 무기</h3><ul class="bul">${(h.tools||[]).map(x=>`<li>${x.h?`<a href="${esc(x.h)}">${M(x.t)}</a>`:M(x.t)}</li>`).join("")}</ul></div></div>
     ${p&&(p.key||[]).length?`<div class="card csat-key"><h3>🔑 키포인트</h3><ol>${p.key.map(x=>`<li>${M(x)}</li>`).join("")}</ol></div>`:""}
     <h2>🧭 풀이 설계</h2><div class="card"><ol class="csat-plan">${(h.plan||[]).map(x=>`<li>${M(x)}</li>`).join("")}</ol><p class="muted small">원본 문제: ${esc(h.view||"EBSi 기출문제에서 시험·번호로 찾기")} — <a href="${esc(h.viewUrl||EBSI)}" target="_blank" rel="noopener">열기</a>. 위 설계를 옆에 두고 원본을 직접 풀어 보세요.</p></div>
-    ${h.motion&&window.MOTION?`<h2>🎬 모션 풀이</h2>${window.MOTION.render(h.motion)}`:""}
+    ${h.motion?`<h2>🖊 선생님 판서 풀이</h2>${viewer(h.motion,{...h,key:(byId[h.pattern]||{}).key,trap:"",apply:[]},h.id)}`:""}
     <h2>🪜 연습 사다리 <span class="muted" style="font-weight:400;font-size:.9rem">— 기본 → 응용 → 실전(자작)</span></h2>
     ${(h.ladder||[]).map((q,k)=>k===2&&!openReal?`<details class="card"><summary><b>실전 단계</b> <span class="muted small">${STAGE_NAME[h.open||"h2"]}부터 권장 — 눌러서 미리 보기</span></summary>${mini(q,h.id+"#l"+k,"실전")}</details>`:mini(q,h.id+"#l"+k,q.lv||["기본","응용","실전"][k])).join("")}
     ${h.evolve?`<div class="box"><b>출제 진화</b> — ${M(h.evolve)}</div>`:""}
     ${srcHtml(h.src)}`);
-    bindMini(h.ladder||[]); typeset(); if(window.MOTION) window.MOTION.mount(); }
+    bindMini(h.ladder||[]); typeset(); bindViewer(); }
 
   // ---------- 4. 섞어 풀기 ----------
   let DR=null;

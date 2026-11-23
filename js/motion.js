@@ -91,5 +91,5 @@
     go(0,true);
     if(window.renderMathInElement) renderMathInElement(fig,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false});
   }); }
-  window.MOTION={render,mount,fx};
+  window.MOTION={render,mount,fx,frameOf,curvePath,W,H,PAD};
 })();
