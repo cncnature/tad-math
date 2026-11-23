@@ -10,11 +10,21 @@
   const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/==(.+?)==/g,"<mark>$1</mark>");
   const col=c=>typeof c==="number"?PAL[c%PAL.length]:(c||PAL[0]);
   // 안전한 수식 → 함수: 숫자, x, + - * / ^ ( ) , 와 허용 함수만
-  const FN={sin:"Math.sin",cos:"Math.cos",tan:"Math.tan",exp:"Math.exp",ln:"Math.log",log:"Math.log10",log2:"Math.log2",sqrt:"Math.sqrt",abs:"Math.abs",floor:"Math.floor",min:"Math.min",max:"Math.max"};
-  function fx(expr){ const s=String(expr).replace(/\s+/g,""); if(!/^[0-9x+\-*/^().,a-z]*$/.test(s)) return null;
-    let ok=true; const js=s.replace(/[a-z][a-z0-9]*/g,w=>{ if(w==="x") return "x"; if(w==="pi") return "Math.PI"; if(w==="e") return "Math.E"; if(FN[w]) return FN[w]; ok=false; return w; })
-      .replace(/(\d|\))(?=[x(A-Z]|Math)/g,"$1*").replace(/x(?=\d|\(|Math)/g,"x*").replace(/\^/g,"**");
-    if(!ok) return null; try{ const f=new Function("x","return "+js+";"); f(1); return f; }catch(e){ return null; } }
+  // 수식 → 함수: 작은 재귀 하강 파서(숫자, x, + - * / ^, 괄호, 곱셈 생략, 허용 함수·상수만). eval 을 쓰지 않는다.
+  const FN1={sin:Math.sin,cos:Math.cos,tan:Math.tan,exp:Math.exp,ln:Math.log,log:Math.log10,log2:Math.log2,sqrt:Math.sqrt,abs:Math.abs,floor:Math.floor,min:Math.min,max:Math.max};
+  function fx(input){ const src=String(input).replace(/\s+/g,""); const T=src.match(/\d+\.?\d*|\.\d+|[a-z][a-z0-9]*|[-+*/^(),]/g)||[]; if(T.join("")!==src) return null; let i=0;
+    const peek=()=>T[i], next=()=>T[i++];
+    const startsPrimary=t=>t!=null&&(/^[\d.]/.test(t)||/^[a-z]/.test(t)||t==="(");
+    function pexpr(){ let a=term(); while(peek()==="+"||peek()==="-"){ const op=next(), b=term(), l=a; a=op==="+"?x=>l(x)+b(x):x=>l(x)-b(x); } return a; }
+    function term(){ let a=unary(); for(;;){ const t=peek(); if(t==="*"||t==="/"){ next(); const b=unary(), l=a; a=t==="*"?x=>l(x)*b(x):x=>l(x)/b(x); } else if(startsPrimary(t)){ const b=power(), l=a; a=x=>l(x)*b(x); } else break; } return a; }
+    function unary(){ if(peek()==="-"){ next(); const a=unary(); return x=>-a(x); } if(peek()==="+"){ next(); return unary(); } return power(); }
+    function power(){ const a=primary(); if(peek()==="^"){ next(); const b=unary(); return x=>Math.pow(a(x),b(x)); } return a; }
+    function primary(){ const t=next(); if(t==null) throw 0; if(/^[\d.]/.test(t)){ const v=parseFloat(t); return ()=>v; }
+      if(t==="("){ const a=pexpr(); if(next()!==")") throw 0; return a; }
+      if(t==="x") return x=>x; if(t==="pi") return ()=>Math.PI; if(t==="e") return ()=>Math.E;
+      if(FN1[t]){ if(next()!=="(") throw 0; const args=[pexpr()]; while(peek()===","){ next(); args.push(pexpr()); } if(next()!==")") throw 0; const f=FN1[t]; return x=>f(...args.map(g=>g(x))); }
+      throw 0; }
+    try{ const f=pexpr(); if(i!==T.length) return null; f(1); return f; }catch(e){ return null; } }
   function frameOf(sp){ const fr=sp.frame; if(!fr) return {X:x=>x,Y:y=>y,graph:false};
     const [x0,x1]=fr.x||[-5,5],[y0,y1]=fr.y||[-5,5]; const sx=(W-2*PAD)/(x1-x0), sy=(H-2*PAD)/(y1-y0);
     return {X:x=>PAD+(x-x0)*sx, Y:y=>H-PAD-(y-y0)*sy, graph:true, fr, x0,x1,y0,y1}; }
@@ -23,7 +33,7 @@
     if(fr.grid!==false){ const st=fr.step||1; for(let x=Math.ceil(x0/st)*st;x<=x1+1e-9;x+=st) g+=`<line x1="${F.X(x)}" x2="${F.X(x)}" y1="${F.Y(y0)}" y2="${F.Y(y1)}" class="mo-grid"/>`; const sty=fr.ystep||st; for(let y=Math.ceil(y0/sty)*sty;y<=y1+1e-9;y+=sty) g+=`<line y1="${F.Y(y)}" y2="${F.Y(y)}" x1="${F.X(x0)}" x2="${F.X(x1)}" class="mo-grid"/>`; }
     const ax=Math.min(Math.max(0,x0),x1), ay=Math.min(Math.max(0,y0),y1);
     g+=`<line x1="${F.X(x0)}" x2="${F.X(x1)}" y1="${F.Y(ay)}" y2="${F.Y(ay)}" class="mo-axis" marker-end="url(#mo-ar)"/><line y1="${F.Y(y0)}" y2="${F.Y(y1)}" x1="${F.X(ax)}" x2="${F.X(ax)}" class="mo-axis" marker-end="url(#mo-ar)"/>`;
-    g+=`<text x="${F.X(x1)-4}" y="${F.Y(ay)-8}" class="mo-axl" text-anchor="end">${esc(fr.xl||"x")}</text><text x="${F.X(ax)+8}" y="${F.Y(y1)+12}" class="mo-axl">${esc(fr.yl||"y")}</text>`;
+    g+=`<text x="${F.X(x1)-4}" y="${F.Y(ay)-8}" class="mo-axl" text-anchor="end">${esc(fr.xl!=null?fr.xl:"x")}</text><text x="${F.X(ax)+8}" y="${F.Y(y1)+12}" class="mo-axl">${esc(fr.yl!=null?fr.yl:"y")}</text>`;
     if(fr.ticks!==false){ const st=fr.step||1; for(let x=Math.ceil(x0/st)*st;x<=x1-1e-9;x+=st){ if(Math.abs(x)<1e-9) continue; g+=`<text x="${F.X(x)}" y="${F.Y(ay)+14}" class="mo-tick" text-anchor="middle">${+x.toFixed(2)}</text>`; } const sty=fr.ystep||st; for(let y=Math.ceil(y0/sty)*sty;y<=y1-1e-9;y+=sty){ if(Math.abs(y)<1e-9) continue; g+=`<text x="${F.X(ax)-6}" y="${F.Y(y)+4}" class="mo-tick" text-anchor="end">${+y.toFixed(2)}</text>`; } g+=`<text x="${F.X(ax)-6}" y="${F.Y(ay)+14}" class="mo-tick" text-anchor="end">O</text>`; }
     return g; }
   function curvePath(F,f,a,b){ const n=160; let d=""; let pen=false; for(let i=0;i<=n;i++){ const x=a+(b-a)*i/n; const y=f(x); if(!isFinite(y)||y<F.y0-(F.y1-F.y0)||y>F.y1+(F.y1-F.y0)){ pen=false; continue; } d+=(pen?"L":"M")+F.X(x).toFixed(1)+" "+F.Y(y).toFixed(1); pen=true; } return d; }
