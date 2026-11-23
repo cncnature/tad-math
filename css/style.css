@@ -564,3 +564,5 @@ mark.hl.g{background:linear-gradient(104deg,transparent 2%,var(--hl2) 3%,var(--h
 .tag.warn{background:rgba(224,138,30,.16);color:#a85d00}.tag.ok{background:rgba(31,157,85,.14);color:#167a41}
 .pill.cf.on{background:var(--acc);color:#fff;border-color:var(--acc)}
 #cq .q{white-space:pre-line;line-height:1.7}#cq .opts button:disabled{cursor:default;opacity:.85}#cq .opts button.ok,#cq .opts button.bad{opacity:1}
+#cq .opts button{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:1rem;cursor:pointer}
+#cq .opts button.ok{border-color:var(--ok);background:rgba(31,157,85,.12)}#cq .opts button.bad{border-color:var(--bad);background:rgba(214,69,69,.12)}
