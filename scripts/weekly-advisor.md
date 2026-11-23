@@ -22,6 +22,7 @@
    - 정책: 교육부·평가원·국가교육위원회의 수능 체제 발표(절대평가·서논술형·문항 수·출제 범위·수능일)를 찾으면 `system.js` 의 `policy` 맨 위에 `{date,title,status,impact,src}` 를 추가한다. 이미 있는 '예정·논의' 항목이 확정되면 status 를 바꾸고 impact 를 고친다. 이 학생의 수능 체계가 바뀌면 `areas`·`stages`·`target` 도 고치고 docs/BACKLOG.md 에 적는다.
    - 경향: 6월·9월 모의평가와 11월 수능이 끝난 주에는 영역별 출제 경향과 고난도 문항 유형(번호·유형만, 문항 원문 금지)을 `trends` 맨 위에 추가한다. 출처 2개 이상.
    - 패턴: 새로 확인된 반복 유형은 해당 `data/csat/<영역>.js` 에 패턴을 추가하고, 기존 패턴의 `years` 에 학년도를 더하거나 `status`(계속·강화·신유형·축소)를 바꾼다. 확인 안 된 연도는 넣지 않는다.
+   - 기출 근거·고난도: 시험 뒤에는 분석 기사에서 번호가 확인된 문항을 해당 패턴 `refs` 에 추가하고, 오답률·고난도로 보도된 문항은 `data/csat/hard-<영역>.js` 에 해부(why·tools·plan·연습 사다리 3단계, 원문 금지)로 추가한다. 수학 정답은 node 로 검산.
    - `updated` 를 바꾸고 `node scripts/check.js`(check-csat.js 포함)를 통과시킨다. suneung.re.kr 은 robots.txt 로 자동 수집을 막으므로 직접 긁지 말고, 평가원 발표를 다룬 정부·언론·분석 자료를 쓴다.
 4. 공식 일정·제도가 바뀌었으면 `data/edu-timeline.js` 의 `system`, `csat`, `semesters[*].naesin/teacher` 를 고치고 `updated` 날짜를 바꾼다.
 5. 사이트 자가 점검: `python3 -m http.server 8765` 를 띄우고 Playwright 로 `#/`, `#/me`, `#/s/kor`, `#/s/soc/<단원>`, `#/sub/<과목>/<차시>`(① ② ③ 문제·서술형 렌더), `#/test/<과목>/<단원>`, `#/rq`, `#/exam-prep`, `#/textbooks`, `#/advisor`, `#/schedule`, `#/weekly`, `#/survival`, 소단원 10개를 열어 JS 오류·KaTeX 오류를 센다. 오류가 있으면 원인을 고친다(데이터 오타, 깨진 수식, 생성기 버그). 큰 설계 변경은 하지 않고, 고친 내용은 보고서에 적는다.
