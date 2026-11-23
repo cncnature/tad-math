@@ -30,6 +30,13 @@ const qok=(q,t)=>{ if(!q.q||!q.exp) err.push("문제 필드 "+t); if(q.opts){ if
 P.forEach(p=>{ (p.more||[]).forEach((q,i)=>qok(q,p.id+" more"+i)); (p.refs||[]).forEach((r,i)=>{ if(!r.exam||!r.no||!r.type) err.push("refs 필드 "+p.id+" #"+i); }); if(p.key&&p.key.length!==3) err.push("key 3개 아님 "+p.id); });
 const H=w.DATA.csatHard||[]; const hid=new Set();
 H.forEach(h=>{ const t=h.id||"(hard id 없음)"; if(hid.has(h.id)) err.push("hard 중복 "+t); hid.add(h.id); if(!byP.has(h.pattern)) err.push("hard pattern "+t+" → "+h.pattern); if(!["킬러","준킬러"].includes(h.era)) err.push("hard era "+t); if(!(h.why||[]).length||!(h.plan||[]).length||!(h.src||[]).length) err.push("hard 필수 "+t); if((h.ladder||[]).length!==3) err.push("hard ladder 3단계 아님 "+t); (h.ladder||[]).forEach((q,i)=>qok(q,t+" ladder"+i)); (h.tools||[]).forEach(x=>{ if(x.h&&!okLink(x.h)) err.push("hard 링크 "+t+" → "+x.h); }); });
+// motion(모션 풀이) 검사 — docs/MOTION-SCHEMA.md
+const fxCtx=vm.createContext({window:{},CSS:{escape:x=>x}}); vm.runInContext(fs.readFileSync(path.join(root,"js/motion.js"),"utf8"),fxCtx); const FX=fxCtx.window.MOTION.fx;
+const KS=new Set(["curve","area","point","line","arrow","vline","hline","poly","circle","label","box","tex","bars","table","text"]);
+const motionOk=(m,t)=>{ if(!m) return; const ids=new Set(); (m.els||[]).forEach(e=>{ if(!KS.has(e.k)) err.push("motion k "+t+" → "+e.k); if(ids.has(e.id)) err.push("motion id 중복 "+t+" → "+e.id); ids.add(e.id); (e.parts||[]).forEach(pt=>{ if(pt.id) ids.add(pt.id); }); ["f","g"].forEach(k=>{ if(e[k]!=null&&!FX(e[k])) err.push("motion 식 "+t+" → "+e[k]); }); });
+  const n=(m.steps||[]).length; if(n<3||n>10) err.push("motion 단계 수 "+t+" ("+n+")"); (m.steps||[]).forEach((s,i)=>{ if(!s.say) err.push("motion say 없음 "+t+" #"+i); [...(s.show||[]),...(s.hi||[]),...(s.hide||[])].forEach(id=>{ if(!ids.has(id)) err.push("motion 없는 id "+t+" #"+i+" → "+id); }); }); };
+const MO=w.DATA.csatMotion||{}; const allIds=new Set([...P.map(p=>p.id),...(w.DATA.csatHard||[]).map(h=>h.id)]); Object.keys(MO).forEach(k=>{ if(!allIds.has(k)) err.push("motion 대상 없음 "+k); }); P.forEach(p=>{ if(!p.motion&&MO[p.id]) p.motion=MO[p.id]; }); (w.DATA.csatHard||[]).forEach(h=>{ if(!h.motion&&MO[h.id]) h.motion=MO[h.id]; });
+P.forEach(p=>motionOk(p.motion,p.id)); (w.DATA.csatHard||[]).forEach(h=>motionOk(h.motion,h.id));
 (C&&C.stages||[]).forEach(s=>Object.values(s.tasks||{}).flat().forEach(x=>{ if(!okLink(x.h)) err.push("stage 링크 "+s.id+" → "+x.h); }));
 if(err.length){ console.error("CSAT 오류\n"+err.join("\n")); process.exit(1); }
-console.log("OK csat — 파일",files.length,"패턴",P.length,"고난도",(w.DATA.csatHard||[]).length,"갈래",Object.values(T).flat().length,"정답 위치",JSON.stringify(pos));
+console.log("OK csat — 파일",files.length,"패턴",P.length,"모션",P.filter(p=>p.motion).length+(w.DATA.csatHard||[]).filter(h=>h.motion).length,"고난도",(w.DATA.csatHard||[]).length,"갈래",Object.values(T).flat().length,"정답 위치",JSON.stringify(pos));
