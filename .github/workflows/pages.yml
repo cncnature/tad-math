@@ -25,6 +25,11 @@ jobs:
           node scripts/send-telegram.js --dry > /dev/null
           node scripts/send-kakao.js --dry > /dev/null
           node scripts/audit.js --json > /dev/null
+      - name: 배포용 묶음 (스크립트 150여 개 → 1개, 압축·해시 이름 — scripts/build.js)
+        run: |
+          npm i --no-save --no-audit --no-fund esbuild@0.24.0
+          node scripts/build.js
+          rm -rf node_modules package-lock.json
       - uses: actions/configure-pages@v5
         with:
           enablement: true   # Pages 가 꺼져 있으면 자동으로 켭니다
