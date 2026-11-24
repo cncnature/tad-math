@@ -670,3 +670,6 @@ figure.wb.mine .wb-ink{pointer-events:auto;cursor:crosshair}figure.wb.ghost .wb-
 .vt-pt.l>b{left:-4px;transform:none}.vt-pt.r>b{left:auto;right:-4px;transform:none}
 @media (max-width:520px){.vt-pt>b{font-size:.74rem}}
 @media (max-width:520px){.vh-bars .vh-t{font-size:16px}}
+
+.wb-vsel{max-width:190px;font-size:.8rem;padding:3px 6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.wb-vhint{font-size:.78rem;color:var(--muted);background:color-mix(in srgb,var(--acc) 7%,var(--card));border-radius:8px;padding:6px 10px;margin:6px 0}
