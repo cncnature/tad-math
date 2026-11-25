@@ -1,5 +1,5 @@
 {
- "date": "2026-11-24",
+ "date": "2026-11-25",
  "sources": [
   {
    "id": "kice-suneung",
@@ -13,7 +13,7 @@
    "name": "교육부 보도자료",
    "ok": true,
    "found": 16,
-   "fresh": 2
+   "fresh": 1
   },
   {
    "id": "adiga",
@@ -67,18 +67,7 @@
  "changes": [
   {
    "source": "교육부 보도자료",
-   "title": "교육부 ‘수능 부정행위 대응팀(TF)’ 본격 가동",
-   "href": "https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe#",
-   "affects": [
-    "data/edu-timeline.js",
-    "data/advisory.js",
-    "data/subjects/*",
-    "data/csat/system.js"
-   ]
-  },
-  {
-   "source": "교육부 보도자료",
-   "title": "중등학교 내신평가 스마트기기 활용 부정행위 대응 방안 발표",
+   "title": "교육부, 수능 부정행위 끝까지 추적 시험지 보관기간 5년으로 연장 추진",
    "href": "https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe#",
    "affects": [
     "data/edu-timeline.js",
