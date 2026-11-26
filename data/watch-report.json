@@ -1,5 +1,5 @@
 {
- "date": "2026-11-25",
+ "date": "2026-11-26",
  "sources": [
   {
    "id": "kice-suneung",
@@ -12,7 +12,7 @@
    "id": "moe-press",
    "name": "교육부 보도자료",
    "ok": true,
-   "found": 16,
+   "found": 17,
    "fresh": 1
   },
   {
@@ -54,7 +54,7 @@
    "name": "예스24 — 2022 개정 중3 교재 출간 감시",
    "ok": true,
    "found": 48,
-   "fresh": 0
+   "fresh": 2
   },
   {
    "id": "yes24-h3",
@@ -67,13 +67,31 @@
  "changes": [
   {
    "source": "교육부 보도자료",
-   "title": "교육부, 수능 부정행위 끝까지 추적 시험지 보관기간 5년으로 연장 추진",
+   "title": "교육부·한국교육과정평가원, 2026년 고교학점제 성과공유회 개최",
    "href": "https://www.moe.go.kr/boardCnts/listRenew.do?boardID=294&m=020402&s=moe#",
    "affects": [
     "data/edu-timeline.js",
     "data/advisory.js",
     "data/subjects/*",
     "data/csat/system.js"
+   ]
+  },
+  {
+   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
+   "title": "특급기출 중학 수학 3-1 중간기말 통합 (2027년)",
+   "href": "https://www.yes24.com/product/goods/202616435",
+   "affects": [
+    "data/subjects/*-g3.js",
+    "data/overrides.js"
+   ]
+  },
+  {
+   "source": "예스24 — 2022 개정 중3 교재 출간 감시",
+   "title": "특급기출 중학 수학 3-1 중간기말 통합 (2027년) 새창이동",
+   "href": "https://www.yes24.com/product/goods/202616435",
+   "affects": [
+    "data/subjects/*-g3.js",
+    "data/overrides.js"
    ]
   }
  ]

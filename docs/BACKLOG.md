@@ -56,6 +56,7 @@
 - [ ] 학부모 5줄 요약에 과목별 정답률 포함
 
 ## 자동 감지 (scripts/watch.js — 주간 조사가 내용을 읽고 반영한 뒤 [x])
+- [ ] 2026-11-26 예스24 — 2022 개정 중3 교재 출간 감시: 특급기출 중학 수학 3-1 중간기말 통합 (2027년) — https://www.yes24.com/product/goods/202616435 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-23 예스24 — 2022 개정 중3 교재 출간 감시: 중학수학 절대강자 유형 3-1 (2027년) — https://www.yes24.com/product/goods/202167569 (영향: data/subjects/*-g3.js, data/overrides.js)
 - [ ] 2026-11-23 교육부 보도자료: 대입 허위 원서접수 신고센터 — https://www.moe.go.kr/sub/infoRenewal.do?m=011523&page=011523&s=moe (영향: data/edu-timeline.js, data/advisory.js, data/subjects/*)
 - [ ] 2026-11-19 예스24 — 2022 개정 중3 교재 출간 감시: 백신 중학 과학 3-1 (2027년) — https://www.yes24.com/product/goods/201268376 (영향: data/subjects/*-g3.js, data/overrides.js)
