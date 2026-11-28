@@ -693,3 +693,9 @@ figure.wb.mine .wb-ink{pointer-events:auto;cursor:crosshair}figure.wb.ghost .wb-
 .gd-page+.gd-page{margin-top:24px}
 @media print{.gd-page+.gd-page{break-before:page;page-break-before:always;margin-top:0}.gd-rest{columns:2}.guide .note{break-inside:auto}}
 .gd-kw{font-size:.82rem;line-height:1.9}.gd-kw b{margin-right:6px;color:var(--pen-red,var(--bad))}.gd-kw span{display:inline-block;border:1px solid var(--line);border-radius:10px;padding:0 8px;margin:0 4px 3px 0}
+.gd-check{font-size:.8rem;line-height:1.55}.gd-check li{margin:0 0 4px}
+.gd-t{flex:1;min-width:0}.gd-t .kw,.gd-t b,.gd-t strong{font-size:inherit;font-weight:700}.gd-t .kw{text-decoration-thickness:1px}
+.gd-src{color:var(--muted);font-size:.72rem;white-space:nowrap}
+.gd-check .gd-box{width:10px;height:10px;margin-top:3px}
+@media print{.gd-check{font-size:9.5pt}.gd-src{font-size:8pt}}
+.gd-t .kw{border-bottom-width:1px}
