@@ -263,7 +263,7 @@ window.ROOM_INIT=function(A){
           const pick=(arr,f)=>arr.map(x=>[gtok(f(x)).filter(w=>tk.includes(w)).length,x]).sort((a,b)=>b[0]-a[0]);
           const tp=pick(pits,x=>x)[0]; const rp=pick(rel.filter(q=>q.kind==="mc"&&q.lv>=2).concat(rel.filter(q=>q.kind==="mc")),q=>q.q+" "+(q.opts||[]).join(" "))[0];
           let rep=rp&&rp[0]>0?{q:rp[1].q,opts:rp[1].opts,a:rp[1].a,exp:rp[1].exp}:null;
-          if(!rep&&sid==="math"){ const se=(D.schoolExams||[]).flatMap(e=>e.items||[]).find(it=>it.l===l0.id); if(se) rep={q:se.q,opts:se.opts,a:se.a,exp:(se.steps||[]).join(" ")+(se.ans?" 답: "+se.ans:"")}; else if(l.example) rep={q:l.example.q,exp:(l.example.sol||[]).join(" ")+(l.example.ans?" 답: "+l.example.ans:"")}; }
+          if(!rep&&sid==="math"){ const se=(D.schoolExams||[]).flatMap(e=>e.items||[]).find(it=>it.l===l0.id); if(se) rep={q:se.q,opts:se.opts,a:se.a,fig:se.fig,figp:se.figp,exp:(se.steps||[]).join(" ")+(se.ans?" 답: "+se.ans:"")}; else if(l.example) rep={q:l.example.q,exp:(l.example.sol||[]).join(" ")+(l.example.ans?" 답: "+l.example.ans:"")}; }
           items.push({u,l,pt,sc,trap:tp&&tp[0]>0?tp[1]:(i===0?pits[0]:null),rep,wrong:(wrong[l0.id]||[]).length,memo:l.memo,pattern:l.pattern}); });
         probs.filter(q=>q.kind==="essay").slice(0,1).forEach(q=>essays.push({u,l,q}));
         pits.forEach(p=>traps.push({u,l,p})); }); });
@@ -271,18 +271,26 @@ window.ROOM_INIT=function(A){
     const seen=new Set(); items.forEach(x=>{ if(x.rep&&seen.has(x.rep.q)) x.rep=null; else if(x.rep) seen.add(x.rep.q); });
     const myWrong=units.flatMap(u=>u.lessons.map(l=>({u,l,n:(wrong[l.id]||[]).length}))).filter(x=>x.n).sort((a,b)=>b.n-a.n);
     return {items,essays,traps,myWrong}; }
+  // 공략집 그림: 차시의 시각 자료(지도·사진·도식·그래프·연표, 수학 도형) 중 유형 문장과 가장 잘 맞는 것을 고른다(같은 그림은 한 번만).
+  const GVT={img:1,svg:1.6,chart:1.3,timeline:1.3,cycle:1,formula:0.6,table:0.2,compare:0.2,flow:0.3,tree:0.2};
+  function gvisList(sid,l){ const L=sid==="math"?(byLesson(l.id)||l):l; const out=(L.visuals||[]).filter(v=>GVT[v.type]>=0.6).map(v=>({k:"v:"+(v.src||v.title||JSON.stringify(v).slice(0,60)),v,txt:[v.title,v.alt,v.note,v.cap].join(" ")}));
+    const m=(D.lessonFigs||{})[l.id]; if(m&&window.FIG&&window.FIG[m.fig]) out.unshift({k:"f:"+l.id,f:m,txt:[m.cap,(m.p||{}).title].join(" ")}); return out; }
+  function gvisHtml(x){ try{ if(x.f) return `<figure class="gd-fig"><div class="figwrap">${window.FIG[x.f.fig](x.f.p||{})}</div>${x.f.cap?`<figcaption>${md(x.f.cap)}</figcaption>`:""}</figure>`;
+      const h=window.VIS?window.VIS.render(x.v).replace(/loading="lazy"/g,'loading="eager"'):""; return h?`<div class="gd-fig">${h}</div>`:""; }catch(e){ return ""; } }
+  function gvisPick(sid,l,text,used){ const tk=gtok(text); const c=gvisList(sid,l).filter(x=>!used.has(x.k)).map(x=>[gtok(x.txt).filter(w=>tk.some(t=>t.includes(w)||w.includes(t))).length*2+(x.f?1.8:GVT[x.v.type]||0),x]).sort((a,b)=>b[0]-a[0]);
+    if(!c.length) return ""; used.add(c[0][1].k); return gvisHtml(c[0][1]); }
   function guideHtml(sid,units,opt={}){ const s=SB(sid); const G=guideData(sid,units); const kws=[...new Set(units.flatMap(kwOf))]; const ex=dd();
-    const top=G.items.slice(0,Math.min(G.items.length,Math.max(12,Math.ceil(G.items.length*0.45)))); const rest=G.items.slice(top.length); const answers=[]; const C="①②③④⑤";
-    const repHtml=r=>{ if(!r) return ""; const k=answers.length+1; answers.push({k,r}); return `<div class="gd-q"><b>대표 문제 ${k}</b> ${md(r.q)}${r.opts?`<div class="gd-opts">${r.opts.map((o,j)=>`<span>${C[j]} ${md(String(o))}</span>`).join("")}</div>`:""}</div>`; };
+    const top=G.items.slice(0,Math.min(G.items.length,Math.max(12,Math.ceil(G.items.length*0.45)))); const rest=G.items.slice(top.length); const answers=[]; const C="①②③④⑤"; const used=new Set();
+    const repHtml=r=>{ if(!r) return ""; const k=answers.length+1; answers.push({k,r}); return `<div class="gd-q"><b>대표 문제 ${k}</b> ${md(r.q)}${r.fig&&window.FIG&&window.FIG[r.fig]?(()=>{ try{ return `<figure class="gd-fig gd-qfig"><div class="figwrap">${window.FIG[r.fig](r.figp||{})}</div></figure>`; }catch(e){ return ""; } })():""}${r.opts?`<div class="gd-opts">${r.opts.map((o,j)=>`<span>${C[j]} ${md(String(o))}</span>`).join("")}</div>`:""}</div>`; };
     const st=n=>`<span class="gd-st t${n}" title="출제 가능성(추정)">${"★".repeat(n)}${"☆".repeat(3-n)}</span>`;
     const head=`<div class="gd-cover"><h2>${s.icon} ${esc(s.name)} — 시험 전날 공략집</h2><p class="small">범위: ${units.map(u=>esc(u.title)).join(" · ")}${ex?` · ${esc(ex.name)} ${ex.d>=0?"D-"+ex.d:""}`:""}</p>
       <div class="gd-how"><b>전날 40분 순서</b> ① ★★★ 유형부터 '공략 포인트'를 소리 내어 읽고 대표 문제를 푼다(15분) ② 함정 체크리스트에서 헷갈리는 것에 표시(10분) ③ 단원 요약에서 빨간 핵심어를 가리고 떠올려 본다(10분) ④ 서술형 한 문항을 답안 없이 써 본다(5분). 다 아는 줄은 펜으로 지운다.</div>
       <div class="gd-kw"><b>핵심어</b> ${kws.slice(0,28).map(k=>`<span>${esc(k)}</span>`).join("")}</div></div>`;
     const sec1=`<h3 class="gd-h">1. 출제 가능성 높은 순 — 문제 유형과 공략 포인트</h3><p class="muted small">★★★ 최우선 · ★★ 우선 · ★ 확인. 단원 시험 경향·핵심어·문제은행 빈도${sid==="math"?"·학교 시험 구성":""}로 매긴 추정 순위입니다(실제 출제를 보장하지 않음). 🔁 = 내가 틀린 적 있는 차시.</p>
-      <ol class="gd-list">${top.map(x=>`<li class="gd-item">${st(x.tier)} <b>${md(x.pt)}</b> ${x.wrong?`<span class="gd-wr">🔁 오답 ${x.wrong}</span>`:""}<div class="muted small">${esc(x.u.title)} › ${esc(x.l.title)}</div>
-        ${x.pattern||x.memo?`<div class="gd-key">✔ 공략: ${md(Array.isArray(x.pattern)?x.pattern.join(" → "):(x.pattern||x.memo))}</div>`:""}${x.trap?`<div class="gd-trap">⚠ 함정: ${markKw(md(x.trap),kws)}</div>`:""}${x.tier>=2?repHtml(x.rep):""}</li>`).join("")}</ol>
+      <ol class="gd-list">${top.map(x=>{ const fig=x.tier>=2||top.indexOf(x)<20?gvisPick(sid,x.l,x.pt+" "+(x.trap||""),used):""; return `<li class="gd-item${fig?" has-fig":""}"><div class="gd-body">${st(x.tier)} <b>${md(x.pt)}</b> ${x.wrong?`<span class="gd-wr">🔁 오답 ${x.wrong}</span>`:""}<div class="muted small">${esc(x.u.title)} › ${esc(x.l.title)}</div>
+        ${x.pattern||x.memo?`<div class="gd-key">✔ 공략: ${md(Array.isArray(x.pattern)?x.pattern.join(" → "):(x.pattern||x.memo))}</div>`:""}${x.trap?`<div class="gd-trap">⚠ 함정: ${markKw(md(x.trap),kws)}</div>`:""}${x.tier>=2?repHtml(x.rep):""}</div>${fig}</li>`; }).join("")}</ol>
       ${rest.length?`<p class="small"><b>그 밖에 확인할 유형</b></p><ul class="gd-rest">${rest.map(x=>`<li>${st(x.tier)} ${md(x.pt)} <span class="muted small">(${esc(x.l.title)})</span></li>`).join("")}</ul>`:""}`;
-    const sec2=`<h3 class="gd-h">2. 단원별 핵심 요약</h3>${units.map(u=>{ const n=unitNote(u); return `${noteHtml(sid,u)}${u.exam?`<p class="small gd-trend"><b>이 단원 시험 경향</b> ${md(u.exam)}</p>`:""}`; }).join("")}`;
+    const sec2=`<h3 class="gd-h">2. 단원별 핵심 요약</h3>${units.map(u=>{ const n=unitNote(u); const strip=u.lessons.map(l=>gvisPick(sid,l,u.title+" "+l.title,used)).filter(Boolean).slice(0,3); return `${noteHtml(sid,u)}${strip.length?`<div class="gd-strip">${strip.join("")}</div>`:""}${u.exam?`<p class="small gd-trend"><b>이 단원 시험 경향</b> ${md(u.exam)}</p>`:""}`; }).join("")}`;
     const sec3=G.essays.length?`<h3 class="gd-h">3. 서술형 대비</h3><ol class="gd-list">${G.essays.slice(0,6).map(x=>`<li class="gd-item"><b>${md(x.q.q)}</b><div class="muted small">${esc(x.l.title)}</div>${x.q.rubric?`<div class="small">채점 기준: ${x.q.rubric.map(r=>esc(r[0])+" "+r[1]+"점").join(" · ")}</div>`:""}<div class="gd-lines"></div></li>`).join("")}</ol>`:"";
     const sec4=`<h3 class="gd-h">${G.essays.length?4:3}. 실수 방지 체크리스트</h3><ul class="gd-check">${G.traps.map(x=>`<li><span class="gd-box"></span><span class="gd-t">${markKw(md(x.p),kws)} <span class="gd-src">(${esc(x.l.title)})</span></span></li>`).join("")}</ul>`;
     const sec5=G.myWrong.length?`<h3 class="gd-h">내 오답이 몰린 차시</h3><p class="small">${G.myWrong.slice(0,10).map(x=>`${esc(x.l.title)} <b>${x.n}</b>`).join(" · ")} — 시험 전 <a class="noprint" href="#/rq">복습 큐</a>로 한 번 더.</p>`:"";
